@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-09-28T05:32:43.600562+00:00",
+  "database": "127.0.0.1:13306/peakrush",
+  "violations": {
+    "stock_conservation": 0,
+    "duplicate_user_orders": 0,
+    "paid_without_payment": 0,
+    "payment_for_unpaid_order": 0,
+    "success_without_order": 0,
+    "failed_request_has_live_order": 0,
+    "closed_without_release_log": 0
+  },
+  "passed": true
+}

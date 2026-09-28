@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "rateLimited": 25,
+  "total": 45,
+  "recoveredStatus": 403,
+  "tamperedTokenStatus": 401
+}

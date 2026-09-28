@@ -1,0 +1,62 @@
+server:
+  port: 8081
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  error:
+    include-message: never
+spring:
+  application:
+    name: peakrush
+  profiles:
+    default: local
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:13306/peakrush?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC}
+    username: ${DB_USER:peakrush}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 3000
+      connection-init-sql: "SET time_zone='+00:00'"
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:16379}
+      timeout: 2s
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:127.0.0.1:19092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 10000
+        request.timeout.ms: 3000
+        max.block.ms: 3000
+    consumer:
+      group-id: peakrush-orders
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
+  task:
+    scheduling:
+      pool:
+        size: 4
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: never
+peakrush:
+  jwt-secret: ${JWT_SECRET:}
+  order-ttl-seconds: ${ORDER_TTL_SECONDS:900}
+  pending-timeout-seconds: ${PENDING_TIMEOUT_SECONDS:1800}

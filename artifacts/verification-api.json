@@ -1,0 +1,2767 @@
+{
+  "startedAt": "2026-09-28T04:49:27.639815+00:00",
+  "base": "http://127.0.0.1:8080",
+  "checks": [
+    {
+      "name": "Non-admin cannot read administration",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 exactly 10 of 100 buyers",
+      "passed": true,
+      "details": {
+        "successful": 10,
+        "responses": [
+          {
+            "requestId": "51.52.f4035fd8d2055f56929f4c19b09c5881",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.58189f986f98a30601e58fdec1cbe73c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.0c8ccdab8b102235a0af4e5eab2f8535",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.1c5ed7e89e226bc70dc75aee5b8f36af",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.9897c9304b466d14d6e220886588981a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.961e4e294b29a84436d492277da0e6b1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.3cbda1f407606376ddf06d8414d6ab0d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.2ac834b1ba0db54ad5163ff1e2e4dbd9",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.d306769e21004eaeae289d3c55540386",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.13394a7c42660c4c6ac5e204b1c77e57",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.25fb75aab7a8e7402435417dfb17d431",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.cc765f238904180d4f3d010d2e7066f9",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.d9c5ed4467347e4e67ede680376b7e6f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.bf7f2e915fa6f838c13bb9ab7430c150",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.55de43f30b96c40912c7a2aca9b73556",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.51223128b005f8698624233a789920c9",
+            "status": "SUCCESS",
+            "orderId": 980,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.3dec379b90096785e83e0e487cd2036a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.06b88a764c46ce5236c24592d096e117",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.77355301eed92ab6319c7ec4d3d75238",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8a49f6b67bb302a6c0444a8ca825e53e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.b13937e0300afe4408377d097c30a95c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.47504e0853046562cf5d9b0c6c4f17b8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.b92ff46ae2fff492ce9e94f14cc30516",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.034a5e5866fccf9ef7e27078849c2c80",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.be14ecf9de2544252c15ac881896eb84",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.114ad65518e1f2fa4d64dcd81241eaa9",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8a214d509ccccdcb10801fc43847fb6e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.d142d64fc9b8ed3ddea6fed0465bd588",
+            "status": "SUCCESS",
+            "orderId": 984,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.676afa2e4b0dc4a44a7f8dd71fbfd455",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.25e7cb249197e0efa1115903e7e253f0",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.b5347a266d035d99cf186f735e5ddc6b",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.0bcc6df5da5b842ccdd8eda784816562",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8d5ecb05b81ff015d9954e8580d6af5d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8d30a9309be39c95dd5ef608c5a0cc09",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8d118876884e98ac7c9c92d18574e6b8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.70c8cc226ef0722adad361d9c3b6cb47",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.506080892e3bff782bbc658803fcdef3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.3b38aded4187bcc4d6545dbcd919b072",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.f314f72fccf85edecc655829f72e514c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.58a7519bfd10e99266ae120f1e0cc436",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.7f6ec9d54c2120182ef60a29fb4f17e8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.661d7bf8c90bd165b65384da0a173d4a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.bc8b798e009f2032a04241b160dfe248",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.fa17921f6059cc4543ee8dd4515f7c78",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.18ec81fb8e8dfccd41654c94a1691ad1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.78b28090fcb20ec915203a43066ef3fe",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.12a82d2b030f19200e1d90ac300a682d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.858f3e276b800b5f5db6231347a8cac8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.f31984bfc49e6feee0649a0e0666dc0a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.31acccbdb0a61b52bd878d8ad13c2357",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.01393c88ea589ed135a06e1676fa6a07",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.531a3f99a22e8f94892dda3126b2b95f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.bc3c7e1dd354a12eb60f84dacb8aa8f2",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.15170dc6f355c1ef8df8dc06ed719562",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.480a241b360dc2e8f6b2b5ac8d36d644",
+            "status": "SUCCESS",
+            "orderId": 989,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.e7924a578893f433254bd7c8d167cee6",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.dda3f493463c7c0d54821cb754b33cda",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.f4f8f11874c2f8c565704b84f3c4ac60",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.b7977ce9a2444a5747250fea74459dd9",
+            "status": "SUCCESS",
+            "orderId": 983,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.4d1cd239b906088ca099d8ccaf5e7de5",
+            "status": "SUCCESS",
+            "orderId": 981,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.39569cefc57fbf01e90831fd0355cd10",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.7930d86bd252712c83e1c8b9908f5e6e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.c855961f7ea6ea5572716d162e214bdb",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.fbc81095489872a44df62e0e1b47033a",
+            "status": "SUCCESS",
+            "orderId": 988,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.269c88d748bb4c5f1d5a2dc8a2f356e7",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.09318464531792b857f09a9e93df190f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.63a9962615128cfc49ebab2eae84d1b1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.9878dd2c4ac0d86cd3bb10d780b0e87c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.75a9067ee087c474f4de5bc79fc348d4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.9ca60dd4ceb3c7427f5ac8d1c9e1a8e1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.d3642e61e2772c2cd8f12cfb02aefdca",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.fcf57d536d1f5a4afed1a12ead6c97a6",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.342bc7da5266af9524d807bf039e3b2e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.6dde60b96bb786e965c4403d9befa657",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.99951422a3e1d8f4f3badc676fd8915b",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.c2ccbb9aa6b00d20b9e9fc8527c83aab",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.71d1c773c45e118edb41ac123060b4e8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.bbb5d85082c3d20b01ed7a57ff4218ea",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.9db623a2fcdb5e3b5d47960e684cd996",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.eb76db72420377edb636e56021e534bf",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.40ce0e3ff3510f4e508cf199cb983cfd",
+            "status": "SUCCESS",
+            "orderId": 985,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.b684494ffd1d72b51a6a508bf49e9e1d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.a642de649ec12544148988e236ee0fef",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.a1193c622ae7fcf031be4ae4e3c56c59",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.2ac7809e77017885c7205edec38388b4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.76b454e74d07639936e74f6089d5e4d5",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.4985027f20bc572b35c04fc24d64eaba",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.8c06e4f2ca6212f9204a49ed9d4d1028",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.3063970c1a7a898ddbbe65d8428e61c2",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.0f9110563a16d09eec4093a4a723b6cf",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.c96bd059563a9f3a2c0370ca02ef3f18",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.d0a5c1de0f1305275a49f94092ef15df",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.26e00b4548237bdc28182fb13ad7e51f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.e4cc9b34c6b03788269fb8163145a9bb",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.b0c3628241ba032cd16567f9020f97a4",
+            "status": "SUCCESS",
+            "orderId": 982,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.4fceebd9cea7c78002d5361166c5e6ec",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.055e002802227b18fe4c49cbf5936b39",
+            "status": "SUCCESS",
+            "orderId": 987,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "51.52.fe57d92aa77a28736c084fe079e9e74e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.2fb3fb0996c131c3992c654ed751e21d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "51.52.3bc8202dcc6d38e7587adad5a95df0fa",
+            "status": "SUCCESS",
+            "orderId": 986,
+            "orderStatus": "CREATED"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V0 zero remaining after sellout",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 order owner enforcement",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 cancel state",
+      "passed": true,
+      "details": {
+        "id": 980,
+        "requestId": "51.52.51223128b005f8698624233a789920c9",
+        "activityId": 51,
+        "itemId": 52,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "CANCELLED",
+        "createdAt": "2026-09-28T04:49:30.914Z",
+        "expireTime": "2026-09-28T05:04:30.914Z",
+        "paidAt": null
+      }
+    },
+    {
+      "name": "V0 compensation returns exactly one",
+      "passed": true,
+      "details": {
+        "id": 51,
+        "name": "Acceptance V0 3771f70c",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:30.354Z",
+        "endTime": "2026-09-28T05:49:30.354Z",
+        "status": "RUNNING",
+        "architectureVersion": "V0",
+        "items": [
+          {
+            "id": 52,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 10,
+            "availableStock": 1,
+            "limitPerUser": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "V0 duplicate cancel never inflates stock",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 restock clears soldout gate",
+      "passed": true,
+      "details": {
+        "requestId": "51.52.a97a5a49c6d6953db47cd32a9e54fd76",
+        "status": "SUCCESS",
+        "orderId": 1080,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V0 mock payment",
+      "passed": true,
+      "details": {
+        "id": 1080,
+        "requestId": "51.52.a97a5a49c6d6953db47cd32a9e54fd76",
+        "activityId": 51,
+        "itemId": 52,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "PAID",
+        "createdAt": "2026-09-28T04:49:32.882Z",
+        "expireTime": "2026-09-28T05:04:32.882Z",
+        "paidAt": "2026-09-28T04:49:32.898Z"
+      }
+    },
+    {
+      "name": "V0 warmup never resets live inventory",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 idempotent request ID",
+      "passed": true,
+      "details": [
+        {
+          "requestId": "52.53.4ab384706f71d7cd16763a23c17c5724",
+          "status": "SUCCESS",
+          "orderId": 1081,
+          "orderStatus": "CREATED"
+        },
+        {
+          "requestId": "52.53.4ab384706f71d7cd16763a23c17c5724",
+          "status": "SUCCESS",
+          "orderId": 1081,
+          "orderStatus": "CREATED"
+        }
+      ]
+    },
+    {
+      "name": "V0 quantity two accepted",
+      "passed": true,
+      "details": {
+        "requestId": "52.53.4ab384706f71d7cd16763a23c17c5724",
+        "status": "SUCCESS",
+        "orderId": 1081,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V0 same key different payload conflicts",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V0 one order per user/item",
+      "passed": true,
+      "details": {
+        "requestId": "52.53.bf6778781822fc3568fb79262374692d",
+        "status": "FAILED",
+        "message": "ALREADY_PURCHASED"
+      }
+    },
+    {
+      "name": "V0 quantity stock guard",
+      "passed": true,
+      "details": {
+        "id": 52,
+        "name": "Acceptance V0 169e50b8",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:32.941Z",
+        "endTime": "2026-09-28T05:49:32.941Z",
+        "status": "RUNNING",
+        "architectureVersion": "V0",
+        "items": [
+          {
+            "id": 53,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 5,
+            "availableStock": 3,
+            "limitPerUser": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "V1 exactly 10 of 100 buyers",
+      "passed": true,
+      "details": {
+        "successful": 10,
+        "responses": [
+          {
+            "requestId": "53.54.251c1eb073792467503492e0824de1cf",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.688fdeeb7f89d5796fe261e57191e135",
+            "status": "SUCCESS",
+            "orderId": 1084,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.efc1279153795695a501627a3b8b24b7",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.9f1a238256724e43599f2a070748a1b7",
+            "status": "SUCCESS",
+            "orderId": 1085,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.c91da4fba4dc98fd12183ddd2a25d742",
+            "status": "SUCCESS",
+            "orderId": 1088,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.6f550c82f4db1d123acfbac640b4f79f",
+            "status": "SUCCESS",
+            "orderId": 1089,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.f4e28471e8ba56f28d1e8ce81c0ac71e",
+            "status": "SUCCESS",
+            "orderId": 1091,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.dd65db20d6bfa08bd9068dc145cf54e4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.a4456b7e79e98286fe0a7d9e5d0907bd",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.610be841858e903d32ffce469778a409",
+            "status": "SUCCESS",
+            "orderId": 1095,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.76698a61d5729195d2df41234da70032",
+            "status": "SUCCESS",
+            "orderId": 1092,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.1ad6ecd4e1dde9a7a53444b4f2a4d39f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.6e10eae5712edcf6b13e4f9316be753f",
+            "status": "SUCCESS",
+            "orderId": 1087,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.f702bd6836789ecf11f0382e1df8bbd6",
+            "status": "SUCCESS",
+            "orderId": 1083,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.1afada941641851ae1946d7616e31b31",
+            "status": "SUCCESS",
+            "orderId": 1086,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "53.54.3c371e169e87d785d817f7d4a69fc700",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.9801a7f0256e64e22047f851ee8c1bb4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.7724585a4a6e9577ba18b3c3373029f1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.7d5bcefb105aeaccbb3df99e1f986998",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.440e500b6a881bbf7b58773b2ac35716",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.102e773dd0aedd639828887337a2a3a7",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.3f8144d6c1e1b4298f95d5aba4f1fb42",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.d5b8897cf0b14840defca66595e658c8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.5f37ec8bbbaa25c277761eaaac549422",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.aecfef94ae5182e9d8a453430666ee71",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.08e6d38a1d1871f0f125d02fc52919be",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.1d55b49e6230c990f3ea12d5caf94b6f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.10f7c1f7ff400aa2e829861b2e3b7eaa",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.0aef8f6f57046e622f459c1c93da043d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.c49afa5fa58b900b42a6a4993d6b65a6",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.55c8f6eb20e0a89f6af6f1773d8cd30f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.20dd5320d9c5114f096f05071b88a2c4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.a5f26ba59d2e07f5227468e47e81d95b",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.b81d1a8b59eb46419f5f2420bafb94c9",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.0eda44cf011b7c3f57e32208c769255e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.0d45ca35372ffd37dda8db3a2e4587f3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.fb091d9890238b94b74ab504f9ff43a3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.44064d54d03dd32b5507bc08dfae2f90",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.cb6ba570aa91e43e0660930e8a236fe8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.5ef4d63e6f4a1cf5a85f8bd406c8b5fa",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.3cb3a5ed70b3f7490e9ec7f33f0a01f4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.76979993c0c78b81661e46f433946d68",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.a2dbcaf6d254d473e434e669374ca45a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.679dbb19e3707af944e72622ed0580d7",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.ae0cbef249016351017785e05690e8b1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.f052a5ab5baee89dbf2ad3adad4f2dec",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.a33037f0669855cac84f5fbeb123a5a2",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.119826e90438e4549ec9d49951a9b24d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.94d2d2b315e13d232c9e69550b2a0154",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.adf11ba42d3af0f41dfa7ed8f5b6f9b7",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.c0e1d5e48b00910a84d1a8c904571e27",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.c202a0f4b4a2f856a963a3e259a1fa9e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.28740419e38934c17aa05a0f1c47d7d0",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.2f3c97a7b6e5d1e2c17c504cb3d0db18",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.cf7a3f9238bfc12d42e9c67dc4c2f9ef",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.7b6a721144387d5e1fc2880cb7205c6a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.2741cc8a6b1a72d0a7956e4479ff5c47",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.3a147c75b80f5e4f248403a49e741973",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.05e4ecaf96797a603a0e069cda2dc2f2",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.6985e111d865a9e787b82ef413020077",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.b2fa7e5b17c6f95a27d914d11ad4db5e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.8cfe55b87907ad0dff3a9d06b9791122",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.b88fbaf8d5f9bb23e175503da770c419",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.c40da63d2441dbeb687458143cd32ba3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.9ab1d5dfff0973c9e30f35f1be4ea597",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.3b50c730547fd731af5769029ee076ed",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.091cc6a9b5e5b19d3e240596362b863d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.fb1c22f9ceac29e7e1c779deb1371505",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.1c6d3ed111be3b0b47a34f9412beb6d3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.842981bfab1972dec09cd134eb45832e",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.189ad17bc8484590d2360d58a36ad20d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.a3631a6d8a2367551d8d4e67e8f60507",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.e9ae4dd85f8cb3c10adbe762b9a7e65a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.c2abbdb8eadbb85da7d05c5abe5aed14",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.df6f21342d6bd7dfa3c5e92bef12a758",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.e3e685b8c694f1068e6cb5b31160d260",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.26df97291f132328dba32c60c7ffd1a3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.e49e369194f5592e762f95ee4156a457",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.bb35e59198db843ab894c6db4002ad78",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.bd3c96efb4838707389aedd9bb9f33ee",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.7ea38ac2c7a25b633cd8aab17e29b73f",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.2563e977033d63be0536bbfd0a79405c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.57b9bfc8497de8a6fe6ef81d1d2b8d0d",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.ecea76b0954da6508968c5115968ebef",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.9fe9743f0d8281bfd80973e7d8c0d46c",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.491b438d21e376fffb0dfaed123ddf23",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.538a502baaf3f55c8037e73821710441",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.8e3d17231b4d9471ae92b48d40e7f639",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.30ebeec607afd8afb7ebc3809d2c1155",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.b45fcb08bb1851da0f3c07136c27659a",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.7c840eccbe6a7e14479ef5fc152316e3",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.4854ae1352af7175e1e7cf07d64854d0",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.f5738d0f27ce463462b5a9af41d51ef1",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.8ad0fb9e18340b62b84fcf0e261294a9",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.18ee5af3cd30bb7a5b19dee7e7ae3301",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.ca7bccc0387dd70c825eea6aae0337f4",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.808b1c3657eb986beb904bcf5c35bbbd",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.002516df8643eb25b88fdcb22329ec68",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.727fae478c11356c69c160f01b0ef264",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          },
+          {
+            "requestId": "53.54.8b7d2163a3fdd921e8003d08c729a6b8",
+            "status": "SOLD_OUT",
+            "message": "SOLD_OUT"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V1 zero remaining after sellout",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V1 order owner enforcement",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V1 cancel state",
+      "passed": true,
+      "details": {
+        "id": 1084,
+        "requestId": "53.54.688fdeeb7f89d5796fe261e57191e135",
+        "activityId": 53,
+        "itemId": 54,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "CANCELLED",
+        "createdAt": "2026-09-28T04:49:33.323Z",
+        "expireTime": "2026-09-28T05:04:33.323Z",
+        "paidAt": null
+      }
+    },
+    {
+      "name": "V1 compensation returns exactly one",
+      "passed": true,
+      "details": {
+        "id": 53,
+        "name": "Acceptance V1 46f34369",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:33.158Z",
+        "endTime": "2026-09-28T05:49:33.158Z",
+        "status": "RUNNING",
+        "architectureVersion": "V1",
+        "items": [
+          {
+            "id": 54,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 10,
+            "availableStock": 1,
+            "limitPerUser": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "V1 duplicate cancel never inflates stock",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V1 restock clears soldout gate",
+      "passed": true,
+      "details": {
+        "requestId": "53.54.d3414ca13321dc951a8373593ecb681c",
+        "status": "SUCCESS",
+        "orderId": 1183,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V1 mock payment",
+      "passed": true,
+      "details": {
+        "id": 1183,
+        "requestId": "53.54.d3414ca13321dc951a8373593ecb681c",
+        "activityId": 53,
+        "itemId": 54,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "PAID",
+        "createdAt": "2026-09-28T04:49:35.139Z",
+        "expireTime": "2026-09-28T05:04:35.139Z",
+        "paidAt": "2026-09-28T04:49:35.153Z"
+      }
+    },
+    {
+      "name": "V1 warmup never resets live inventory",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V1 idempotent request ID",
+      "passed": true,
+      "details": [
+        {
+          "requestId": "54.55.ef1fe285c8e49480127ffb2138248d1b",
+          "status": "SUCCESS",
+          "orderId": 1184,
+          "orderStatus": "CREATED"
+        },
+        {
+          "requestId": "54.55.ef1fe285c8e49480127ffb2138248d1b",
+          "status": "SUCCESS",
+          "orderId": 1184,
+          "orderStatus": "CREATED"
+        }
+      ]
+    },
+    {
+      "name": "V1 quantity two accepted",
+      "passed": true,
+      "details": {
+        "requestId": "54.55.ef1fe285c8e49480127ffb2138248d1b",
+        "status": "SUCCESS",
+        "orderId": 1184,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V1 same key different payload conflicts",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V1 one order per user/item",
+      "passed": true,
+      "details": {
+        "requestId": "54.55.ad9c39c3676d16f7e9ff852ab61e73ff",
+        "status": "FAILED",
+        "message": "ALREADY_PURCHASED"
+      }
+    },
+    {
+      "name": "V1 quantity stock guard",
+      "passed": true,
+      "details": {
+        "id": 54,
+        "name": "Acceptance V1 b660509e",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:35.192Z",
+        "endTime": "2026-09-28T05:49:35.192Z",
+        "status": "RUNNING",
+        "architectureVersion": "V1",
+        "items": [
+          {
+            "id": 55,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 5,
+            "availableStock": 3,
+            "limitPerUser": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2 exactly 10 of 100 buyers",
+      "passed": true,
+      "details": {
+        "successful": 10,
+        "responses": [
+          {
+            "requestId": "55.56.86dbe50c26e8b4a0e224918c8d6d1dd0",
+            "status": "SUCCESS",
+            "orderId": 1192,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.97edccbc6f2260872201301446895d6a",
+            "status": "SUCCESS",
+            "orderId": 1193,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.69ab7122ac2f496c9034e7c8e1444336",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.458d0d73c7de50b394f2727ab45f8107",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.1dc91689847d4fcfbfccccdd3a2dfa07",
+            "status": "SUCCESS",
+            "orderId": 1191,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.58165e535397fee02a497b89d9eb1fdb",
+            "status": "SUCCESS",
+            "orderId": 1194,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.cf0230db4e66589df8cbe2eb4715d52c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.84bae4abd858a76a3696c1fc599333d9",
+            "status": "SUCCESS",
+            "orderId": 1186,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.b96f523a3fd4e0825da304c8ad7ba837",
+            "status": "SUCCESS",
+            "orderId": 1188,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.67070990a1c24862e4c9ad2ce3cb0d8c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.0df805ffaf94bf07550188770189ae0b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.b93471b93bd3691d14a2da4a1942d438",
+            "status": "SUCCESS",
+            "orderId": 1195,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.d98f3ff73856cd556a3e7114e689d5b8",
+            "status": "SUCCESS",
+            "orderId": 1190,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.01de359f67272604d85e2d1c61173459",
+            "status": "SUCCESS",
+            "orderId": 1189,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.fd9ea620d05ccafe4efb1bdcdeaab3df",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.8fd896c79c839bb06e14ad59063677e3",
+            "status": "SUCCESS",
+            "orderId": 1187,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "55.56.ed83ec2b2d273269109c10f71d072277",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.00e4e2d29fca143907d398b2c62741e9",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.66392479871966c0b3544d35fcbcbddc",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.21c08a8b41df361ef1378a9cc38e01a8",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.a55ecd340afc520b3175a80b11eef635",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.10c5d5a9ce1df91535f0bcb9d0060619",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.ca1462b6bdcca0ded2a0ac86578d481a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.0955c9004de1e008aa24163d2a95080c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.b5b8c772a2df60c1ba53817ccc219e46",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.9748fec3eda0960df9d2bc44c82930a0",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.87832750f38523329869a3f1785f2f56",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.597c000ab17740b71057c30d47630ac1",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.37af0f49d498b0b4657e590059d834d1",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.dc54a410d03a9ebc287dca53d825e077",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.da6fb272b578fdba2faede25c02ba9f2",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.594a6d8e51b8d6d0bc18016ba9a75352",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.343e1704e85f505e18af54638d07748a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.9ef20144588e44bd4d0ac2d911803eb5",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.e123aafefa07d5e32b3f19f983b03ad4",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.57dab439347b111aad4899bb3990f490",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.bc0787f48228707ad9adf7bea32cdeaa",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.b0399cc4990d96d1352539aba218793f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.e027d037db62a67eae5bdb46e074592b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.3908a6f2c87480eab9bac6e4fa1cafa2",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.252e495bee5fb309f27f187675b16d25",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f3ef07c80855d94160220b962399efbd",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.a324177d32d8b8e6781d99d10153a733",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.5995d59287b865377e1ef334f983aa18",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.5754943bcce1ce40d8c1707ac429a96b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f5575d8bb789586fbc60af4e67d3a363",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.67bd66b45a969671bf691e7675aa00e5",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.5cc7e41c4fa3e94c02f3781ee500b1b9",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.601ca3d65a2626b99e2bd2503ab3933d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.67d0c64becaccf137e29cfb596007331",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.19c5afb8cc8b75d5e19e564e9c60f3f1",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f18a0efdd805d72a7055d8d8b2dfdc9d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.6cb86fa2a8f2e5ffeb3c4bbcba7379e0",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.b856c542e5cbabd2ee5ff5eb32d813ea",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.637661eb9af7c9ad077798b133515c55",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.c2964a9dfe464dc12c6b95e02e57188c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.09ac5ca24c94c09b3d8c95388389229f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.bccb8c212aff9e4a628cfa167e71a236",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.b1fa00d546de94633edc84fff47c71a5",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.5a2205fdbb2881cd1375fdf24a0802c3",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f3c9494f03a278730182d78481604a43",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.a1bf6ff058040754f521a466f72b9272",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.811cf69a2d1aa0e4682b45dd8d3363fd",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.1bda95e62d0da12167456fc73aa9b5d8",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.ea8842ace34cdd4e16df102179d3a837",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f7aacf4c7391948c7d29c5205b4f9391",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.4159627a9a60ca189a1e9e045f2efc4a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.9221551ac55ab67b6764ce67ef6b1db5",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.ed8206e424fa5ae22f9512185898a89d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.8a54da6895be1cb93b9e4e6d0c336ef8",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.1bb9f53981ce8b1cc86f2456508d1725",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.2e0b64db33f54cfc69837476bb128f15",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.4c7a3e1f1a90ae1234d7edc729a38b18",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.8977d6127b0c3d7f59559e240cb07536",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.2faabc91cf9ae548acc0e9d028922d82",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.cc8c4c6f1db9adffbab3d27e1e4bffc2",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.fdb76e0878c6d3781e1652d924db7434",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.6b1bb7602b25974faeb0def8a5e7bf2d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.a429aa54ea8e0d15d951f71ca424629e",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.bdcd7486fcb77d369d1788e1c0797e59",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.9509c8f13bd78dcb44b05dc66289a94b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.273a33964e622b30cf2287748fe8196f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.7ca9bf3ba051d716e10c075b19a13fc0",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.0d6cb33b42c0bc423bae9ad4d34a3733",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.a8967067f19e3ae33b171ee87e264ade",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.02f69117dcca8cd720d06dcc524a43d4",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f4b65fca8e0f86d2e885609b5814df6e",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.3d3dacb35b9400fa82db604cb8289de3",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.f8f0a6c8a487b02558f4f1f4035e4d2d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.1357a1ad97fe2bcc352505e19867fe02",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.fd82a4b4009081ea3c2b8964ef5b0a0f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.c697f7918d64f5dbd61005deddb6b31d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.ca320831dfb64ee3f48b4fc2f4574aa3",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.47ebe6d7a0cd58df814400e3cf775b7f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.499a0de6bb580400a734becabf6427ee",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.7dc53e75724b811f1f996d243c452a08",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.65340b9d28f20eab3fc479bdd718bbe9",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.840f85a8d8b93a71d16dea28e9210018",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.3df31050dbc36d33afcf41b3beaa8f03",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "55.56.0c027dfd677ff3025dd14083badc30e0",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2 zero remaining after sellout",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V2 order owner enforcement",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V2 cancel state",
+      "passed": true,
+      "details": {
+        "id": 1192,
+        "requestId": "55.56.86dbe50c26e8b4a0e224918c8d6d1dd0",
+        "activityId": 55,
+        "itemId": 56,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "CANCELLED",
+        "createdAt": "2026-09-28T04:49:35.551Z",
+        "expireTime": "2026-09-28T05:04:35.551Z",
+        "paidAt": null
+      }
+    },
+    {
+      "name": "V2 compensation returns exactly one",
+      "passed": true,
+      "details": {
+        "id": 55,
+        "name": "Acceptance V2 80e1ee79",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:35.372Z",
+        "endTime": "2026-09-28T05:49:35.372Z",
+        "status": "RUNNING",
+        "architectureVersion": "V2",
+        "items": [
+          {
+            "id": 56,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 10,
+            "availableStock": 1,
+            "limitPerUser": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "V2 duplicate cancel never inflates stock",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V2 restock clears soldout gate",
+      "passed": true,
+      "details": {
+        "requestId": "55.56.5d8e304464aeba90dd574ccd7fb23c35",
+        "status": "SUCCESS",
+        "orderId": 1196,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V2 mock payment",
+      "passed": true,
+      "details": {
+        "id": 1196,
+        "requestId": "55.56.5d8e304464aeba90dd574ccd7fb23c35",
+        "activityId": 55,
+        "itemId": 56,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "PAID",
+        "createdAt": "2026-09-28T04:49:37.265Z",
+        "expireTime": "2026-09-28T05:04:37.265Z",
+        "paidAt": "2026-09-28T04:49:37.279Z"
+      }
+    },
+    {
+      "name": "V2 warmup never resets live inventory",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V2 idempotent request ID",
+      "passed": true,
+      "details": [
+        {
+          "requestId": "56.57.c394010003ff02ec6f84cfafdbfc60d1",
+          "status": "SUCCESS",
+          "orderId": 1197,
+          "orderStatus": "CREATED"
+        },
+        {
+          "requestId": "56.57.c394010003ff02ec6f84cfafdbfc60d1",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "name": "V2 quantity two accepted",
+      "passed": true,
+      "details": {
+        "requestId": "56.57.c394010003ff02ec6f84cfafdbfc60d1",
+        "status": "SUCCESS",
+        "orderId": 1197,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V2 same key different payload conflicts",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V2 one order per user/item",
+      "passed": true,
+      "details": {
+        "code": "ALREADY_PURCHASED",
+        "message": "活动未开始、已结束或超过限购"
+      }
+    },
+    {
+      "name": "V2 quantity stock guard",
+      "passed": true,
+      "details": {
+        "id": 56,
+        "name": "Acceptance V2 b7a2bded",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:37.312Z",
+        "endTime": "2026-09-28T05:49:37.312Z",
+        "status": "RUNNING",
+        "architectureVersion": "V2",
+        "items": [
+          {
+            "id": 57,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 5,
+            "availableStock": 3,
+            "limitPerUser": 2
+          }
+        ]
+      }
+    },
+    {
+      "name": "V3 exactly 10 of 100 buyers",
+      "passed": true,
+      "details": {
+        "successful": 10,
+        "responses": [
+          {
+            "requestId": "57.58.f7ab89b20abb5777786b8baeebe9bf73",
+            "status": "SUCCESS",
+            "orderId": 1200,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.ac17ee05e17234abedd41c9e5ae63ef4",
+            "status": "SUCCESS",
+            "orderId": 1201,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.db2189fbfc3b6317f361c64ecc09453a",
+            "status": "SUCCESS",
+            "orderId": 1198,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.781f10dcb682d3a9094cd3bfb2fd9917",
+            "status": "SUCCESS",
+            "orderId": 1203,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.fe52545e45ef9da89ccb2d339b88ae24",
+            "status": "SUCCESS",
+            "orderId": 1199,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.471ca372294f9afa2c1fc4cfda793b10",
+            "status": "SUCCESS",
+            "orderId": 1202,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.da1cabdb4c8dc954777f6c6ecd096cd1",
+            "status": "SUCCESS",
+            "orderId": 1206,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.f07f133b628eb3b90e5cde9dc1db7542",
+            "status": "SUCCESS",
+            "orderId": 1204,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.11a9b45111d7c53675b8bbb33f819836",
+            "status": "SUCCESS",
+            "orderId": 1205,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.787c71249d03dc53deb95ab2749d5eeb",
+            "status": "SUCCESS",
+            "orderId": 1207,
+            "orderStatus": "CREATED"
+          },
+          {
+            "requestId": "57.58.91909de85143a091c2f224b2a1825e1a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.63dda02dc9e052121a705613293ed73b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.9f3d59995f155393d817dfec1a40a559",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.e834c828b63490edf69aa20d0a23506d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.e030d2f54670ba80cdf0095a2bd992c2",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.64819e6359eea65afc1bd8aa24a11d49",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.bb0a09b4a577748ee072ebf3982e3974",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.2f5767e27b977d945eef34a59678d954",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.cd8b212e87aff513dc15a41a3ac21e95",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.ab42cbef98d1c3a5c6308b82a61431ae",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.b482d977e90242b39608e920aa454f10",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.c401200c453a6aabace9b0f20e015b26",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.2fabbce943114e2a5bf1eb629823f808",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.a8d56d0c61722737adfaca47aa0b3c80",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.77875fbddf0d8a5d2c6ce60a566417bb",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.6746735b9584f6cddda5be396da21a52",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.600726bb55a0fbd627a370e8fd39ca57",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.db789dffcac53bfcc98878e65e662372",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.99d245e504cbfdf59276e2722c16f389",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.6b57b0a56364f5e1b7cc19e16ff8618c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.f979a2116be552ae1f145a667af0ae79",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.01cb62fdc34302e70f7e121cfdf41553",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.21f594c32fddae845a1a58a422866051",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.04c8942883a86fdf97eda8a1f7e61acc",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.69a923adbd83b97276ba850625d54a97",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.22dc1058ff0141ac4ea64b7d65bdcd92",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.fedd463c70d999dd6037bab470db5852",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.42eb645fe3e49589c0e43a86d5153e34",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.bc5ba16a5fe3b4876b9bc237b64e96cd",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.ee419439051d00aeff4da3982846d02a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.1d8b1f0990518a4fa101ebc73eea695c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.6dab179422b04bfabee8fe785710955b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.d7f9ea954457a5f3b9f02f19641d34f4",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.1a0c9f526a4244ecfe49a2f63e433ee2",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.71f9e0182daafcaebd35773d170d93b8",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.85c739626e333e41fef0da6c3e73bfa1",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.0e77e14127adb8cc35002e0fdfd97393",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.af5291f4b8ad3a2cad5b1918ec1aa69a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.a86432f7fe3e7c42641d6cbcd4465e84",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.6d0abde6a44faa14f2810e668d0babfd",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.7d570516137bd4fc72ecacaa6c211df1",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.8480edfed10511396f6cfdc12184541a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.5e27128ca87cc4976381fcb529a7e532",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.b44eaffa921666abcda8921f6df90b8f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.72e2b82a93273e89bf011c0594cf9829",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.85d626f4ffcf16ede26997863cf5c0ec",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.f76e9810fb09b34c0cac751edac74f94",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.8d79ec3591750396c6795bb7f65f2672",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.0e6cbc4fb01af7cf6107dabc4faa69bb",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.dc51b7276fbfa020462c9201fdc6c2f7",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.4ac035f094b1e0b19df1cd7ea0c30883",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.fb27e5a1eb41d4b79df30b5b9cda6e7d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.4bc2b53c81632a5a48150dbec4d589fd",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.8d164c5241e252688952bac0838ff14a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.bf6a3c234ef2302e058131d8f0d94808",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.a62d013b9226f385f617f49aa53a4090",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.6d8107d82ec298aa0feb3a71475ba8bf",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.333af1e1d60ba99466e5330cefea79ba",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.706dab9e59c43209c0deeda090350663",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.fafc98d1d9c48e853c9319273e6c8988",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.41ac120a56238a08abab5218744516bc",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.93a50fe95d91191d426f05066c7ca4e7",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.39c5f22551ba877e1a1304f7d812e7d9",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.dd6c22a2037b60fb1a116e9a54926280",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.d1f377751e90a3728f47e2bcdad37ecc",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.f2f0e02caa7dfeeeb16e3c44de9174c6",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.a4249149e57d04e923688d287b67505c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.7359ce7aa5b18a86029554eaa4b7d55b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.26a083d1a1825868285a438501bcbb55",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.b88273afb63e3f5c87feff87d11e7530",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.f6c07f00b1822b8efdb79f1aaaa1bbc7",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.7929286163e04340e3100b1fb86a2ca7",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.7ac160826e3a6a92c4f2b266b1897837",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.5b65aec608543f35424a9aaf8888720a",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.bb1be203010cb95f10ce36b61b8102cc",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.4f2e60e6bf8f0283882c99a8a736513c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.4be86832bec1b4024cccceb1f7d4f506",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.ae3743ceb3e9dac570de67e9e75fbf1f",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.cdc25700429c9398645b060beaa2f6d0",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.8ccc8bc6a60613423628a2d2c62b33ad",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.b3530d51d0aa088364c4ba535f63cccf",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.50df026285ed5bfa6f1890fc8e668caa",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.393d3ef2677ea5f4010ff378e10f9e11",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.327f77098f9470a1d37a141d58650989",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.19240ccc7a711cc39dacb81d694e2d0b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.08e23d65e9c133593a963811af685d2b",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.707b0c10036248da5023a217483eac8d",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.9c5f08d1a59a4c3eaa7bd26f058b1564",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.da551f308b40457f64b87e654c64069c",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          },
+          {
+            "requestId": "57.58.d0c4b80172c0f5e882b9ba66188b5a62",
+            "status": "SOLD_OUT",
+            "message": "商品已售罄"
+          }
+        ]
+      }
+    },
+    {
+      "name": "V3 zero remaining after sellout",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 order owner enforcement",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 cancel state",
+      "passed": true,
+      "details": {
+        "id": 1200,
+        "requestId": "57.58.f7ab89b20abb5777786b8baeebe9bf73",
+        "activityId": 57,
+        "itemId": 58,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "CANCELLED",
+        "createdAt": "2026-09-28T04:49:37.615Z",
+        "expireTime": "2026-09-28T05:04:37.615Z",
+        "paidAt": null
+      }
+    },
+    {
+      "name": "V3 compensation returns exactly one",
+      "passed": true,
+      "details": {
+        "id": 57,
+        "name": "Acceptance V3 63417a68",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:37.445Z",
+        "endTime": "2026-09-28T05:49:37.445Z",
+        "status": "RUNNING",
+        "architectureVersion": "V3",
+        "items": [
+          {
+            "id": 58,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 10,
+            "availableStock": 1,
+            "limitPerUser": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "V3 duplicate cancel never inflates stock",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 restock clears soldout gate",
+      "passed": true,
+      "details": {
+        "requestId": "57.58.008b7b0d08ea5277d04f670bca1daaa8",
+        "status": "SUCCESS",
+        "orderId": 1208,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V3 mock payment",
+      "passed": true,
+      "details": {
+        "id": 1208,
+        "requestId": "57.58.008b7b0d08ea5277d04f670bca1daaa8",
+        "activityId": 57,
+        "itemId": 58,
+        "productName": "全天候运动智能手表",
+        "imageUrl": "/assets/product-watch.png",
+        "quantity": 1,
+        "unitPrice": 19.9,
+        "totalAmount": 19.9,
+        "status": "PAID",
+        "createdAt": "2026-09-28T04:49:39.412Z",
+        "expireTime": "2026-09-28T05:04:39.412Z",
+        "paidAt": "2026-09-28T04:49:39.580Z"
+      }
+    },
+    {
+      "name": "V3 warmup never resets live inventory",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 idempotent request ID",
+      "passed": true,
+      "details": [
+        {
+          "requestId": "58.59.2ed064fcc10c0d9b5140d8ba5c48e185",
+          "status": "PENDING",
+          "message": "排队处理中"
+        },
+        {
+          "requestId": "58.59.2ed064fcc10c0d9b5140d8ba5c48e185",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "name": "V3 quantity two accepted",
+      "passed": true,
+      "details": {
+        "requestId": "58.59.2ed064fcc10c0d9b5140d8ba5c48e185",
+        "status": "SUCCESS",
+        "orderId": 1209,
+        "orderStatus": "CREATED"
+      }
+    },
+    {
+      "name": "V3 same key different payload conflicts",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 one order per user/item",
+      "passed": true,
+      "details": {
+        "code": "ALREADY_PURCHASED",
+        "message": "活动未开始、已结束或超过限购"
+      }
+    },
+    {
+      "name": "V3 quantity stock guard",
+      "passed": true,
+      "details": {
+        "id": 58,
+        "name": "Acceptance V3 fd879765",
+        "description": "Isolated acceptance fixture",
+        "startTime": "2026-09-28T04:48:39.612Z",
+        "endTime": "2026-09-28T05:49:39.612Z",
+        "status": "RUNNING",
+        "architectureVersion": "V3",
+        "items": [
+          {
+            "id": 59,
+            "productId": 3,
+            "name": "全天候运动智能手表",
+            "description": "健康监测 · 运动追踪 · 长效续航",
+            "imageUrl": "/assets/product-watch.png",
+            "originalPrice": 1599.0,
+            "seckillPrice": 19.9,
+            "totalStock": 5,
+            "availableStock": 3,
+            "limitPerUser": 2
+          }
+        ]
+      }
+    }
+  ],
+  "stages": [
+    {
+      "version": "V0",
+      "raceSeconds": 2.596,
+      "successes": 10,
+      "buyers": 100,
+      "passed": true
+    },
+    {
+      "version": "V1",
+      "raceSeconds": 2.097,
+      "successes": 10,
+      "buyers": 100,
+      "passed": true
+    },
+    {
+      "version": "V2",
+      "raceSeconds": 1.965,
+      "successes": 10,
+      "buyers": 100,
+      "passed": true
+    },
+    {
+      "version": "V3",
+      "raceSeconds": 2.364,
+      "successes": 10,
+      "buyers": 100,
+      "passed": true
+    }
+  ],
+  "passed": true
+}
