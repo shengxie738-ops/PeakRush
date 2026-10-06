@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "objective": "Deep desktop clone of https://follow.art — 3D construction, page design, UI design, motion design, 3D assets and visual transitions, iterated repeatedly to raise fidelity.",
+  "status": "in_progress",
+  "resultState": "PARTIAL",
+  "updated": "2026-10-01T23:55:00Z",
+  "referenceLock": {
+    "origin": "https://follow.art",
+    "siteTag": "v_1790676598601",
+    "nuxtBuild": "63c1e131-150b-472a-8fd2-ea1d2a3b59fb",
+    "capturedWindow": "2026-09-29T16:10Z – 2026-09-30T08:55Z",
+    "captureViewport": "1376x772 @ dpr 1.5",
+    "assetsTraced": 158
+  },
+  "verified": [
+    "typecheck exit 0",
+    "build passes (2.85s)",
+    "5/5 motion-runtime unit tests pass (T04 acceptance: one frame per tick, progress interval, reversibility, 30/60/120Hz damping identity)",
+    "verify:assets PASS — 105/105 local assets traced to a real reference request with sha256",
+    "stack identified by measurement: Nuxt 3 + three r176 + Lenis 1.3.3, and GSAP/ScrollTrigger provably absent",
+    "sub-page content captured by same-origin fetch: 3 pricing cycles (5.99 / 11.99 / 59.88 usd), 5 FAQ groups with 79 questions, About team of 7, product plan bullets, gift-card copy",
+    "hero ring MEASURED from the live reference, no longer fitted: spineLength 94.24718821101328, spineOffset 161, pathSegment 1, flow 1, per-card pathOffset = i/9",
+    "spineTexture (1024x4 RGBA HalfFloat) decoded texel-for-texel: a flat radius-15 circle in the XZ plane, x^2+z^2=225 and y=0 at every column",
+    "fov 29.2518 corroborated twice independently: the live camera, and inverting the captured projection matrix (m5=3.8319625854492188, m0/m5=1.78234=1376/772)",
+    "all SIX home WebGL scene roots captured, including connectory (8-plane pool showing 4, radius 4.24, offset -pi/2) and testimonials (radius 6.3, offset -5.4) which had never been observed",
+    "/signin rendered UI measured in a hidden same-origin iframe (evidence/reference/signin-measured.md)",
+    "D01 idle rotation derived from source and confirmed live: deltaTime * -5e-5 turns/frame = -0.05 turns/s = 20 s period",
+    "hero canvas display box measured: CSS 1376x772, buffer 2752x1544 -> renderer pixel ratio pinned at 2 on a dpr-1.5 device",
+    "typecheck, build (0 warnings), vitest 47 tests, verify:assets 107/107, verify:evidence and check-hero-cards all exit 0",
+    "/pricing Cause A closed by measurement: the reference declares .plans-difference--md .plans-difference__list-item{height:50px}; without it rows were content-driven at 43.9375px. .subscription-and-pricing 2057.08 -> 2118.22 (ref 2118.23), .plans-difference 1318.5 -> 1379.66 (ref 1379.65)",
+    "per-plan benefit state implemented, not just observed: the Starter column renames two rows, reorders Sharing, gives every row its own sub-list (11 vs Pro 5), and disabled rows drop the tooltip wrapper and switch to icon-promo-more-close inside _not-subscribed-wrapper",
+    "/pricing Cause B closed: 76.4396px clearance moved from margin-top on .gift-card-section to padding-top (pt-promo-header) on the sticky inner; layer-1 inner gained the reference sticky--sticky (L0 2152.62/relative -> 2213.77/sticky)",
+    "promo rotator is the reference inline-grid text-swap (TextSwap.vue): 4 words in one cell, class state machine, transition transform+clip-path 1.5s cubic-bezier(.55,0,.1,1), no keyframes. Promo p 63.11 -> 38.78 (ref 38.79)",
+    "Cause C characterised: reference /pricing footer is a compact 185.21px static <footer class=\"promo-footer ...\">, and 2213.77+1883.17+185.21=4282 exactly; the clone has no <footer> and instead a third 772px .section__layer (4869)",
+    "round 34 gates re-run after every change: typecheck 0, lint 0, build 0, vitest 47 passed, playwright 12 passed, verify:assets 0, verify:evidence 0, check-hero-cards 0, score:clone 0",
+    "DIFF-015 closed: /pricing and /gift-card render the reference footer.promo-footer. Clone [0,4097.03,1376,185.48] vs reference [0,4097.94,1376,185.21]; .scrollable__area scrollHeight 4283 = reference exactly; 73/73 box-tree nodes and 120/120 tag+class+attribute signatures match. The 185.21px decomposes as 19.1099 + 0.67 + 19.1099 + 69.8958 + 76.4396, the last term being --spacing + --cookie-message-height (60 x --scale-px = 57.3297) from body.cookie-message-active.",
+    "DIFF-017 closed (found this round): SiteFooter declared its wrappers as functional components but read the default slot off the second argument, so ZERO <footer> rendered on 11 routes. After the fix home scrollHeight is 7563 and home.join 808, both exactly the reference — this is the 36px gap recorded as unexplained in round 28. A duplicate footer on / (HomePage and HomeJoinUs each rendering one) was removed in the same pass.",
+    "DIFF-019 closed: the promo TextSwap dwell is 30s (13 consecutive --active changes at 29.9-30.1s, captured by MutationObserver on the class state machine, no visible panel needed). The clone had been advancing every 1.5s by reusing the measured transition duration as the period.",
+    "DIFF-016 partially closed: checkpoints 26 -> 30 (V27@1150, V28@1544, V29@1927 frame the plans table; V30@3511 is max scroll and the first frame that can contain the promo footer). All 30 clone frames captured at 1376x772@1.5 with 0 page errors; 28 recorded reference frames are unaffected.",
+    "42 reference stylesheets enumerated from the live site and 30 previously-unknown chunks downloaded (0 failures), including PagePromoFooter.4X9VGMLH.css and GiftCardSection.CNO1zmYt.css. Coverage audit in evidence/reference/css-coverage-round34.md: 15 COVERED / 16 PARTIAL / 11 ABSENT with 115 declaration-level conflicts.",
+    "GiftCardSection CSS proves the 676.448px pinned in round 31 is really calc(100svh - var(--spacing-promo-header) - var(--spacing)) = 676.4505 at the forensic viewport, and that .gift-card-section__video-preview-text is an absolutely positioned label inside the video wrapper (the \"HOW GIFT CARD WORKS?\" question), not a display heading.",
+    "mean pixel diff over the 26 comparable checkpoints: 24.67 % (was 25.09 %). /pricing V17 3.94 % and V18 5.34 % held; V14 (home join + footer) is recorded for the first time at 6.94 %."
+  ],
+  "openGates": [
+    "DIFF-016 remainder — the 4 new /pricing checkpoints have clone frames but no reference frames: the in-app panel reported visibilityState=hidden for the whole of round 34. Run docs/research/follow.art/pricing/reference-capture-runbook.md.",
+    "DIFF-018 — section-10__footer now renders but measures h=69.83 against the reference 413.76 on 8 routes. Its geometry was never verified because the element did not exist until this round.",
+    "DIFF-020 — clone /gift-card is 6312 tall against two independent reference reads of 2068. Suspected structural mismatch, but hidden-document collapse is a known confound and must be excluded with one visible-panel frame first.",
+    "DIFF-021 — the get-seen WebGL host is styled inset:0 where the reference declares a 134.78 % box; the declaration predicts the previously measured canvasCss [584,686] to 0.33 px, so the V04/V05/V06 residual is CSS. Same audit: the scrollbar @layer components block and :root{--header-height} are absent, affecting every checkpoint.",
+    "GAP-004, DIFF-008, DIFF-010, DIFF-014; GAP-005/PENDING-02 blocked on continuous frames.",
+    "T07 motion choreography registry and T11 final report; scorecard.total still null (1 of 6 categories scorable)."
+  ],
+  "concurrentlyRunning": {
+    "static-fix": "src/features/home, src/components, src/content/*.ts, displayHeadings.json, styles/home-overrides.css — DIFF-001/002/003",
+    "webgl-fix": "src/webgl, src/testing, tests/unit — DIFF-004 plus spine calibration",
+    "subpages": "src/pages, src/content/subpages, tests/e2e — 11 route templates from captured content"
+  },
+  "handoff": {
+    "blocked": false,
+    "blockedOn": "Nothing structurally. Only pixel pixels/continuous-frame trajectories (GAP-001, GAP-005) still need the visible panel; every other item is executable now.",
+    "unblockAction": "Optional: user brings the Qoder in-app Browser panel to the foreground on https://follow.art, enabling take_screenshot for the 26 checkpoints at 1376x772.",
+    "inappBrowserIsShared": "A hidden same-origin iframe (1376x772) inside the tab is the preferred probe surface: it hydrates, mounts WebGL scenes and renders routes without navigating the user's tab, and it leaves the top document untouched. Always run the teardown body.",
+    "locallyExecutableNext": [
+      "node scripts/emit-reference-probe.mjs <route> <body-file> [outFile] — generates the hidden same-origin iframe probe wrapper that evals a body file VERBATIM (call from Git Bash with MSYS_NO_PATHCONV=1 or a leading-/ route gets rewritten to a Windows path)",
+      "node scripts/check-probe-bodies.mjs — probe body invariants (no backslash, no backtick, no ${), zero-arg; 9/9 pass",
+      "node .scratch/footer-routes.mjs — per-route footer inventory of the clone (counts, classes, heights, scrollHeight)",
+      "VIEWPORTS=inapp node scripts/capture-local.mjs then node scripts/compare-reference.mjs (26 compared, mean 24.67 %)",
+      "npm run dev serves http://127.0.0.1:5175 — NEVER pipe it through head/tail",
+      "npx vitest run tests/unit — 47 tests; npx playwright test — 12 tests (chromium-headless-shell was installed this round into %LOCALAPPDATA%\\ms-playwright)"
+    ],
+    "methodNote": "State machines that are driven by class swaps are measurable in a hidden document via MutationObserver with timestamps — that closed the TextSwap dwell without any pixel. Conversely, SPA navigation inside the probe iframe collapses transform/sticky geometry (/pricing read 2068 instead of 4283 after router.push), so route sweeps may only be trusted for element identity, and a full document load (iframe.src = route) is required for heights. See evidence/reference/promo-footer-and-css-round34.md §4.",
+    "doNot": [
+      "do not update a local snapshot into a baseline, and never copy evidence/local into evidence/reference",
+      "do not re-add GSAP or ScrollTrigger — their absence from the reference is measured",
+      "do not retry ring radius 12.9, ring phase, or any expectation that a hero card crosses x=0",
+      "do not make the hero camera roll depend on scroll progress — it is pointer-driven",
+      "do not invent the progress->uniform easing for the four non-hero scenes, the /signup UI, or per-plan benefit states",
+      "do not deploy publicly: all 107 assets are rights=permission-required",
+      "do not commit or push — the workspace is not a git repository and the user has not asked for one"
+    ]
+  },
+  "closedThisRound": [
+    "DIFF-015 (route-scoped promo-footer variant, /pricing + /gift-card)",
+    "DIFF-017 (SiteFooter functional-component slot bug — zero footers on 11 routes)",
+    "DIFF-019 (TextSwap dwell 1.5s -> 30s, measured)",
+    "CAUSE-C restated: the /pricing +586px was the footer component plus the duplicate/empty footer, not a height knob"
+  ]
+}

@@ -20,3 +20,19 @@ PeakRush高并发秒杀系统项目报告.docx
 
 **/__pycache__/
 *.pyc
+
+# logn in/ 是 follow.art 复刻站源目录，作为登录页移植的来源纳入版本控制。
+# 只入库源码与配置；抓取资产、参考截图、构建产物与一次性比对输出留在磁盘。
+# node_modules/ 与 dist/ 已由上面的 **/node_modules/、**/dist/ 覆盖。
+logn in/.scratch/
+logn in/test-results/
+logn in/public/assets/
+logn in/evidence/
+logn in/docs/design-references/
+logn in/cmp.mjs
+logn in/shots.mjs
+logn in/dist-oracle.json
+logn in/dist-1440.json
+logn in/p2.json
+logn in/p3.json
+logn in/p4.json

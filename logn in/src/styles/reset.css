@@ -1,0 +1,49 @@
+/* ==========================================================================
+   reset.css — follow.art desktop clone
+   ==========================================================================
+   Provenance: evidence/reference/raw/_nuxt/entry.D4FdtiYZ.css plus the 11
+   route/component chunks, captured 2026-09-29T16:12Z (Nuxt build
+   63c1e131-150b-472a-8fd2-ea1d2a3b59fb); reference viewport 1376x772 @ dpr 1.5.
+
+   Every declaration in this file is a verbatim lift from those chunks. Values
+   that could not be located are flagged  UNKNOWN - pending measurement  and
+   carry a conservative default. Machine-readable evidence per token lives in
+   design/tokens.reference.json.
+
+   The reference authors six named layers and the order is load-bearing. The
+   order statement is repeated at the top of every file in src/styles/ so the
+   cascade is right whatever the eventual import order is.
+   ========================================================================== */
+
+@layer reset, base, utilities, components-base, components, overrides;
+
+/* html/body `overflow:clip` is NOT here - the reference ships it in
+   @layer components-base via :has(.scrollable--root); see layout.css.
+
+   Note html{font-size:.625em}: the reference sets the root to 10px so that
+   every `rem` in the design system reads as tenths of a px. --scale-rem and
+   --scale-text-rem are built on top of it (1rem -> 10px before clamping). */
+
+@layer reset {
+  html{height:100%;-webkit-overflow-scrolling:touch;font-size:.625em;overflow-x:hidden;scroll-behavior:smooth}
+  body{background:var(--t-background);margin:0;min-height:100svh}
+  body,button,input,select,textarea{font-feature-settings:"kern" 1;font-kerning:normal;text-rendering:optimizeLegibility}
+  blockquote,dd,dl,dt,h1,h2,h3,h4,h5,h6,hr,p{margin:0}
+  a{text-decoration:none}
+  dialog{background:none;border:0;display:none;margin:0;padding:0}
+  dialog[open]{display:block}
+  *,:after,:before{box-sizing:border-box}
+  main,picture{display:block}
+  img{-webkit-user-select:none;-moz-user-select:none;user-select:none;vertical-align:top}
+  img[draggable=false]{pointer-events:none;-webkit-user-drag:none}
+  iframe,video{--aspect-ratio:16/9;aspect-ratio:var(--aspect-ratio);border:0;display:block;height:auto;width:100%}
+}
+
+/* print rules from @layer reset */
+@media print {
+@layer reset {
+  html{height:auto}
+  body,html{overflow:visible}
+  body{min-height:0;width:100%}
+}
+}

@@ -1,0 +1,856 @@
+/* ==========================================================================
+   tokens.css — follow.art desktop clone
+   ==========================================================================
+   Provenance: evidence/reference/raw/_nuxt/entry.D4FdtiYZ.css plus the 11
+   route/component chunks, captured 2026-09-29T16:12Z (Nuxt build
+   63c1e131-150b-472a-8fd2-ea1d2a3b59fb); reference viewport 1376x772 @ dpr 1.5.
+
+   Every declaration in this file is a verbatim lift from those chunks. Values
+   that could not be located are flagged  UNKNOWN - pending measurement  and
+   carry a conservative default. Machine-readable evidence per token lives in
+   design/tokens.reference.json.
+
+   The reference authors six named layers and the order is load-bearing. The
+   order statement is repeated at the top of every file in src/styles/ so the
+   cascade is right whatever the eventual import order is.
+   ========================================================================== */
+
+@layer reset, base, utilities, components-base, components, overrides;
+
+@layer base {
+  /* ------------------------------------------------------------------------
+     1. BREAKPOINT SWITCH - the mechanism that makes the whole layout scale.
+     ------------------------------------------------------------------------
+     follow.art has no width-only mobile breakpoints. Each design decision is
+     authored as a PAIR of custom properties:
+
+        padding-top: var(--md,   <value at md and up>)
+                     var(--n-md, <value below md>);
+
+     Exactly one name resolves, by abusing the guaranteed-invalid state:
+
+        default   --md:  ;       defined and EMPTY  -> var(--md,A)   => nothing
+                  --n-md: initial  guaranteed-invalid -> var(--n-md,B) => B
+        so the "n-md" (narrow) branch wins.
+
+        md-up     the two are swapped, so the md branch wins.
+
+     `initial` on a custom property is what activates a var() fallback. The
+     trailing `and (min-width:1px)` on each condition is build-tool filler the
+     reference ships; reproduced verbatim.
+
+     Breakpoint conditions (verbatim; DESKTOP = reachable at >= 1024px):
+       sm     (min-aspect-ratio:13/9) or (min-width:568px)
+       md     (min-width:980px) or (min-width:668px & min-height:416px) ...   DESKTOP
+       lg     (min-width:1440px) or (min-width:980px & min-aspect-ratio:10/11) DESKTOP
+       xl     (min-width:1200px & min-height:500px & min-aspect-ratio:10/11)
+              or (min-width:1440px & min-height:700px)                          DESKTOP
+       xxl    (min-width:1440px & min-height:700px)                              DESKTOP
+       xxxl   (min-width:1920px & min-height:700px)
+       xxxxl  (min-width:2400px & min-height:700px)
+
+     At the captured viewport 1376x772 the ACTIVE switches are md, lg and xl.
+     xxl / xxxl / xxxxl are OFF - all of them need width >= 1440px.
+     No @container queries appear anywhere in the 12 chunks; the scaling is
+     pure media-query switching that repoints these custom properties.
+     ------------------------------------------------------------------------ */
+
+  /* baseline: every narrow branch wins */
+  @media (min-width:1px){:root{--sm: ;--n-sm:initial;--md: ;--n-md:initial;--lg: ;--n-lg:initial;--xl: ;--n-xl:initial;--xxl: ;--n-xxl:initial;--xxxl: ;--n-xxxl:initial;--xxxxl: ;--n-xxxxl:initial}}
+
+  /* sm-and-up switch */
+  @media (min-aspect-ratio:13/9) and (min-width:1px),(min-width:568px) and (min-width:1px){:root{--n-sm: ;--sm:initial}}
+
+  /* md-and-up switch */
+  @media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9) and (min-width:1px),(min-width:668px) and (max-aspect-ratio:10/11) and (min-width:1px),(min-width:668px) and (min-height:416px) and (min-width:1px),(min-width:980px) and (min-width:1px){:root{--n-md: ;--md:initial}}
+
+  /* lg-and-up switch */
+  @media (min-width:1440px) and (min-width:1px),(min-width:980px) and (min-aspect-ratio:10/11) and (min-width:1px){:root{--n-lg: ;--lg:initial}}
+
+  /* xl-and-up switch */
+  @media (min-width:1200px) and (min-height:500px) and (min-aspect-ratio:10/11) and (min-width:1px),(min-width:1440px) and (min-height:700px) and (min-width:1px){:root{--n-xl: ;--xl:initial}}
+
+  /* xxl-and-up switch */
+  @media (min-width:1440px) and (min-height:700px) and (min-width:1px){:root{--n-xxl: ;--xxl:initial}}
+
+  /* xxxl-and-up switch */
+  @media (min-width:1920px) and (min-height:700px) and (min-width:1px){:root{--n-xxxl: ;--xxxl:initial}}
+
+  /* xxxxl-and-up switch */
+  @media (min-width:2400px) and (min-height:700px) and (min-width:1px){:root{--n-xxxxl: ;--xxxxl:initial}}
+
+  /* ------------------------------------------------------------------------
+     2. FLUID PIXEL UNITS.
+     The layout is authored in multiples of --scale-px: "1px" means
+     1/1440th of the viewport, clamped into [0.5px, 1px]. Text sizes use
+     --scale-text-px / --scale-text-rem, which floor at 0.7. --scale-px is a
+     hard 1px only once the viewport escapes the "compressed" list below - in
+     practice width >= 1440px with a tall enough window.
+
+     Resolved at the capture viewport 1376x772:
+       --scale-px       = clamp(.5px, .06944vw, 1px)              = 0.9555px
+       --scale-text-px  = clamp(.7px, .4px + .04167vw, 1px)       = 0.9734px
+       --scale-rem      = clamp(.5rem, .5rem + .69444vw - 5px, 1rem)  = 0.9555rem
+       --scale-text-rem = clamp(.7rem, .7rem + .41667vw - 3px, 1rem)  = 0.9734rem
+     (rem needs html{font-size:.625em} => 1rem = 10px, see reset.css)
+
+     Derived design widths: the scale units target 1440px, while the raw vw
+     literals in component CSS target 1460px, e.g.
+       15.6164383562vw = 228/1460    31.5068493151vw = 460/1460
+     and the narrow literals target 390px, e.g. 28.2051282051vw = 110/390.
+     The 1440 vs 1460 gap exists in the reference; it is not a transcription
+     error and is preserved.
+     ------------------------------------------------------------------------ */
+
+  :root{--scale-px:1px;--scale-rem:1rem;--scale-text-px:1px;--scale-text-rem:1rem}
+
+  @media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9) and (max-height:499px),(min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9) and (max-width:1439px),(min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9) and (min-width:1200px) and (max-height:699px),(min-width:668px) and (max-aspect-ratio:10/11) and (max-height:499px),(min-width:668px) and (max-aspect-ratio:10/11) and (max-width:1439px),(min-width:668px) and (max-aspect-ratio:10/11) and (min-width:1200px) and (max-height:699px),(min-width:668px) and (min-height:416px) and (max-height:499px),(min-width:668px) and (min-height:416px) and (max-width:1439px),(min-width:668px) and (min-height:416px) and (min-width:1200px) and (max-height:699px),(min-width:980px) and (max-height:499px),(min-width:980px) and (max-width:1439px),(min-width:980px) and (min-width:1200px) and (max-height:699px){:root{--scale-px:clamp(.5px,.06944vw,1px);--scale-rem:clamp(.5rem, calc(.5rem + .69444vw - 5px) ,1rem);--scale-text-px:clamp(.7px, calc(.4px + .04167vw) ,1px);--scale-text-rem:clamp(.7rem, calc(.7rem + .41667vw - 3px) ,1rem)}}
+
+  /* ------------------------------------------------------------------------
+     3. SPACING COMPOSITES. --spacing is the page gutter; every spacing
+     utility in layout.css is a multiple of it. Values are (md-up, below-md)
+     unless noted. Resolved at 1376x772 with --scale-px = 0.9555px:
+       --spacing               20 -> 19.11px   (30 -> 28.67px at xxxxl)
+       --spacing-small         15 -> 14.33px   (no breakpoint pair in source)
+       --spacing-tiny           5 ->  4.78px   (no breakpoint pair in source)
+       --spacing-header        50 -> 47.77px   (40 -> 38.22px below md)
+       --spacing-promo-header  80 -> 76.44px   (110 at xxxxl, 60 below md)
+       --spacing-grid-gutter   20 -> 19.11px   (10 below md) - the value the
+                               12-col grid uses via --grid-col-gutter
+     ------------------------------------------------------------------------ */
+
+  :root{--spacing:var(--xxxxl,calc(var(--scale-px)*30)) var(--n-xxxxl,calc(var(--scale-px)*20));--spacing-small:calc(var(--scale-px)*15);--spacing-tiny:calc(var(--scale-px)*5);--spacing-header:var(--md,calc(var(--scale-px)*50)) var(--n-md,calc(var(--scale-px)*40));--spacing-promo-header:var(--xxxxl,calc(var(--scale-px)*110)) var(--n-xxxxl,var(--md,calc(var(--scale-px)*80)) var(--n-md,calc(var(--scale-px)*60)));--spacing-grid-gutter:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10))}
+
+  /* ------------------------------------------------------------------------
+     4. COLOUR PRIMITIVES. The complete --c-* set. Every alpha variant ships a
+     `-rgb` companion so consumers can do rgba(var(--c-black-rgb), .4).
+     ------------------------------------------------------------------------ */
+
+  :root{--c-white:#fff;--c-white-rgb:255,255,255;--c-white-10:hsla(0,0%,100%,.1);--c-white-10-rgb:255,255,255;--c-white-20:hsla(0,0%,100%,.2);--c-white-20-rgb:255,255,255;--c-white-30:hsla(0,0%,100%,.3);--c-white-30-rgb:255,255,255;--c-white-60:hsla(0,0%,100%,.6);--c-white-60-rgb:255,255,255;--c-grey:#9c9c9c;--c-grey-rgb:156,156,156;--c-black:#000;--c-black-rgb:0,0,0;--c-black-3:rgba(0,0,0,.03);--c-black-3-rgb:0,0,0;--c-black-15:rgba(0,0,0,.15);--c-black-15-rgb:0,0,0;--c-black-20:rgba(0,0,0,.2);--c-black-20-rgb:0,0,0;--c-black-60:rgba(0,0,0,.6);--c-black-60-rgb:0,0,0;--c-gray-popup-bg:rgba(80,80,80,.5);--c-gray-popup-bg-rgb:80,80,80;--c-orange:#f4793a;--c-orange-rgb:244,121,58;--c-green:#8e9487;--c-green-rgb:142,148,135;--c-pink:#c5939d;--c-pink-rgb:197,147,157;--c-blue:#8498ac;--c-blue-rgb:132,152,172;--c-error:#ea1b4f;--c-error-rgb:234,27,79}
+}
+
+/* ==========================================================================
+   SEMANTIC THEME MATRIX  (--t-*)
+   The reference declares the full matrix once, on a selector group that also
+   contains `body`, so it is the always-on default; the .ui-* classes then
+   override a subset. .ui-light and .ui-print appear ONLY in that default
+   group - they have no override block of their own, i.e. they are aliases of
+   the white default. `color:var(--t-text)` is part of the group.
+   Evidence: entry.D4FdtiYZ.css, @layer base.
+   ========================================================================== */
+
+@layer base {
+  /* default matrix - 363 declarations */
+  .ui-blue,.ui-dark,.ui-green,.ui-light,.ui-orange,.ui-pink,.ui-print,body{
+    --t-background:var(--c-white);
+    --t-background-rgb:var(--c-white-rgb);
+
+    --t-avatar:var(--c-black-3);
+    --t-avatar-rgb:var(--c-black-3-rgb);
+
+    --t-line:var(--c-black-15);
+    --t-line-rgb:var(--c-black-15-rgb);
+
+    --t-line-thin:var(--c-black-20);
+    --t-line-thin-rgb:var(--c-black-20-rgb);
+
+    --t-small:var(--c-grey);
+    --t-small-rgb:var(--c-grey-rgb);
+
+    --t-text:var(--c-black);
+    --t-text-rgb:var(--c-black-rgb);
+
+    --t-heading:var(--c-black);
+    --t-heading-rgb:var(--c-black-rgb);
+
+    --t-primary:var(--c-orange);
+    --t-primary-rgb:var(--c-orange-rgb);
+
+    --t-accent:var(--c-orange);
+    --t-accent-rgb:var(--c-orange-rgb);
+
+    --t-skeleton:rgba(var(--t-heading-rgb),.07);
+
+    --t-skeleton-shimmer:rgba(var(--t-background-rgb),.5);
+
+    --t-button_primary_accent:var(--c-orange);
+    --t-button_primary_accent-rgb:var(--c-orange-rgb);
+    --t-button_primary_text:var(--c-white);
+    --t-button_primary_text-rgb:var(--c-white-rgb);
+    --t-button_primary_background:var(--c-black);
+    --t-button_primary_background-rgb:var(--c-black-rgb);
+    --t-button_primary_hovered-text:var(--c-white);
+    --t-button_primary_hovered-text-rgb:var(--c-white-rgb);
+    --t-button_primary_hovered-background:var(--c-black);
+    --t-button_primary_hovered-background-rgb:var(--c-black-rgb);
+    --t-button_primary_disabled-background:var(--c-grey);
+    --t-button_primary_disabled-background-rgb:var(--c-grey-rgb);
+    --t-button_secondary_accent:var(--c-orange);
+    --t-button_secondary_accent-rgb:var(--c-orange-rgb);
+    --t-button_secondary_text:var(--c-black);
+    --t-button_secondary_text-rgb:var(--c-black-rgb);
+    --t-button_secondary_background:var(--c-white);
+    --t-button_secondary_background-rgb:var(--c-white-rgb);
+    --t-button_secondary_hovered-text:var(--c-black);
+    --t-button_secondary_hovered-text-rgb:var(--c-black-rgb);
+    --t-button_secondary_hovered-background:var(--c-white);
+    --t-button_secondary_hovered-background-rgb:var(--c-white-rgb);
+    --t-button_secondary_disabled-background:rgba(var(--c-white-rgb),.7);
+    --t-button_danger_accent:var(--c-black);
+    --t-button_danger_accent-rgb:var(--c-black-rgb);
+    --t-button_danger_text:var(--c-white);
+    --t-button_danger_text-rgb:var(--c-white-rgb);
+    --t-button_danger_background:var(--c-error);
+    --t-button_danger_background-rgb:var(--c-error-rgb);
+    --t-button_danger_hovered-text:var(--c-white);
+    --t-button_danger_hovered-text-rgb:var(--c-white-rgb);
+    --t-button_danger_hovered-background:var(--c-error);
+    --t-button_danger_hovered-background-rgb:var(--c-error-rgb);
+    --t-button_outline_accent:var(--c-orange);
+    --t-button_outline_accent-rgb:var(--c-orange-rgb);
+    --t-button_outline_text:var(--c-black);
+    --t-button_outline_text-rgb:var(--c-black-rgb);
+    --t-button_outline_background:transparent;
+    --t-button_outline_background-rgb:0,0,0;
+    --t-button_outline_border:var(--c-black);
+    --t-button_outline_border-rgb:var(--c-black-rgb);
+    --t-button_outline_disabled-text:var(--t-line);
+    --t-button_outline_disabled-text-rgb:var(--t-line-rgb);
+    --t-button_outline_disabled-border:var(--t-line);
+    --t-button_outline_disabled-border-rgb:var(--t-line-rgb);
+    --t-button_outline--small_accent:var(--c-orange);
+    --t-button_outline--small_accent-rgb:var(--c-orange-rgb);
+    --t-button_outline--small_text:var(--t-small);
+    --t-button_outline--small_text-rgb:var(--t-small-rgb);
+    --t-button_outline--small_background:transparent;
+    --t-button_outline--small_background-rgb:0,0,0;
+    --t-button_outline--small_border:var(--t-small);
+    --t-button_outline--small_border-rgb:var(--t-small-rgb);
+    --t-button_outline--small_hovered-text:var(--t-heading);
+    --t-button_outline--small_hovered-text-rgb:var(--t-heading-rgb);
+    --t-button_outline--small_hovered-border:var(--t-heading);
+    --t-button_outline--small_hovered-border-rgb:var(--t-heading-rgb);
+    --t-button_outline--small_disabled-text:var(--t-line);
+    --t-button_outline--small_disabled-text-rgb:var(--t-line-rgb);
+    --t-button_outline--small_disabled-border:var(--t-line);
+    --t-button_outline--small_disabled-border-rgb:var(--t-line-rgb);
+    --t-button_outline--error_border:var(--c-error);
+    --t-button_outline--error_border-rgb:var(--c-error-rgb);
+    --t-button_link_accent:var(--t-accent);
+    --t-button_link_accent-rgb:var(--t-accent-rgb);
+    --t-button_link_text:var(--t-text);
+    --t-button_link_text-rgb:var(--t-text-rgb);
+    --t-button_link_hovered-text:var(--t-text);
+    --t-button_link_hovered-text-rgb:var(--t-text-rgb);
+    --t-button_link_active-hovered-text:var(--t-text);
+    --t-button_link_active-hovered-text-rgb:var(--t-text-rgb);
+    --t-button_link_active-text:var(--t-small);
+    --t-button_link_active-text-rgb:var(--t-small-rgb);
+    --t-button_link_active-accent:var(--c-orange);
+    --t-button_link_active-accent-rgb:var(--c-orange-rgb);
+    --t-button_link--small_accent:var(--c-orange);
+    --t-button_link--small_accent-rgb:var(--c-orange-rgb);
+    --t-button_link--small_text:var(--t-small);
+    --t-button_link--small_text-rgb:var(--t-small-rgb);
+    --t-button_link--small_hovered-text:var(--t-heading);
+    --t-button_link--small_hovered-text-rgb:var(--t-heading-rgb);
+    --t-button_link--heading_accent:var(--c-orange);
+    --t-button_link--heading_accent-rgb:var(--c-orange-rgb);
+    --t-button_link--heading_text:var(--t-heading);
+    --t-button_link--heading_text-rgb:var(--t-heading-rgb);
+    --t-button_link--heading_hovered-text:var(--t-heading);
+    --t-button_link--heading_hovered-text-rgb:var(--t-heading-rgb);
+    --t-button_link--heading_active-text:var(--t-small);
+    --t-button_link--heading_active-text-rgb:var(--t-small-rgb);
+    --t-button_link--heading_disabled-text:var(--t-line);
+    --t-button_link--heading_disabled-text-rgb:var(--t-line-rgb);
+    --t-button_link--select_accent:transparent;
+    --t-button_link--select_accent-rgb:0,0,0;
+    --t-button_link--select_text:var(--t-text);
+    --t-button_link--select_text-rgb:var(--t-text-rgb);
+    --t-button_link--select_hovered-text:var(--t-text);
+    --t-button_link--select_hovered-text-rgb:var(--t-text-rgb);
+    --t-button_link--select_active-text:var(--t-small);
+    --t-button_link--select_active-text-rgb:var(--t-small-rgb);
+    --t-button_link--error_accent:var(--t-heading);
+    --t-button_link--error_accent-rgb:var(--t-heading-rgb);
+    --t-button_link--error_text:var(--c-error);
+    --t-button_link--error_text-rgb:var(--c-error-rgb);
+    --t-button_link--error_hovered-text:var(--c-error);
+    --t-button_link--error_hovered-text-rgb:var(--c-error-rgb);
+
+    --t-input_radio_label:var(--t-text);
+    --t-input_radio_label-rgb:var(--t-text-rgb);
+    --t-input_radio_border:var(--t-line);
+    --t-input_radio_border-rgb:var(--t-line-rgb);
+    --t-input_radio_accent:var(--t-primary);
+    --t-input_radio_accent-rgb:var(--t-primary-rgb);
+    --t-input_radio_hovered-label:var(--t-heading);
+    --t-input_radio_hovered-label-rgb:var(--t-heading-rgb);
+    --t-input_radio_hovered-border:var(--t-heading);
+    --t-input_radio_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_radio_focused-border:var(--t-primary);
+    --t-input_radio_focused-border-rgb:var(--t-primary-rgb);
+    --t-input_radio_active-hovered-border:var(--t-heading);
+    --t-input_radio_active-hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_radio_active-focused-border:var(--t-primary);
+    --t-input_radio_active-focused-border-rgb:var(--t-primary-rgb);
+    --t-input_radio_disabled-label:var(--t-small);
+    --t-input_radio_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_radio_disabled-border:var(--t-line);
+    --t-input_radio_disabled-border-rgb:var(--t-line-rgb);
+    --t-input_radio_active-disabled-label:var(--t-small);
+    --t-input_radio_active-disabled-label-rgb:var(--t-small-rgb);
+    --t-input_radio_active-disabled-accent:var(--t-small);
+    --t-input_radio_active-disabled-accent-rgb:var(--t-small-rgb);
+    --t-input_radio_error-border:var(--c-error);
+    --t-input_radio_error-border-rgb:var(--c-error-rgb);
+    --t-input_radio-card_label:var(--t-heading);
+    --t-input_radio-card_label-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_border:var(--t-heading);
+    --t-input_radio-card_border-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_accent:var(--t-heading);
+    --t-input_radio-card_accent-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_hovered-label:var(--t-heading);
+    --t-input_radio-card_hovered-label-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_hovered-border:var(--t-heading);
+    --t-input_radio-card_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_focused-border:var(--t-primary);
+    --t-input_radio-card_focused-border-rgb:var(--t-primary-rgb);
+    --t-input_radio-card_active-hovered-border:var(--t-heading);
+    --t-input_radio-card_active-hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_radio-card_active-focused-border:var(--t-primary);
+    --t-input_radio-card_active-focused-border-rgb:var(--t-primary-rgb);
+    --t-input_radio-card_disabled-label:var(--t-small);
+    --t-input_radio-card_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_radio-card_disabled-border:var(--t-line);
+    --t-input_radio-card_disabled-border-rgb:var(--t-line-rgb);
+    --t-input_radio-card_active-disabled-label:var(--t-small);
+    --t-input_radio-card_active-disabled-label-rgb:var(--t-small-rgb);
+    --t-input_radio-card_active-disabled-accent:var(--t-small);
+    --t-input_radio-card_active-disabled-accent-rgb:var(--t-small-rgb);
+    --t-input_radio-card_error-border:var(--c-error);
+    --t-input_radio-card_error-border-rgb:var(--c-error-rgb);
+    --t-input_checkbox_label:var(--t-heading);
+    --t-input_checkbox_label-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_border:var(--t-heading);
+    --t-input_checkbox_border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_accent:var(--t-background);
+    --t-input_checkbox_accent-rgb:var(--t-background-rgb);
+    --t-input_checkbox_hovered-label:var(--t-heading);
+    --t-input_checkbox_hovered-label-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_hovered-border:var(--t-heading);
+    --t-input_checkbox_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_focused-border:var(--t-heading);
+    --t-input_checkbox_focused-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_active-background:var(--t-heading);
+    --t-input_checkbox_active-background-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_active-hovered-border:var(--t-heading);
+    --t-input_checkbox_active-hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_active-focused-border:var(--t-heading);
+    --t-input_checkbox_active-focused-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox_disabled-label:var(--t-line);
+    --t-input_checkbox_disabled-label-rgb:var(--t-line-rgb);
+    --t-input_checkbox_disabled-border:var(--t-line);
+    --t-input_checkbox_disabled-border-rgb:var(--t-line-rgb);
+    --t-input_checkbox_active-disabled-label:var(--t-small);
+    --t-input_checkbox_active-disabled-label-rgb:var(--t-small-rgb);
+    --t-input_checkbox_active-disabled-accent:var(--t-small);
+    --t-input_checkbox_active-disabled-accent-rgb:var(--t-small-rgb);
+    --t-input_checkbox_error-border:var(--c-error);
+    --t-input_checkbox_error-border-rgb:var(--c-error-rgb);
+    --t-input_checkbox-promo_label:var(--t-text);
+    --t-input_checkbox-promo_label-rgb:var(--t-text-rgb);
+    --t-input_checkbox-promo_border:var(--t-text);
+    --t-input_checkbox-promo_border-rgb:var(--t-text-rgb);
+    --t-input_checkbox-promo_accent:var(--t-primary);
+    --t-input_checkbox-promo_accent-rgb:var(--t-primary-rgb);
+    --t-input_checkbox-promo_hovered-label:var(--t-heading);
+    --t-input_checkbox-promo_hovered-label-rgb:var(--t-heading-rgb);
+    --t-input_checkbox-promo_hovered-border:var(--t-heading);
+    --t-input_checkbox-promo_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox-promo_focused-border:var(--t-primary);
+    --t-input_checkbox-promo_focused-border-rgb:var(--t-primary-rgb);
+    --t-input_checkbox-promo_active-hovered-border:var(--t-heading);
+    --t-input_checkbox-promo_active-hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_checkbox-promo_active-focused-border:var(--t-primary);
+    --t-input_checkbox-promo_active-focused-border-rgb:var(--t-primary-rgb);
+    --t-input_checkbox-promo_disabled-label:var(--t-small);
+    --t-input_checkbox-promo_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_checkbox-promo_disabled-border:var(--t-line);
+    --t-input_checkbox-promo_disabled-border-rgb:var(--t-line-rgb);
+    --t-input_checkbox-promo_active-disabled-label:var(--t-small);
+    --t-input_checkbox-promo_active-disabled-label-rgb:var(--t-small-rgb);
+    --t-input_checkbox-promo_active-disabled-accent:var(--t-small);
+    --t-input_checkbox-promo_active-disabled-accent-rgb:var(--t-small-rgb);
+    --t-input_checkbox-promo_error-border:var(--c-error);
+    --t-input_checkbox-promo_error-border-rgb:var(--c-error-rgb);
+    --t-input_base_label:var(--c-black-60);
+    --t-input_base_label-rgb:var(--c-black-60-rgb);
+    --t-input_base_background:transparent;
+    --t-input_base_background-rgb:0,0,0;
+    --t-input_base_color:var(--t-heading);
+    --t-input_base_color-rgb:var(--t-heading-rgb);
+    --t-input_base_border:var(--t-heading);
+    --t-input_base_border-rgb:var(--t-heading-rgb);
+    --t-input_base_placeholder:var(--t-small);
+    --t-input_base_placeholder-rgb:var(--t-small-rgb);
+    --t-input_base_empty-label:var(--c-black-60);
+    --t-input_base_empty-label-rgb:var(--c-black-60-rgb);
+    --t-input_base_empty-border:var(--t-line);
+    --t-input_base_empty-border-rgb:var(--t-line-rgb);
+    --t-input_base_hovered-color:var(--t-heading);
+    --t-input_base_hovered-color-rgb:var(--t-heading-rgb);
+    --t-input_base_hovered-border:var(--t-heading);
+    --t-input_base_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_base_focused-color:var(--t-heading);
+    --t-input_base_focused-color-rgb:var(--t-heading-rgb);
+    --t-input_base_focused-border:var(--t-heading);
+    --t-input_base_focused-border-rgb:var(--t-heading-rgb);
+    --t-input_base_disabled-label:var(--t-small);
+    --t-input_base_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_base_disabled-color:var(--t-small);
+    --t-input_base_disabled-color-rgb:var(--t-small-rgb);
+    --t-input_base_disabled-border:var(--t-small);
+    --t-input_base_disabled-border-rgb:var(--t-small-rgb);
+    --t-input_base_error-label:var(--c-black-60);
+    --t-input_base_error-label-rgb:var(--c-black-60-rgb);
+    --t-input_base_error-border:var(--c-error);
+    --t-input_base_error-border-rgb:var(--c-error-rgb);
+    --t-input_base_error-empty-label:var(--c-black-60);
+    --t-input_base_error-empty-label-rgb:var(--c-black-60-rgb);
+    --t-input_base_error-hovered-label:var(--c-black-60);
+    --t-input_base_error-hovered-label-rgb:var(--c-black-60-rgb);
+    --t-input_darker_label:var(--t-text);
+    --t-input_darker_label-rgb:var(--t-text-rgb);
+    --t-input_darker_background:transparent;
+    --t-input_darker_background-rgb:0,0,0;
+    --t-input_darker_color:var(--t-heading);
+    --t-input_darker_color-rgb:var(--t-heading-rgb);
+    --t-input_darker_border:var(--t-heading);
+    --t-input_darker_border-rgb:var(--t-heading-rgb);
+    --t-input_darker_placeholder:var(--t-heading);
+    --t-input_darker_placeholder-rgb:var(--t-heading-rgb);
+    --t-input_darker_empty-label:var(--t-heading);
+    --t-input_darker_empty-label-rgb:var(--t-heading-rgb);
+    --t-input_darker_empty-border:var(--t-heading);
+    --t-input_darker_empty-border-rgb:var(--t-heading-rgb);
+    --t-input_darker_hovered-color:var(--t-heading);
+    --t-input_darker_hovered-color-rgb:var(--t-heading-rgb);
+    --t-input_darker_hovered-border:var(--t-heading);
+    --t-input_darker_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_darker_focused-color:var(--t-heading);
+    --t-input_darker_focused-color-rgb:var(--t-heading-rgb);
+    --t-input_darker_focused-border:var(--t-heading);
+    --t-input_darker_focused-border-rgb:var(--t-heading-rgb);
+    --t-input_darker_disabled-label:var(--t-small);
+    --t-input_darker_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_darker_disabled-color:var(--t-small);
+    --t-input_darker_disabled-color-rgb:var(--t-small-rgb);
+    --t-input_darker_disabled-border:var(--t-small);
+    --t-input_darker_disabled-border-rgb:var(--t-small-rgb);
+    --t-input_darker_error-label:var(--t-text);
+    --t-input_darker_error-label-rgb:var(--t-text-rgb);
+    --t-input_darker_error-border:var(--c-error);
+    --t-input_darker_error-border-rgb:var(--c-error-rgb);
+    --t-input_darker_error-empty-label:var(--c-black-60);
+    --t-input_darker_error-empty-label-rgb:var(--c-black-60-rgb);
+    --t-input_darker_error-hovered-label:var(--c-black-60);
+    --t-input_darker_error-hovered-label-rgb:var(--c-black-60-rgb);
+    --t-input_underline_label:var(--t-text);
+    --t-input_underline_label-rgb:var(--t-text-rgb);
+    --t-input_underline_background:transparent;
+    --t-input_underline_background-rgb:0,0,0;
+    --t-input_underline_color:var(--t-text);
+    --t-input_underline_color-rgb:var(--t-text-rgb);
+    --t-input_underline_border:var(--t-text);
+    --t-input_underline_border-rgb:var(--t-text-rgb);
+    --t-input_underline_placeholder:var(--t-small);
+    --t-input_underline_placeholder-rgb:var(--t-small-rgb);
+    --t-input_underline_hovered-color:var(--t-heading);
+    --t-input_underline_hovered-color-rgb:var(--t-heading-rgb);
+    --t-input_underline_hovered-border:var(--t-text);
+    --t-input_underline_hovered-border-rgb:var(--t-text-rgb);
+    --t-input_underline_empty-border:var(--t-line);
+    --t-input_underline_empty-border-rgb:var(--t-line-rgb);
+    --t-input_underline_focused-color:var(--t-heading);
+    --t-input_underline_focused-color-rgb:var(--t-heading-rgb);
+    --t-input_underline_focused-border:var(--t-text);
+    --t-input_underline_focused-border-rgb:var(--t-text-rgb);
+    --t-input_underline_disabled-label:var(--t-small);
+    --t-input_underline_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_underline_disabled-color:var(--t-small);
+    --t-input_underline_disabled-color-rgb:var(--t-small-rgb);
+    --t-input_underline_disabled-border:var(--t-small);
+    --t-input_underline_disabled-border-rgb:var(--t-small-rgb);
+    --t-input_underline_error-label:var(--t-text);
+    --t-input_underline_error-label-rgb:var(--t-text-rgb);
+    --t-input_underline_error-border:var(--c-error);
+    --t-input_underline_error-border-rgb:var(--c-error-rgb);
+    --t-input_no-border_label:var(--t-text);
+    --t-input_no-border_label-rgb:var(--t-text-rgb);
+    --t-input_no-border_background:transparent;
+    --t-input_no-border_background-rgb:0,0,0;
+    --t-input_no-border_color:var(--t-text);
+    --t-input_no-border_color-rgb:var(--t-text-rgb);
+    --t-input_no-border_border:var(--t-text);
+    --t-input_no-border_border-rgb:var(--t-text-rgb);
+    --t-input_no-border_placeholder:var(--t-small);
+    --t-input_no-border_placeholder-rgb:var(--t-small-rgb);
+    --t-input_no-border_hovered-color:var(--t-heading);
+    --t-input_no-border_hovered-color-rgb:var(--t-heading-rgb);
+    --t-input_no-border_hovered-border:var(--t-text);
+    --t-input_no-border_hovered-border-rgb:var(--t-text-rgb);
+    --t-input_no-border_empty-border:var(--t-line);
+    --t-input_no-border_empty-border-rgb:var(--t-line-rgb);
+    --t-input_no-border_focused-color:var(--t-heading);
+    --t-input_no-border_focused-color-rgb:var(--t-heading-rgb);
+    --t-input_no-border_focused-border:var(--t-text);
+    --t-input_no-border_focused-border-rgb:var(--t-text-rgb);
+    --t-input_no-border_disabled-label:var(--t-small);
+    --t-input_no-border_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_no-border_disabled-color:var(--t-small);
+    --t-input_no-border_disabled-color-rgb:var(--t-small-rgb);
+    --t-input_no-border_disabled-border:var(--t-small);
+    --t-input_no-border_disabled-border-rgb:var(--t-small-rgb);
+    --t-input_no-border_error-label:var(--t-text);
+    --t-input_no-border_error-label-rgb:var(--t-text-rgb);
+    --t-input_no-border_error-border:var(--c-error);
+    --t-input_no-border_error-border-rgb:var(--c-error-rgb);
+    color:var(--t-text);
+  }
+
+  /* ------------------------------------------------------------------------
+     THEME OVERRIDES, in source order. .ui-orange / .ui-blue / .ui-pink /
+     .ui-green are byte-identical apart from --t-background; that is why each
+     is written out in full rather than grouped.
+     ------------------------------------------------------------------------ */
+
+  /* .ui-orange */
+  .ui-orange{
+    --t-background:var(--c-orange);
+    --t-background-rgb:var(--c-orange-rgb);
+
+    --t-line:var(--c-white-30);
+    --t-line-rgb:var(--c-white-30-rgb);
+
+    --t-line-thin:var(--c-white-20);
+    --t-line-thin-rgb:var(--c-white-20-rgb);
+
+    --t-small:var(--c-white-60);
+    --t-small-rgb:var(--c-white-60-rgb);
+
+    --t-text:var(--c-white);
+    --t-text-rgb:var(--c-white-rgb);
+
+    --t-heading:var(--c-black);
+    --t-heading-rgb:var(--c-black-rgb);
+
+    --t-primary:var(--c-white);
+    --t-primary-rgb:var(--c-white-rgb);
+
+    --t-accent:var(--c-black);
+    --t-accent-rgb:var(--c-black-rgb);
+
+    --t-button_primary_accent:var(--t-background);
+    --t-button_primary_accent-rgb:var(--t-background-rgb);
+    --t-button_link_active-text:var(--t-heading);
+    --t-button_link_active-text-rgb:var(--t-heading-rgb);
+    color:var(--t-text);
+  }
+
+  /* .ui-blue */
+  .ui-blue{
+    --t-background:var(--c-blue);
+    --t-background-rgb:var(--c-blue-rgb);
+
+    --t-line:var(--c-white-30);
+    --t-line-rgb:var(--c-white-30-rgb);
+
+    --t-line-thin:var(--c-white-20);
+    --t-line-thin-rgb:var(--c-white-20-rgb);
+
+    --t-small:var(--c-white-60);
+    --t-small-rgb:var(--c-white-60-rgb);
+
+    --t-text:var(--c-white);
+    --t-text-rgb:var(--c-white-rgb);
+
+    --t-heading:var(--c-black);
+    --t-heading-rgb:var(--c-black-rgb);
+
+    --t-primary:var(--c-white);
+    --t-primary-rgb:var(--c-white-rgb);
+
+    --t-accent:var(--c-black);
+    --t-accent-rgb:var(--c-black-rgb);
+
+    --t-button_primary_accent:var(--t-background);
+    --t-button_primary_accent-rgb:var(--t-background-rgb);
+    --t-button_link_active-text:var(--t-heading);
+    --t-button_link_active-text-rgb:var(--t-heading-rgb);
+    color:var(--t-text);
+  }
+
+  /* .ui-pink */
+  .ui-pink{
+    --t-background:var(--c-pink);
+    --t-background-rgb:var(--c-pink-rgb);
+
+    --t-line:var(--c-white-30);
+    --t-line-rgb:var(--c-white-30-rgb);
+
+    --t-line-thin:var(--c-white-20);
+    --t-line-thin-rgb:var(--c-white-20-rgb);
+
+    --t-small:var(--c-white-60);
+    --t-small-rgb:var(--c-white-60-rgb);
+
+    --t-text:var(--c-white);
+    --t-text-rgb:var(--c-white-rgb);
+
+    --t-heading:var(--c-black);
+    --t-heading-rgb:var(--c-black-rgb);
+
+    --t-primary:var(--c-white);
+    --t-primary-rgb:var(--c-white-rgb);
+
+    --t-accent:var(--c-black);
+    --t-accent-rgb:var(--c-black-rgb);
+
+    --t-button_primary_accent:var(--t-background);
+    --t-button_primary_accent-rgb:var(--t-background-rgb);
+    --t-button_link_active-text:var(--t-heading);
+    --t-button_link_active-text-rgb:var(--t-heading-rgb);
+    color:var(--t-text);
+  }
+
+  /* .ui-green */
+  .ui-green{
+    --t-background:var(--c-green);
+    --t-background-rgb:var(--c-green-rgb);
+
+    --t-line:var(--c-white-30);
+    --t-line-rgb:var(--c-white-30-rgb);
+
+    --t-line-thin:var(--c-white-20);
+    --t-line-thin-rgb:var(--c-white-20-rgb);
+
+    --t-small:var(--c-white-60);
+    --t-small-rgb:var(--c-white-60-rgb);
+
+    --t-text:var(--c-white);
+    --t-text-rgb:var(--c-white-rgb);
+
+    --t-heading:var(--c-black);
+    --t-heading-rgb:var(--c-black-rgb);
+
+    --t-primary:var(--c-white);
+    --t-primary-rgb:var(--c-white-rgb);
+
+    --t-accent:var(--c-black);
+    --t-accent-rgb:var(--c-black-rgb);
+
+    --t-button_primary_accent:var(--t-background);
+    --t-button_primary_accent-rgb:var(--t-background-rgb);
+    --t-button_link_active-text:var(--t-heading);
+    --t-button_link_active-text-rgb:var(--t-heading-rgb);
+    color:var(--t-text);
+  }
+
+  /* .ui-dark */
+  .ui-dark{
+    --t-background:var(--c-black);
+    --t-background-rgb:var(--c-black-rgb);
+
+    --t-avatar:var(--c-white-10);
+    --t-avatar-rgb:var(--c-white-10-rgb);
+
+    --t-line:var(--c-white-30);
+    --t-line-rgb:var(--c-white-30-rgb);
+
+    --t-line-thin:var(--c-white-20);
+    --t-line-thin-rgb:var(--c-white-20-rgb);
+
+    --t-small:var(--c-white-60);
+    --t-small-rgb:var(--c-white-60-rgb);
+
+    --t-text:var(--c-white);
+    --t-text-rgb:var(--c-white-rgb);
+
+    --t-heading:var(--c-white);
+    --t-heading-rgb:var(--c-white-rgb);
+
+    --t-primary:var(--c-white);
+    --t-primary-rgb:var(--c-white-rgb);
+
+    --t-accent:var(--c-orange);
+    --t-accent-rgb:var(--c-orange-rgb);
+
+    --t-skeleton:rgba(var(--t-heading-rgb),.2);
+
+    --t-skeleton-shimmer:rgba(var(--t-heading-rgb),.1);
+
+    --t-button_primary_accent:var(--t-background);
+    --t-button_primary_accent-rgb:var(--t-background-rgb);
+    --t-button_outline_text:var(--c-white);
+    --t-button_outline_text-rgb:var(--c-white-rgb);
+    --t-button_outline_background:transparent;
+    --t-button_outline_background-rgb:0,0,0;
+    --t-button_outline_border:var(--c-white);
+    --t-button_outline_border-rgb:var(--c-white-rgb);
+    --t-button_outline--small_accent:var(--c-orange);
+    --t-button_outline--small_accent-rgb:var(--c-orange-rgb);
+    --t-button_outline--small_text:var(--t-small);
+    --t-button_outline--small_text-rgb:var(--t-small-rgb);
+    --t-button_outline--small_background:transparent;
+    --t-button_outline--small_background-rgb:0,0,0;
+    --t-button_outline--small_border:var(--t-line-thin);
+    --t-button_outline--small_border-rgb:var(--t-line-thin-rgb);
+    --t-button_outline--small_hovered-text:var(--t-heading);
+    --t-button_outline--small_hovered-text-rgb:var(--t-heading-rgb);
+    --t-button_outline--small_hovered-border:var(--t-heading);
+    --t-button_outline--small_hovered-border-rgb:var(--t-heading-rgb);
+    --t-button_outline--small_disabled-text:var(--t-line);
+    --t-button_outline--small_disabled-text-rgb:var(--t-line-rgb);
+    --t-button_outline--small_disabled-border:var(--t-line);
+    --t-button_outline--small_disabled-border-rgb:var(--t-line-rgb);
+    --t-button_outline--accent_accent:var(--t-accent);
+    --t-button_outline--accent_accent-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_text:var(--t-accent);
+    --t-button_outline--accent_text-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_background:transparent;
+    --t-button_outline--accent_background-rgb:0,0,0;
+    --t-button_outline--accent_border:var(--t-accent);
+    --t-button_outline--accent_border-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_hovered-text:var(--t-accent);
+    --t-button_outline--accent_hovered-text-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_hovered-border:var(--t-accent);
+    --t-button_outline--accent_hovered-border-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_disabled-text:var(--t-accent);
+    --t-button_outline--accent_disabled-text-rgb:var(--t-accent-rgb);
+    --t-button_outline--accent_disabled-border:var(--t-accent);
+    --t-button_outline--accent_disabled-border-rgb:var(--t-accent-rgb);
+
+    --t-input_base_label:var(--t-small);
+    --t-input_base_label-rgb:var(--t-small-rgb);
+    --t-input_base_background:transparent;
+    --t-input_base_background-rgb:0,0,0;
+    --t-input_base_color:var(--t-heading);
+    --t-input_base_color-rgb:var(--t-heading-rgb);
+    --t-input_base_border:var(--t-heading);
+    --t-input_base_border-rgb:var(--t-heading-rgb);
+    --t-input_base_placeholder:var(--t-small);
+    --t-input_base_placeholder-rgb:var(--t-small-rgb);
+    --t-input_base_empty-label:var(--t-small);
+    --t-input_base_empty-label-rgb:var(--t-small-rgb);
+    --t-input_base_empty-border:var(--t-line);
+    --t-input_base_empty-border-rgb:var(--t-line-rgb);
+    --t-input_base_hovered-color:var(--t-heading);
+    --t-input_base_hovered-color-rgb:var(--t-heading-rgb);
+    --t-input_base_hovered-border:var(--t-heading);
+    --t-input_base_hovered-border-rgb:var(--t-heading-rgb);
+    --t-input_base_focused-color:var(--t-heading);
+    --t-input_base_focused-color-rgb:var(--t-heading-rgb);
+    --t-input_base_focused-border:var(--t-heading);
+    --t-input_base_focused-border-rgb:var(--t-heading-rgb);
+    --t-input_base_disabled-label:var(--t-small);
+    --t-input_base_disabled-label-rgb:var(--t-small-rgb);
+    --t-input_base_disabled-color:var(--t-small);
+    --t-input_base_disabled-color-rgb:var(--t-small-rgb);
+    --t-input_base_disabled-border:var(--t-small);
+    --t-input_base_disabled-border-rgb:var(--t-small-rgb);
+    --t-input_base_error-label:var(--t-text);
+    --t-input_base_error-label-rgb:var(--t-text-rgb);
+    --t-input_base_error-border:var(--c-error);
+    --t-input_base_error-border-rgb:var(--c-error-rgb);
+    --t-input_base_error-empty-label:var(--t-small);
+    --t-input_base_error-empty-label-rgb:var(--t-small-rgb);
+    --t-input_base_error-hovered-label:var(--t-small);
+    --t-input_base_error-hovered-label-rgb:var(--t-small-rgb);
+    color:var(--t-text);
+  }
+
+  /* .ui-light - no override block exists in the reference, it resolves to the
+        default white matrix. Kept as an explicit no-op so the class name is a
+        documented part of the API rather than a missing file. */
+  .ui-light { /* intentionally empty */ }
+
+  /* .ui-print - same: no override block, only matched by the print rules. */
+  .ui-print { /* intentionally empty */ }
+
+  /* ------------------------------------------------------------------------
+     BACKGROUND HELPERS - .ui-*-background sits beside the theme class in the
+     reference markup.
+     ------------------------------------------------------------------------ */
+
+  .ui-blue-background,.ui-dark-background,.ui-green-background,.ui-light-background,.ui-orange-background,.ui-pink-background,.ui-print-background,body{background:var(--c-white)}
+  .ui-dark-background{background:var(--c-black)}
+  .ui-orange-background{background:var(--c-orange)}
+  .ui-blue-background{background:var(--c-blue)}
+  .ui-pink-background{background:var(--c-pink)}
+  .ui-green-background{background:var(--c-green)}
+  .ui-background{background:var(--t-background)}
+
+  /* ------------------------------------------------------------------------
+     PRINT THEME - the reference re-maps the semantic tokens for print and
+     .ui-print is a real theme class, so both rules are reproduced.
+     ------------------------------------------------------------------------ */
+
+  .ui-blue,.ui-dark,.ui-green,.ui-light,.ui-orange,.ui-pink,.ui-print .ui-dark .ui-orange .ui-blue .ui-pink .ui-green,:root body{--t-background:#fff;--t-background-rgb:255,255,255;--t-line:#666;--t-line-rgb:102,102,102;--t-small:#666;--t-small-rgb:102,102,102;--t-text:#000;--t-text-rgb:0,0,0;--t-heading:#000;--t-heading-rgb:0,0,0;--t-primary:#000;--t-primary-rgb:0,0,0;--t-accent:#000;--t-accent-rgb:0,0,0}
+
+  .body,.ui-background body,.ui-blue-background,.ui-dark-background,.ui-green-background,.ui-light-background,.ui-orange-background,.ui-pink-background,.ui-print-background .ui-dark-background .ui-orange-background .ui-blue-background .ui-pink-background .ui-green-background{background:#fff}
+}
+
+/* ==========================================================================
+   COMPONENT-PRIVATE TOKEN DEFAULTS
+   Not --t-*: these are the per-component knobs the reference sets in its own
+   layers, collected here so component CSS only has to consume them.
+   ========================================================================== */
+
+/* Responsive display switches exposed as tokens instead of classes. */
+@layer utilities {
+  :root{--is-visible--sm-down:var(--md,none) var(--n-md,block);--is-visible--md-up:var(--md,block) var(--n-md,none);--is-visible--xxxl-down:var(--xxxxl,none) var(--n-xxxxl,block);--is-visible--xxxxl:var(--xxxxl,block) var(--n-xxxxl,none)}
+}
+
+/* --promo-header-height is declared UNLAYERED in the reference. Unlayered
+   author CSS outranks every named layer, so keeping it unlayered is
+   load-bearing. Resolved at 1376x772: 60 * 0.9555 = 57.33px. */
+:root{--promo-header-height:var(--xxxxl,calc(var(--scale-px)*80)) var(--n-xxxxl,var(--md,calc(var(--scale-px)*60)) var(--n-md,calc(var(--scale-px)*40)))}
+
+/* Cookie-banner reservation. reference-lock.json records the capture state as
+   `cookie-message-active`, so the live desktop values are
+   --cookie-message-height = 60 * --scale-px = 57.33px and
+   --cookie-message-mobile-height = 0px at md-up. Unlayered in the source. */
+body{--cookie-message-mobile-height:0px;--cookie-message-height:0px}body.cookie-message-active{--cookie-message-mobile-height:var(--md,0px) var(--n-md,calc(var(--scale-px)*40));--cookie-message-height:var(--md,calc(var(--scale-px)*60)) var(--n-md,calc(var(--scale-px)*40))}.cookie-message{bottom:var(--md,var(--spacing)) var(--n-md,0);display:var(--md,flex) var(--n-md,block);height:40px;justify-content:center;left:0;pointer-events:none;position:fixed;width:100%;z-index:1000}.cookie-message__layout{align-items:center;border-top:var(--md,none) var(--n-md,calc(var(--scale-px)*1) solid var(--t-line));box-shadow:var(--md,0 calc(var(--scale-px)*20) calc(var(--scale-px)*80) 0 rgba(var(--c-black-rgb),.2)) var(--n-md,none);display:flex;flex-wrap:nowrap;gap:var(--spacing);height:100%;justify-content:var(--md,center) var(--n-md,space-between);padding:var(--md,calc(var(--scale-px)*5) calc(var(--scale-px)*5) calc(var(--scale-px)*5) calc(var(--scale-px)*10)) var(--n-md,calc(var(--scale-px)*10) calc(var(--scale-px)*20));pointer-events:auto}.cookie-message__layout-buttons{display:flex;flex-wrap:nowrap;gap:var(--md,calc(var(--scale-px)*5)) var(--n-md,calc(var(--scale-px)*10))}.cookie-message__text{display:flex;gap:.3em}.page-enter-active,.page-leave-active{transition:opacity .4s ease}.page-enter-from,.page-leave-to{opacity:0}@layer components-base{.scrollbar{bottom:var(--scrollbar-padding-y,0);padding-left:var(--scrollbar-padding-x,0);padding-right:var(--scrollbar-padding-x,0);position:absolute;right:0;top:var(--scrollbar-padding-y,0)}.scrollbar__position{height:100%}.scrollbar__thumb{background:var(--scrollbar-color,#000);border-radius:var(--scrollbar-radius,0);cursor:grab;opacity:var(--scrollbar-opacity,1);position:relative;transition:all .4s ease;transition-property:background,opacity;width:var(--scrollbar-width,8px)}.scrollbar__thumb:before{bottom:-10px;content:"";left:-10px;position:absolute;right:-10px;top:-10px}.scrollbar__thumb:hover{background:var(--scrollbar-hover-color,var(--scrollbar-color,#000));opacity:var(--scrollbar-hover-opacity,var(--scrollbar-opacity,1px))}.scrollbar--dragging .scrollbar__thumb{background:var(--scrollbar-dragging-color,var(--scrollbar-hover-color,#000));cursor:grabbing;opacity:var(--scrollbar-dragging-opacity,var(--scrollbar-hover-opacity,1px))}.scrollbar--invisible .scrollbar__thumb,.scrollbar--invisible .scrollbar__thumb:hover{cursor:default;opacity:0}.with-modal .scrollable--root>.scrollbar,.with-overlay .scrollable--root>.scrollbar{opacity:0}}
+
+@layer components-base {
+  /* .btn is declared four times in the reference (type shorthand, transition,
+     geometry, icon spacing). All reproduced, in source order. */
+  .btn{align-items:center;background-color:transparent;border:0;border-radius:var(--btn-border-radius,none);box-shadow:var(--btn-box-shadow,none);color:var(--btn-text);cursor:pointer;display:inline-flex;height:var(--btn-height,auto);justify-content:center;opacity:var(--btn-opacity,1);padding:0;position:relative;text-align:center;text-decoration:none;touch-action:manipulation;-webkit-user-select:none;-moz-user-select:none;user-select:none;vertical-align:middle;white-space:nowrap}
+  .btn{box-shadow:var(--btn-focused-box-shadow,var(--btn-box-shadow));color:var(--btn-focused-text,var(--btn-text));opacity:var(--btn-focused-opacity,var(--btn-opacity))}
+  .btn{color:var(--btn-hovered-text,var(--btn-text))}
+  .btn{box-shadow:var(--btn-disabled-box-shadow,var(--btn-box-shadow));color:var(--btn-disabled-text,var(--btn-text));opacity:var(--btn-disabled-opacity,var(--btn-opacity))}
+  .btn{box-shadow:var(--btn-active-box-shadow,var(--btn-box-shadow));color:var(--btn-active-text,var(--btn-text));opacity:var(--btn-active-opacity,var(--btn-opacity))}
+  .btn{color:var(--btn-active-focused-hovered-text,var(--btn-active-focused-text))}
+  .btn{border:1px solid var(--t-primary)!important;color:var(--t-heading)!important}
+  .btn{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .btn{--fos:-.169em;--foe:-.088em}
+  .btn{transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:color,opacity}
+  .btn{--btn-height:var(--md,calc(var(--scale-px)*40)) var(--n-md,calc(var(--scale-px)*30));--btn-padding:var(--md,0 calc(var(--scale-px)*12)) var(--n-md,0 calc(var(--scale-px)*9))}
+  .btn{--btn-icon-spacing:calc(var(--scale-px)*10)}
+
+  .btn--smallish{--btn-height:calc(var(--scale-px)*30);--btn-padding:0 calc(var(--scale-px)*9)}
+  .btn--small{--btn-height:var(--md,calc(var(--scale-px)*30)) var(--n-md,calc(var(--scale-px)*20));--btn-padding:0 calc(var(--scale-px)*9)}
+  .btn--medium{--btn-height:calc(var(--scale-px)*40);--btn-padding:0 calc(var(--scale-px)*9)}
+  .btn--large{--btn-height:var(--xxxxl,calc(var(--scale-px)*120)) var(--n-xxxxl,var(--md,calc(var(--scale-px)*80)) var(--n-md,calc(var(--scale-px)*60)));--btn-padding:var(--md,calc(var(--scale-px)*12)) var(--n-md,calc(var(--scale-px)*9) calc(var(--scale-px)*9) calc(var(--scale-px)*10))}
+  .btn--icon-spacing-small{--btn-icon-spacing:calc(var(--scale-px)*6)}
+  .btn--icon-spacing-smallish{--btn-icon-spacing:calc(var(--scale-px)*20)}
+  .btn--icon-spacing-medium{--btn-icon-spacing:var(--md,calc(var(--scale-px)*43)) var(--n-md,calc(var(--scale-px)*19))}
+  .btn--link{--btn-border-radius:0!important}
+.btn--link{--btn-accent:var(--t-button_link_accent);--btn-text:var(--t-button_link_text);--btn-hovered-text:var(--t-button_link_hovered-text);--btn-active-hovered-text:var(--t-button_link_active-hovered-text);--btn-active-text:var(--t-button_link_active-text);--btn-active-accent:var(--t-button_link_active-accent)}
+  .btn__content{align-items:center;display:flex;gap:var(--btn-icon-spacing);height:var(--btn-height);justify-content:space-between;min-width:100%;padding:var(--btn-padding);position:relative;z-index:1}
+  .icon{display:inline-block;flex-shrink:0;height:calc(var(--icon-height)*var(--scale-px, 1));vertical-align:middle;width:calc(var(--icon-width)*var(--scale-px, 1))}
+
+  .spinner{animation:spinner 1s linear infinite;border:var(--spinner-radius,calc(var(--scale-px)*2)) solid var(--spinner-color,currentColor);border-bottom-color:transparent;border-radius:50%;display:block;height:var(--spinner-size,calc(var(--scale-px)*16));left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);transform-origin:50% 50%;width:var(--spinner-size,calc(var(--scale-px)*16));z-index:2}.btn .spinner{--spinner-color:currentColor}@keyframes spinner{0%{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(1turn)}}}@layer components{.spinner{--spinner-size:calc(var(--scale-px)*17);--spinner-radius:1px;--spinner-color:currentColor}.spinner--large{--spinner-size:calc(var(--scale-px)*100);--spinner-radius:2px}
+}

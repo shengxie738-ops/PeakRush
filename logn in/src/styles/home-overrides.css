@@ -1,0 +1,1036 @@
+/* ==========================================================================
+   home-overrides.css — follow.art desktop clone (T02/T03 page + section layer)
+   ==========================================================================
+   Scope: the rules the four authored style files (tokens.css, reset.css,
+   typography.css, layout.css) do NOT carry, but that the reference DOM of
+   docs/DOM_CONTRACT.md needs. Nothing below is invented: each numbered block
+   names the captured chunk it was lifted from, byte-for-byte. Anything written
+   by this clone instead of lifted is flagged  CLONE-LOCAL  at its head.
+
+   Layer order statement repeated (load-bearing, see reset.css line 18).
+   ========================================================================== */
+
+@layer reset, base, utilities, components-base, components, overrides;
+
+/* --------------------------------------------------------------------------
+   1. CLONE-LOCAL cascade repair for .btn colour / border
+   Evidence: entry.D4FdtiYZ.css declares the hard border + heading colour rule
+   INSIDE a print guard:
+     @media print{.btn{border:1px solid var(--t-primary)!important;
+                      color:var(--t-heading)!important}}
+   src/styles/tokens.css (line ~836) lifted that declaration WITHOUT its
+   @media print guard, so on screen every .btn gets a 1px border and
+   --t-heading text — the primary CTA is #fff on #000 in the reference
+   (--t-button_primary_text:var(--c-white), tokens.css line 178).
+   Fix (not an edit of tokens.css, per the brief): re-state the reference's own
+   colour/border cascade as !important declarations inside
+   @layer utilities + @media not print. !important reverses layer order, so
+   utilities outranks components-base and beats the stray tokens.css rule,
+   while --btn-text / --btn-hovered-text keep resolving to whatever the
+   @layer components variant rules set. Every declaration below is lifted
+   verbatim from entry.D4FdtiYZ.css in source order; only the !important flag
+   and the print guard are added by this clone.
+   -------------------------------------------------------------------------- */
+@layer utilities {
+@media not print {
+  .btn{border:0!important;color:var(--btn-text)!important;}
+  .btn:focus-visible{color:var(--btn-focused-text,var(--btn-text))!important;}
+  @media (hover:hover) and (pointer:fine){.btn:where(:not(.is-disabled,:disabled)):hover{color:var(--btn-hovered-text,var(--btn-text))!important;}}
+  .btn:is(.is-disabled,:disabled){color:var(--btn-disabled-text,var(--btn-text))!important;}
+  .btn.is-active{color:var(--btn-active-text,var(--btn-text))!important;}
+  .btn.is-active:focus-visible{color:var(--btn-active-focused-hovered-text,var(--btn-active-focused-text))!important;}
+  @media (hover:hover){.btn:where(:not(.is-disabled,:disabled)).is-active:hover{color:var(--btn-active-hovered-text,var(--btn-active-text))!important;}}
+  .btn:where(.is-disabled,:disabled).is-active{color:var(--btn-active-disabled-text,var(--btn-active-text))!important;}
+}
+}
+
+/* --------------------------------------------------------------------------
+   2. Utility atoms missing from the authored style files.
+   Evidence: entry.D4FdtiYZ.css (@layer utilities / @layer overrides) —
+   .is-hidden:* display switches, .hr-thin, .icon geometry and the
+   .icon-shake / .icon-shake-reverse keyframes. All are applied verbatim by the
+   reference render functions (Bi84onXO.js Icon + Button, Cc-BjTZB.js landing
+   sections, CCJzzdh0.js Join Us).
+   -------------------------------------------------------------------------- */
+@layer overrides{
+.is-hidden{display:none!important}
+}
+@layer overrides{
+@media (hover:none),(pointer:coarse){
+.is-hidden\:touch{display:none!important}
+}
+}
+@layer overrides{
+@media (hover:hover),(pointer:fine){
+.is-hidden\:hover{display:none!important}
+}
+}
+@layer overrides{
+.is-hidden\:xs-up{display:none!important}
+}
+@layer overrides{
+@media (max-width:567px) and (max-aspect-ratio:13/9){
+.is-hidden\:xs,.is-hidden\:xs-down{display:none!important}
+}
+}
+@layer overrides{
+@media (min-aspect-ratio:13/9),(min-width:568px){
+.is-hidden\:sm-up{display:none!important}
+}
+}
+@layer overrides{
+@media (max-width:567px) and (max-aspect-ratio:13/9),(max-width:667px) and (min-aspect-ratio:13/9),(max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9){
+.is-hidden\:sm-down{display:none!important}
+}
+}
+@layer overrides{
+@media (max-width:667px) and (min-aspect-ratio:13/9),(max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9){
+.is-hidden\:sm{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){
+.is-hidden\:md-up{display:none!important}
+}
+}
+@layer overrides{
+@media (max-aspect-ratio:10/11) and (max-width:1439px),(max-aspect-ratio:13/9) and (max-width:667px),(max-width:979px){
+.is-hidden\:md-down{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11) and (max-width:1439px),(min-width:668px) and (min-height:416px) and (max-width:979px){
+.is-hidden\:md{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:1440px),(min-width:980px) and (min-aspect-ratio:10/11){
+.is-hidden\:lg-up{display:none!important}
+}
+}
+@layer overrides{
+@media (max-aspect-ratio:10/11) and (max-width:1439px),(max-height:499px) and (min-aspect-ratio:10/11),(max-width:1199px) and (min-aspect-ratio:10/11),(max-width:979px){
+.is-hidden\:lg-down{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:980px) and (max-height:499px),(min-width:980px) and (max-width:1199px) and (min-aspect-ratio:10/11){
+.is-hidden\:lg{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:1920px) and (min-height:700px){
+.is-hidden\:xxxl-up{display:none!important}
+}
+}
+@layer overrides{
+@media (max-height:699px),(max-width:2399px){
+.is-hidden\:xxxl-down{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:1920px) and (min-height:700px) and (max-width:2399px){
+.is-hidden\:xxxl{display:none!important}
+}
+}
+@layer overrides{
+@media (min-width:2400px) and (min-height:700px){
+.is-hidden\:xxxxl-up{display:none!important}
+}
+}
+@layer overrides{
+.is-hidden\:xxxxl-down{display:none!important}
+}
+@layer overrides{
+@media (min-width:2400px) and (min-height:700px){
+.is-hidden\:xxxxl{display:none!important}
+}
+}
+@layer utilities{
+.hr-thin{border-color:var(--t-line-thin)}
+}
+@layer components-base{
+@keyframes spinner{0%{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(1turn)}}
+}
+@layer components-base{
+.icon{display:inline-block;flex-shrink:0;height:calc(var(--icon-height)*var(--scale-px, 1));vertical-align:middle;width:calc(var(--icon-width)*var(--scale-px, 1))}
+}
+@layer overrides{
+.icon-early-access{margin-bottom:var(--xxxxl,0) var(--n-xxxxl,calc(var(--scale-px)*-8));margin-left:var(--xxxxl,0) var(--n-xxxxl,calc(var(--scale-px)*-8))}
+}
+@layer overrides{
+.icon-videinfra{margin-bottom:-4px;margin-top:-4px}
+}
+@layer overrides{
+.icon-shake{animation:icon-next-animation .45s step-end infinite}
+}
+@layer overrides{
+.icon-shake-reverse{animation:icon-next-animation .45s step-end infinite reverse}
+}
+@layer overrides{
+.icon-next,.icon-next-reverse{animation:icon-next-animation .45s step-end infinite;transform-origin:center}
+}
+@layer overrides{
+.icon-cancel,.icon-confirm,.icon-open{margin:-1px}
+}
+@keyframes icon-next-animation{33.33%{transform:rotate(-5deg)}66.66%{transform:rotate(-10deg)}}
+@layer components-base{
+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-icon,var(--btn-text))}
+}
+@layer components-base{
+.btn:focus-visible .icon:where(:not(.btn__hover-accent)),:where(.btn-container):focus-visible .btn .icon:where(:not(.btn__hover-accent)),:where(input):focus-visible+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):focus-visible+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-focused-icon,var(--btn-icon))}
+}
+@layer components-base{
+@media (hover:hover) and (pointer:fine){
+.btn:where(:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)):hover .btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-hovered-icon,var(--btn-icon))}
+}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-disabled .btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-disabled-icon,var(--btn-icon))}
+}
+@layer components-base{
+.btn.is-active .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active .btn .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-icon,var(--btn-icon))}
+}
+@layer components-base{
+.btn.is-active:focus-visible .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active:focus-visible .btn .icon:where(:not(.btn__hover-accent)),:where(input):checked:focus-visible+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):checked:focus-visible+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-focused-hovered-icon,var(--btn-active-focused-icon))}
+}
+@layer components-base{
+@media (hover:hover){
+.btn:where(:not(.is-disabled,:disabled)).is-active:hover .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)).is-active:hover .btn .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)):hover .btn.is-active .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn:where(:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-hovered-icon,var(--btn-active-icon))}
+}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active .btn:where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label):where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn:where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-disabled-icon,var(--btn-active-icon))}
+}
+@layer components-base{
+.btn .icon{transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:color,transform}
+}
+
+/* --------------------------------------------------------------------------
+   3. Button component family.
+   Evidence: entry.D4FdtiYZ.css. tokens.css carries only the flattened .btn
+   base block; the variant, state and geometry rules below were missing. The
+   whole .btn family is re-lifted here (with its real :hover / :focus-visible /
+   .is-disabled selectors) in a later file inside the same layer, so the state
+   cascade matches the reference.
+   -------------------------------------------------------------------------- */
+@layer utilities{
+.text-right>.btn--block{justify-self:end}
+}
+@layer utilities{
+.text-right\:md>.btn--block{justify-self:var(--md,end) var(--n-md,start)}
+}
+@layer components-base{
+.btn .spinner{--spinner-color:currentColor}
+}
+@layer components-base{
+.btn{align-items:center;background-color:transparent;border:0;border-radius:var(--btn-border-radius,none);box-shadow:var(--btn-box-shadow,none);color:var(--btn-text);cursor:pointer;display:inline-flex;height:var(--btn-height,auto);justify-content:center;opacity:var(--btn-opacity,1);padding:0;position:relative;text-align:center;text-decoration:none;touch-action:manipulation;-webkit-user-select:none;-moz-user-select:none;user-select:none;vertical-align:middle;white-space:nowrap}
+}
+@layer components-base{
+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-icon,var(--btn-text))}
+}
+@layer components-base{
+.btn:after{background:var(--btn-background,transparent);border-color:var(--btn-border,transparent)}
+}
+@layer components-base{
+.btn:before{background:var(--btn-hovered-background,transparent);border-color:var(--btn-hovered-border,transparent)}
+}
+@layer components-base{
+.btn>svg rect{stroke:var(--btn-border,transparent)}
+}
+@layer components-base{
+.btn>svg rect+rect{stroke:var(--btn-hovered-border,transparent)}
+}
+@layer components-base{
+.btn:focus-visible,:where(.btn-container):focus-visible .btn,:where(input):focus-visible+.btn:where(label),:where(label input):focus-visible+.btn{box-shadow:var(--btn-focused-box-shadow,var(--btn-box-shadow));color:var(--btn-focused-text,var(--btn-text));opacity:var(--btn-focused-opacity,var(--btn-opacity))}
+}
+@layer components-base{
+.btn:focus-visible .icon:where(:not(.btn__hover-accent)),:where(.btn-container):focus-visible .btn .icon:where(:not(.btn__hover-accent)),:where(input):focus-visible+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):focus-visible+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-focused-icon,var(--btn-icon))}
+}
+@layer components-base{
+.btn:focus-visible:after,:where(.btn-container):focus-visible .btn:after,:where(input):focus-visible+.btn:where(label):after,:where(label input):focus-visible+.btn:after{background:var(--btn-focused-background,var(--btn-background));border-color:var(--btn-focused-border,var(--btn-border))}
+}
+@layer components-base{
+.btn:focus-visible:before,:where(.btn-container):focus-visible .btn:before,:where(input):focus-visible+.btn:where(label):before,:where(label input):focus-visible+.btn:before{background:var(--btn-focused-hovered-background,var(--btn-hovered-background));border-color:var(--btn-focused-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+.btn:focus-visible>svg rect,:where(.btn-container):focus-visible .btn>svg rect,:where(input):focus-visible+.btn:where(label)>svg rect,:where(label input):focus-visible+.btn>svg rect{stroke:var(--btn-focused-border,var(--btn-border))}
+}
+@layer components-base{
+.btn:focus-visible>svg rect+rect,:where(.btn-container):focus-visible .btn>svg rect+rect,:where(input):focus-visible+.btn:where(label)>svg rect+rect,:where(label input):focus-visible+.btn>svg rect+rect{stroke:var(--btn-focused-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+@media (hover:hover) and (pointer:fine){
+.btn:where(:not(.is-disabled,:disabled)):hover,:where(.btn-container:not(.is-disabled,:disabled)):hover .btn{color:var(--btn-hovered-text,var(--btn-text))}
+}
+}
+@layer components-base{
+@media (hover:hover) and (pointer:fine){
+.btn:where(:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)):hover .btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-hovered-icon,var(--btn-icon))}
+}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled),:where(.btn-container).is-disabled .btn{box-shadow:var(--btn-disabled-box-shadow,var(--btn-box-shadow));color:var(--btn-disabled-text,var(--btn-text));opacity:var(--btn-disabled-opacity,var(--btn-opacity))}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-disabled .btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-disabled-icon,var(--btn-icon))}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled):after,:where(.btn-container).is-disabled .btn:after{background:var(--btn-disabled-background,var(--btn-background));border-color:var(--btn-disabled-border,var(--btn-border))}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled):before,:where(.btn-container).is-disabled .btn:before{background:var(--btn-disabled-hovered-background,var(--btn-hovered-background));border-color:var(--btn-disabled-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled)>svg rect,:where(.btn-container).is-disabled .btn>svg rect{stroke:var(--btn-disabled-border,var(--btn-border))}
+}
+@layer components-base{
+.btn:is(.is-disabled,:disabled)>svg rect+rect,:where(.btn-container).is-disabled .btn>svg rect+rect{stroke:var(--btn-disabled-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+.btn.is-active,:where(.btn-container).is-active .btn,:where(input):checked+.btn:where(label),:where(label input):checked+.btn{box-shadow:var(--btn-active-box-shadow,var(--btn-box-shadow));color:var(--btn-active-text,var(--btn-text));opacity:var(--btn-active-opacity,var(--btn-opacity))}
+}
+@layer components-base{
+.btn.is-active .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active .btn .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-icon,var(--btn-icon))}
+}
+@layer components-base{
+.btn.is-active:after,:where(.btn-container).is-active .btn:after,:where(input):checked+.btn:where(label):after,:where(label input):checked+.btn:after{background:var(--btn-active-background,var(--btn-background));border-color:var(--btn-active-border,var(--btn-border))}
+}
+@layer components-base{
+.btn.is-active:before,:where(.btn-container).is-active .btn:before,:where(input):checked+.btn:where(label):before,:where(label input):checked+.btn:before{background:var(--btn-active-hovered-background,var(--btn-hovered-background));border-color:var(--btn-active-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+.btn.is-active>svg rect,:where(.btn-container).is-active .btn>svg rect,:where(input):checked+.btn:where(label)>svg rect,:where(label input):checked+.btn>svg rect{stroke:var(--btn-active-border,var(--btn-border))}
+}
+@layer components-base{
+.btn.is-active>svg rect+rect,:where(.btn-container).is-active .btn>svg rect+rect,:where(input):checked+.btn:where(label)>svg rect+rect,:where(label input):checked+.btn>svg rect+rect{stroke:var(--btn-active-hovered-border,var(--btn-hovered-border))}
+}
+@layer components-base{
+.btn.is-active:focus-visible,:where(.btn-container).is-active:focus-visible .btn,:where(input):checked:focus-visible+.btn:where(label),:where(label input):checked:focus-visible+.btn{color:var(--btn-active-focused-hovered-text,var(--btn-active-focused-text))}
+}
+@layer components-base{
+.btn.is-active:focus-visible .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active:focus-visible .btn .icon:where(:not(.btn__hover-accent)),:where(input):checked:focus-visible+.btn:where(label) .icon:where(:not(.btn__hover-accent)),:where(label input):checked:focus-visible+.btn .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-focused-hovered-icon,var(--btn-active-focused-icon))}
+}
+@layer components-base{
+@media (hover:hover){
+.btn:where(:not(.is-disabled,:disabled)).is-active:hover,:where(.btn-container:not(.is-disabled,:disabled)).is-active:hover .btn,:where(.btn-container:not(.is-disabled,:disabled)):hover .btn.is-active,:where(input):checked+.btn:where(label:not(.is-disabled,:disabled)):hover,:where(label input):checked+.btn:where(:not(.is-disabled,:disabled)):hover{color:var(--btn-active-hovered-text,var(--btn-active-text))}
+}
+}
+@layer components-base{
+@media (hover:hover){
+.btn:where(:not(.is-disabled,:disabled)).is-active:hover .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)).is-active:hover .btn .icon:where(:not(.btn__hover-accent)),:where(.btn-container:not(.is-disabled,:disabled)):hover .btn.is-active .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn:where(:not(.is-disabled,:disabled)):hover .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-hovered-icon,var(--btn-active-icon))}
+}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active,:where(.btn-container).is-active .btn:where(.is-disabled,:disabled),:where(input):checked+.btn:where(label):where(.is-disabled,:disabled),:where(label input):checked+.btn:where(.is-disabled,:disabled){box-shadow:var(--btn-active-disabled-box-shadow,var(--btn-active-box-shadow));color:var(--btn-active-disabled-text,var(--btn-active-text));opacity:var(--btn-active-disabled-opacity,var(--btn-active-opacity))}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active .icon:where(:not(.btn__hover-accent)),:where(.btn-container).is-active .btn:where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(input):checked+.btn:where(label):where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)),:where(label input):checked+.btn:where(.is-disabled,:disabled) .icon:where(:not(.btn__hover-accent)){color:var(--btn-active-disabled-icon,var(--btn-active-icon))}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active:after,:where(.btn-container).is-active .btn:where(.is-disabled,:disabled):after,:where(input):checked+.btn:where(label):where(.is-disabled,:disabled):after,:where(label input):checked+.btn:where(.is-disabled,:disabled):after{background:var(--btn-active-disabled-background,var(--btn-active-background));border-color:var(--btn-active-disabled-border,var(--btn-active-border))}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active:before,:where(.btn-container).is-active .btn:where(.is-disabled,:disabled):before,:where(input):checked+.btn:where(label):where(.is-disabled,:disabled):before,:where(label input):checked+.btn:where(.is-disabled,:disabled):before{background:var(--btn-active-disabled-hovered-background,var(--btn-active-hovered-background));border-color:var(--btn-active-disabled-hovered-border,var(--btn-active-hovered-border))}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active>svg rect,:where(.btn-container).is-active .btn:where(.is-disabled,:disabled)>svg rect,:where(input):checked+.btn:where(label):where(.is-disabled,:disabled)>svg rect,:where(label input):checked+.btn:where(.is-disabled,:disabled)>svg rect{stroke:var(--btn-active-disabled-border,var(--btn-active-border))}
+}
+@layer components-base{
+.btn:where(.is-disabled,:disabled).is-active>svg rect+rect,:where(.btn-container).is-active .btn:where(.is-disabled,:disabled)>svg rect+rect,:where(input):checked+.btn:where(label):where(.is-disabled,:disabled)>svg rect+rect,:where(label input):checked+.btn:where(.is-disabled,:disabled)>svg rect+rect{stroke:var(--btn-active-disabled-hovered-border,var(--btn-active-hovered-border))}
+}
+@layer components-base{
+.btn.is-disabled,.btn:disabled{cursor:default;pointer-events:none}
+}
+@layer components-base{
+.btn:where(span:not([role=button],[role=option])){cursor:default}
+}
+@layer components-base{
+.btn-container:not(.is-disabled,:disabled) .btn:where(span:not([role=button],[role=option])),label input:not(:disabled)+.btn:where(span:not([role=button],[role=option])){cursor:pointer}
+}
+@layer components-base{
+.btn.icon{display:inline-flex;transition-property:all}
+}
+@layer components-base{
+.btn.is-loading .btn__icon,.btn.is-loading .btn__text{opacity:0}
+}
+@layer components-base{
+.btn:after,.btn:before{border-radius:var(--btn-border-radius);bottom:0;content:"";left:0;position:absolute;right:0;top:0}
+}
+@layer components-base{
+.btn:before{z-index:1}
+}
+@layer components-base{
+.btn:after{pointer-events:none}
+}
+@layer components-base{
+.btn>svg rect{rx:var(--btn-border-radius);ry:var(--btn-border-radius)}
+}
+@layer components-base{
+@media print{
+.btn{border:1px solid var(--t-primary)!important;color:var(--t-heading)!important}
+}
+}
+@layer components-base{
+.btn{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn,.win .btn{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn{transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:color,opacity}
+}
+@layer components-base{
+.btn .icon{transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:color,transform}
+}
+@layer components-base{
+.btn:after,.btn:before{transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:transform,background-color,border-color,box-shadow,opacity}
+}
+@layer components-base{
+.btn:before{opacity:0}
+}
+@layer components-base{
+@media (hover:hover) and (pointer:fine){
+.btn:where(:not(.is-disabled,:disabled)):hover:before,:where(.btn-container:not(.is-disabled,:disabled)):hover .btn:before{opacity:1}
+}
+}
+@layer components-base{
+.btn--accent{--hover-accent-height:22px}
+}
+@layer components-base{
+.btn--accent .btn__hover-accent{color:var(--btn-accent);height:var(--hover-accent-height);left:max(-13%,-14px);opacity:0;pointer-events:none;position:absolute;top:50%;transform:scaleX(.5) translateY(-50%);transform-origin:0 50%;transition:.3s cubic-bezier(.25,.74,.22,.99);transition-property:opacity,transform;width:calc(100% + min(26%,28px));z-index:1}
+}
+@layer components-base{
+.btn--accent .btn__hover-accent--text{transform:scaleX(.2312138728) translateY(-50%);z-index:-1}
+}
+@layer components-base{
+.btn--accent.btn--no-role .btn__hover-accent{display:none}
+}
+@layer components-base{
+@media (hover:hover) and (pointer:fine){
+.btn--accent:where(:not(.is-disabled,:disabled)):hover .btn__hover-accent,:where(.btn-container:not(.is-disabled,:disabled)):hover .btn--accent .btn__hover-accent{opacity:1;transform:scaleX(1) translateY(-50%)}
+}
+}
+@layer components-base{
+.btn--accent:focus-visible .btn__hover-accent,:where(.btn-container):focus-visible .btn--accent .btn__hover-accent,:where(input):focus-visible+.btn--accent:where(label) .btn__hover-accent,:where(label input):focus-visible+.btn--accent .btn__hover-accent{opacity:1;transform:scaleX(1) translateY(-50%)}
+}
+@layer components-base{
+.btn--outline{--btn-border-size:1px}
+}
+@layer components-base{
+.btn--outline:after,.btn--outline:before{border-style:solid;border-width:var(--btn-border-size)}
+}
+@layer components-base{
+.btn--square{aspect-ratio:1;flex-grow:0;flex-shrink:0}
+}
+@layer components-base{
+.btn--square .btn__content{padding-left:0;padding-right:0}
+}
+@layer components-base{
+.btn--square .btn__text>img{max-width:var(--btn-height);-o-object-fit:cover;object-fit:cover}
+}
+@layer components-base{
+.btn--ellipsis,.btn--ellipsis .btn__text{min-width:0}
+}
+@layer components-base{
+.btn--ellipsis .btn__text-text{display:block;margin-bottom:-.2em;margin-top:-.2em;overflow:hidden;padding-bottom:.2em;padding-right:.1em;padding-top:.2em;text-overflow:ellipsis;white-space:nowrap}
+}
+@layer components-base{
+.btn--link{--btn-border-radius:0!important}
+}
+@layer components-base{
+.btn--link:where(:not(.btn--link--select)){--btn-padding:0!important}
+}
+@layer components-base{
+.btn--link:where(:not(.btn--full,.btn--square)){width:auto}
+}
+@layer components-base{
+.btn--link:where(:not(.btn--square)){height:auto}
+}
+@layer components-base{
+.btn--link:where(:not(.btn--square))>.btn__content{height:auto;justify-content:flex-start;text-align:left}
+}
+@layer components-base{
+.btn--link:before{display:none}
+}
+@layer components-base{
+.btn--link:focus-visible,:where(.btn-container):focus-visible .btn--link,:where(input):focus-visible+.btn--link:where(label),:where(label input):focus-visible+.btn--link{box-shadow:none}
+}
+@layer components-base{
+.btn--link:focus-visible:not(.btn-container),:where(.btn-container):focus-visible .btn--link:not(.btn-container),:where(input):focus-visible+.btn--link:where(label):not(.btn-container),:where(label input):focus-visible+.btn--link:not(.btn-container){outline-color:currentColor;outline-offset:1px;outline-style:auto;outline-width:1px}
+}
+@layer components-base{
+.btn--link--underline .btn__text{text-decoration:underline;text-decoration-color:var(--t-line-thin);text-underline-offset:.3em}
+}
+@layer components-base{
+.btn--link--underline:hover .btn__text{text-decoration:none}
+}
+@layer components-base{
+.btn--full{width:100%}
+}
+@layer components-base{
+.btn--full\:sm-down{width:var(--md,auto) var(--n-md,100%)}
+}
+@layer components-base{
+.btn--full\:md-up{width:var(--md,100%) var(--n-md,auto)}
+}
+@layer components-base{
+.btn--block{display:flex}
+}
+@layer components-base{
+.btn--block:where(:not(.btn--full,.btn--square)){width:-moz-fit-content;width:fit-content}
+}
+@layer components-base{
+.btn-container{cursor:pointer}
+}
+@layer components-base{
+.btn-container:is(.is-disabled,:disabled){cursor:default}
+}
+@layer components-base{
+.btn{--btn-height:var(--md,calc(var(--scale-px)*40)) var(--n-md,calc(var(--scale-px)*30));--btn-padding:var(--md,0 calc(var(--scale-px)*12)) var(--n-md,0 calc(var(--scale-px)*9))}
+}
+@layer components-base{
+.btn--smallish{--btn-height:calc(var(--scale-px)*30);--btn-padding:0 calc(var(--scale-px)*9)}
+}
+@layer components-base{
+.btn--small{--btn-height:var(--md,calc(var(--scale-px)*30)) var(--n-md,calc(var(--scale-px)*20));--btn-padding:0 calc(var(--scale-px)*9)}
+}
+@layer components-base{
+.btn--medium{--btn-height:calc(var(--scale-px)*40);--btn-padding:0 calc(var(--scale-px)*9)}
+}
+@layer components-base{
+.btn--large{--btn-height:var(--xxxxl,calc(var(--scale-px)*120)) var(--n-xxxxl,var(--md,calc(var(--scale-px)*80)) var(--n-md,calc(var(--scale-px)*60)));--btn-padding:var(--md,calc(var(--scale-px)*12)) var(--n-md,calc(var(--scale-px)*9) calc(var(--scale-px)*9) calc(var(--scale-px)*10))}
+}
+@layer components-base{
+.btn--large .btn__text{align-self:flex-end}
+}
+@layer components-base{
+.btn--large .btn__icon{align-self:flex-start}
+}
+@layer components-base{
+.btn--text-base{font-size:var(--xxxxl,calc(var(--scale-text-rem)*3.8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.6)) var(--n-md,calc(var(--scale-text-rem)*2.1)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*4.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*3)) var(--n-md,calc(var(--scale-text-rem)*2.5)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-base,.win .btn--text-base{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-smaller{font-size:var(--xxxxl,calc(var(--scale-text-rem)*1.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*1.3)) var(--n-md,calc(var(--scale-text-rem)*1.2)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*2)) var(--n-xxxxl,calc(var(--scale-text-rem)*1.6));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-smaller,.win .btn--text-smaller{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-base{font-size:calc(var(--scale-text-rem)*1.3);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.02em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-base,.win .btn--text-card-base{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-h1{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*30.1)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*25.7)) var(--n-md,calc(var(--scale-text-rem)*14.3))));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*23)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*20)) var(--n-md,calc(var(--scale-text-rem)*11))));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+}
+@layer components-base{
+.btn--text-h1,.win .btn--text-h1{--fos:-.167em;--foe:-.133em}
+}
+@layer components-base{
+.btn--text-h2-sm{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*22.8)) var(--n-md,calc(var(--scale-text-rem)*11.4)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*18)) var(--n-md,calc(var(--scale-text-rem)*9)));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+}
+@layer components-base{
+.btn--text-h2-sm,.win .btn--text-h2-sm{--fos:-.167em;--foe:-.133em}
+}
+@layer components-base{
+.btn--text-h5{font-size:calc(var(--scale-text-rem)*8.5);--lh:calc(var(--scale-text-rem)*9);font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+}
+@layer components-base{
+.btn--text-h5,.win .btn--text-h5{--fos:-.167em;--foe:-.133em}
+}
+@layer components-base{
+.btn--text-card-original{font-size:calc(var(--scale-text-rem)*2);--lh:calc(var(--scale-text-rem)*2.5);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-original,.win .btn--text-card-original{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card{font-size:calc(var(--scale-text-rem)*1.6);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card,.win .btn--text-card{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-lead{font-size:calc(var(--scale-text-rem)*1.6);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-lead,.win .btn--text-card-lead{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-lead-sm{font-size:var(--md,calc(var(--scale-text-rem)*1.6)) var(--n-md,calc(var(--scale-text-rem)*1.3));--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:var(--md,-.03em) var(--n-md,-.02em);line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-lead-sm,.win .btn--text-card-lead-sm{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-small{font-size:calc(var(--scale-text-rem)*1.3);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.02em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-small,.win .btn--text-card-small{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-medium{font-size:calc(var(--scale-text-rem)*1.6);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-medium,.win .btn--text-card-medium{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-large{font-size:calc(var(--scale-text-rem)*2);--lh:calc(var(--scale-text-rem)*2.5);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-large,.win .btn--text-card-large{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-card-h1{font-size:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*3.2));--lh:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*3.5));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.04em;line-height:var(--lh);text-transform:none}
+}
+@layer components-base{
+.btn--text-card-h1,.win .btn--text-card-h1{--fos:-.169em;--foe:-.088em}
+}
+@layer components-base{
+.btn--text-left .btn__content{justify-content:flex-start}
+}
+@layer components-base{
+.btn--text-right .btn__content{justify-content:flex-end}
+}
+@layer components-base{
+.btn{--btn-icon-spacing:calc(var(--scale-px)*10)}
+}
+@layer components-base{
+.btn--icon-spacing-small{--btn-icon-spacing:calc(var(--scale-px)*6)}
+}
+@layer components-base{
+.btn--icon-spacing-smallish{--btn-icon-spacing:calc(var(--scale-px)*20)}
+}
+@layer components-base{
+.btn--icon-spacing-medium{--btn-icon-spacing:var(--md,calc(var(--scale-px)*43)) var(--n-md,calc(var(--scale-px)*19))}
+}
+@layer components-base{
+.btn--full.btn--icon-spacing-max .btn__content{justify-content:space-between}
+}
+@layer components-base{
+.btn--primary{--btn-accent:var(--t-button_primary_accent);--btn-text:var(--t-button_primary_text);--btn-background:var(--t-button_primary_background);--btn-hovered-text:var(--t-button_primary_hovered-text);--btn-hovered-background:var(--t-button_primary_hovered-background);--btn-disabled-background:var(--t-button_primary_disabled-background)}
+}
+@layer components-base{
+.btn--secondary{--btn-accent:var(--t-button_secondary_accent);--btn-text:var(--t-button_secondary_text);--btn-background:var(--t-button_secondary_background);--btn-hovered-text:var(--t-button_secondary_hovered-text);--btn-hovered-background:var(--t-button_secondary_hovered-background);--btn-disabled-background:var(--t-button_secondary_disabled-background)}
+}
+@layer components-base{
+.btn--danger{--btn-accent:var(--t-button_danger_accent);--btn-text:var(--t-button_danger_text);--btn-background:var(--t-button_danger_background);--btn-hovered-text:var(--t-button_danger_hovered-text);--btn-hovered-background:var(--t-button_danger_hovered-background)}
+}
+@layer components-base{
+.btn--outline{--btn-accent:var(--t-button_outline_accent);--btn-text:var(--t-button_outline_text);--btn-background:var(--t-button_outline_background);--btn-border:var(--t-button_outline_border);--btn-disabled-text:var(--t-button_outline_disabled-text);--btn-disabled-border:var(--t-button_outline_disabled-border)}
+}
+@layer components-base{
+.btn--outline--small{--btn-accent:var(--t-button_outline--small_accent);--btn-text:var(--t-button_outline--small_text);--btn-background:var(--t-button_outline--small_background);--btn-border:var(--t-button_outline--small_border);--btn-hovered-text:var(--t-button_outline--small_hovered-text);--btn-hovered-border:var(--t-button_outline--small_hovered-border);--btn-disabled-text:var(--t-button_outline--small_disabled-text);--btn-disabled-border:var(--t-button_outline--small_disabled-border)}
+}
+@layer components-base{
+.btn--outline--error{--btn-border:var(--t-button_outline--error_border)}
+}
+@layer components-base{
+.btn--link{--btn-accent:var(--t-button_link_accent);--btn-text:var(--t-button_link_text);--btn-hovered-text:var(--t-button_link_hovered-text);--btn-active-hovered-text:var(--t-button_link_active-hovered-text);--btn-active-text:var(--t-button_link_active-text);--btn-active-accent:var(--t-button_link_active-accent)}
+}
+@layer components-base{
+.btn--link--small{--btn-accent:var(--t-button_link--small_accent);--btn-text:var(--t-button_link--small_text);--btn-hovered-text:var(--t-button_link--small_hovered-text)}
+}
+@layer components-base{
+.btn--link--heading{--btn-accent:var(--t-button_link--heading_accent);--btn-text:var(--t-button_link--heading_text);--btn-hovered-text:var(--t-button_link--heading_hovered-text);--btn-active-text:var(--t-button_link--heading_active-text);--btn-disabled-text:var(--t-button_link--heading_disabled-text)}
+}
+@layer components-base{
+.btn--link--select{--btn-accent:var(--t-button_link--select_accent);--btn-text:var(--t-button_link--select_text);--btn-hovered-text:var(--t-button_link--select_hovered-text);--btn-active-text:var(--t-button_link--select_active-text)}
+}
+@layer components-base{
+.btn--link--error{--btn-accent:var(--t-button_link--error_accent);--btn-text:var(--t-button_link--error_text);--btn-hovered-text:var(--t-button_link--error_hovered-text)}
+}
+@layer components-base{
+.btn--outline--accent{--btn-accent:var(--t-button_outline--accent_accent);--btn-text:var(--t-button_outline--accent_text);--btn-background:var(--t-button_outline--accent_background);--btn-border:var(--t-button_outline--accent_border);--btn-hovered-text:var(--t-button_outline--accent_hovered-text);--btn-hovered-border:var(--t-button_outline--accent_hovered-border);--btn-disabled-text:var(--t-button_outline--accent_disabled-text);--btn-disabled-border:var(--t-button_outline--accent_disabled-border)}
+}
+
+/* --------------------------------------------------------------------------
+   4. Fixed header (promo-header), mobile menu (#menu modal), modal chrome,
+   .title wrapper, error layout, page transition.
+   Evidence: entry.D4FdtiYZ.css, matched against the markup emitted by
+   Bi84onXO.js PagePromoHeader / PagePromoMobileMenu / Modal / TitleAnimation /
+   PageError.
+   -------------------------------------------------------------------------- */
+.fade-absolute-enter-active{transition:opacity .8s cubic-bezier(.55,0,.1,1)}
+.fade-absolute-enter-from,.fade-absolute-leave-from,.fade-absolute-leave-to{opacity:0}
+.fade-absolute-enter-from{position:absolute}
+.fade-absolute-enter-to{opacity:1}
+@layer components-base{
+.with-modal .scrollable--root>.scrollbar,.with-overlay .scrollable--root>.scrollbar{opacity:0}
+}
+@layer components-base{
+.modal{top:0;right:0;bottom:0;left:0;overflow:hidden;position:fixed;z-index:3}
+}
+@layer components{
+.modal--menu{--grid-gx:0px;--grid-gy:0px;--grid-row-width:100vw;--grid-col-count:12;--grid-col-item-width:calc((var(--grid-row-width) - var(--grid-gx)*(var(--grid-col-count) - 1))/var(--grid-col-count))}
+}
+@layer components{
+.modal--menu .modal__wrapper-header-close{left:var(--md,calc(100vw - var(--grid-col-item-width)*3 - var(--grid-gx)*2 + var(--scale-px)*10 + var(--spacing))) var(--n-md,auto);right:var(--md,auto) var(--n-md,var(--spacing))}
+}
+@layer components{
+.modal--menu .modal__background{background-color:var(--c-gray-popup-bg);display:var(--md,none) var(--n-md,block)}
+}
+@layer components{
+.mobile-menu-logo{display:block;padding:20px;width:-moz-fit-content;width:fit-content}
+}
+@layer components{
+.mobile-menu{display:flex;flex-direction:column;height:100svh;padding-top:max(70px,10.2564102564svh)}
+}
+@layer components{
+.promo-header{left:0;position:fixed;top:0;width:100%;z-index:10}
+}
+@layer components{
+.promo-header:after{border-bottom:1px solid var(--t-line);bottom:0;content:"";display:none;left:0;position:absolute;transition:transform 1.5s cubic-bezier(.55,0,.1,1);width:100%}
+}
+@layer components{
+.promo-header--expanded{color:#00f}
+}
+@layer components{
+.promo-header--expanded .promo-header__row{transform:var(--md,translateY(calc(var(--scale-px)*-9))) var(--n-md,none)}
+}
+@layer components{
+.promo-header--expanded .promo-header__logo-text{opacity:var(--md,1) var(--n-md,0)}
+}
+@layer components{
+.promo-header--border:after{display:block}
+}
+@layer components{
+.promo-header--border-auto:after{display:block;transform:var(--md,scaleX(0)) var(--n-md,none)}
+}
+@layer components{
+.promo-header--border-auto.promo-header--expanded:after{transform:scaleX(1)}
+}
+@layer components{
+.title{position:relative}
+}
+@layer components{
+.title svg{display:block;height:auto;width:100%}
+}
+@layer components{
+.title path{transform-origin:50% 0}
+}
+@layer components{
+.error-layout{display:flex;flex-direction:column;height:100svh}
+}
+
+/* --------------------------------------------------------------------------
+   5. <Group> helper component (D0P05qe6.js) — whole chunk lifted.
+   Evidence: Group.EkqwFAZf.css.
+   -------------------------------------------------------------------------- */
+@layer components;@layer utilities{.group{align-items:flex-start;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-start}.group--tiny{gap:calc(var(--scale-px)*5)}.group--smaller{gap:calc(var(--scale-px)*10)}.group--progress{gap:calc(var(--scale-px)*14)}.group--small{gap:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10))}.group--medium{gap:calc(var(--scale-px)*20)}.group--spacing{gap:var(--spacing)}.group--v-start,.group--v-start\:xs{align-items:flex-start}.group--v-center,.group--v-center\:xs{align-items:center}.group--v-end,.group--v-end\:xs{align-items:flex-end}.group--h-start,.group--h-start\:xs{justify-content:flex-start}.group--h-center,.group--h-center\:xs{justify-content:center}.group--h-end,.group--h-end\:xs{justify-content:flex-end}.group--h-between,.group--h-between\:xs{justify-content:space-between}.group--wrap,.group--wrap\:xs{flex-wrap:wrap}.group--nowrap,.group--nowrap\:xs{flex-wrap:nowrap}.group--column,.group--column\:xs{flex-direction:column}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.group--v-start\:md{align-items:flex-start}.group--v-center\:md{align-items:center}.group--v-end\:md{align-items:flex-end}.group--h-start\:md{justify-content:flex-start}.group--h-center\:md{justify-content:center}.group--h-end\:md{justify-content:flex-end}.group--h-between\:md{justify-content:space-between}.group--wrap\:md{flex-wrap:wrap}.group--nowrap\:md{flex-wrap:nowrap}.group--column\:md{flex-direction:column}}@media (min-width:2400px) and (min-height:700px){.group--v-start\:xxxxl{align-items:flex-start}.group--v-center\:xxxxl{align-items:center}.group--v-end\:xxxxl{align-items:flex-end}.group--h-start\:xxxxl{justify-content:flex-start}.group--h-center\:xxxxl{justify-content:center}.group--h-end\:xxxxl{justify-content:flex-end}.group--h-between\:xxxxl{justify-content:space-between}.group--wrap\:xxxxl{flex-wrap:wrap}.group--nowrap\:xxxxl{flex-wrap:nowrap}.group--column\:xxxxl{flex-direction:column}}}
+
+/* --------------------------------------------------------------------------
+   6. HOME PAGE SECTION GEOMETRY — whole chunk lifted verbatim.
+   Evidence: index.DRJU4ja6.css, mapped to the DOM_CONTRACT sectionIds:
+     .intro          -> home.hero         (1544px, 2 canvases, landing-1-intro)
+     .section-2      -> home.get-seen     (1544px, 1 canvas, landing-2-get-seen)
+     .section-5      -> home.card         (2123px, 1 canvas, landing-5-nexus)
+     .section-4      -> home.centralize   (1544px, 0 canvases)
+     .section-3      -> home.audience     (1544px, 0 canvases)
+     .section-9      -> home.testimonials (1544px, 1 canvas, landing-9)
+     .section-7      -> home.connectory   (2316px, 1 canvas, landing-7)
+     .fixed-sign-up-button / -stub -> the sticky Join CTA the sections reserve
+   -------------------------------------------------------------------------- */
+@layer components{.intro{display:flex;flex-direction:column;justify-content:space-between}.intro>*{flex:1}.intro .landing-1-intro-webgl__canvas-wrapper canvas,.intro__footer,.intro__title,.intro__title-decoration{transition:transform 1.5s cubic-bezier(.55,0,.1,1)}.intro--show{opacity:1}.intro--show .intro__title{transform:translateY(0) scaleY(1)}.intro--show .intro__title-decoration{transform:translate(0)}.intro--show .intro__footer{transform:translateY(0)}.intro--show .landing-1-intro-webgl__canvas-wrapper canvas{transform:none!important}.intro__title{transform:translateY(-80%) scaleY(0)}@media (max-width:567px) and (max-aspect-ratio:13/9),(max-width:667px) and (min-aspect-ratio:13/9),(max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9){.intro__title{max-height:402px;min-height:312px}}@media screen and (max-width:567px) and (max-aspect-ratio:13/9) and (max-height:730px),screen and (max-width:667px) and (min-aspect-ratio:13/9) and (max-height:730px),screen and (max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9) and (max-height:730px){.intro__title{height:48.75svh!important}}@media screen and (max-width:567px) and (max-aspect-ratio:13/9) and (min-height:730px),screen and (max-width:667px) and (min-aspect-ratio:13/9) and (min-height:730px),screen and (max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9) and (min-height:730px){.intro__title{height:51.5384615385svh!important}}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.intro__title{position:relative;top:-4px}}.intro__title-decoration{left:var(--md,54.5%) var(--n-md,0);position:absolute;top:var(--md,54%) var(--n-md,52%);transform:var(--md,translateY(300%) rotate(35deg)) var(--n-md,translate(-100%,150%) rotate(35deg));transition-delay:1s;width:var(--md,19.3835616438vw) var(--n-md,64.1025641026vw)}.intro__title-decoration img{transform:var(--md,none) var(--n-md,rotateY(-251deg))}.intro__text-icon-wrapper{position:relative}.intro__text-icon{height:100%;left:var(--md,auto) var(--n-md,-1.6em);position:absolute;right:var(--md,-1.05em) var(--n-md,auto);top:var(--md,.1em) var(--n-md,-.1em);transform:var(--md,none) var(--n-md,rotateY(180deg));vertical-align:baseline;width:var(--xxxxl,calc(var(--scale-px)*24)) var(--n-xxxxl,var(--md,calc(var(--scale-px)*16)) var(--n-md,calc(var(--scale-px)*24)))}.intro__footer{display:flex;flex-direction:var(--md,row) var(--n-md,column);justify-content:space-between;margin-bottom:var(--cookie-message-mobile-height,0);position:relative;transform:translateY(120%);z-index:3}.intro .landing-1-intro-webgl__canvas-wrapper canvas{transform:var(--md,translateY(100%) rotate(35deg)) var(--n-md,translate(-100%,50%) rotate(35deg));transition-delay:1s}}@layer components{.section-2{gap:calc(var(--scale-px)*20);margin-bottom:var(--cookie-message-mobile-height,0)}.section-2__media{align-items:center;aspect-ratio:var(--md,700/680) var(--n-md,350/270);display:flex;justify-content:center;position:relative;width:100%}.section-2__media-wrapper{height:var(--md,36.9863013699vw) var(--n-md,110vw);width:var(--md,31.5068493151vw) var(--n-md,100%)}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.section-2__media-wrapper{left:50%;position:absolute;top:50%;transform:translate(-52.2%,-50%)}}.section-2__media-wrapper:hover{cursor:pointer}.section-2__media-wrapper:hover .btn__hover-accent{opacity:1;transform:scaleX(1) translateY(-50%)}.section-2__video-preview-wrapper,.section-2__video-preview-wrapper-inner{height:100%}.section-2__video-preview-title{bottom:var(--spacing);left:var(--spacing);position:absolute}.section-2__video-preview-play-btn{height:var(--md,4.1095890411vw) var(--n-md,calc(var(--scale-px)*40));left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);width:var(--md,4.1095890411vw) var(--n-md,calc(var(--scale-px)*40));z-index:1}.section-2__video-preview-play-btn .btn__hover-accent{height:var(--md,2.1917808219vw) var(--n-md,calc(var(--scale-px)*20));left:var(--md,-1.3698630137vw) var(--n-md,calc(var(--scale-px)*-10));width:var(--md,3.4246575342vw) var(--n-md,calc(var(--scale-px)*30))}.section-2__video-preview-play-icon{height:var(--md,1.095890411vw) var(--n-md,4.1025641026vw);width:var(--md,.6849315068vw) var(--n-md,2.5641025641vw)}.section-2__media-decoration{aspect-ratio:var(--md,630/561.4) var(--n-md,1/.8922);left:var(--md,49.3%) var(--n-md,-23.2%);position:absolute;top:50%;transform:var(--md,translate(-50%,-53.5%)) var(--n-md,translateY(-50%));width:var(--md,136.4285714286%) var(--n-md,40.2%);z-index:var(--md,-1) var(--n-md,0)}.section-2__title{position:relative;width:-moz-fit-content;width:fit-content}.section-2__title h2{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw)}.section-2__title h2 span{display:var(--md,inline-block) var(--n-md,inline)}.section-2__title-seen-word{position:relative}.section-2__title-icon-1,.section-2__title-icon-2{aspect-ratio:56/89;position:absolute}.section-2__title-icon-1{aspect-ratio:56/89;right:var(--xxxl,-9%) var(--n-xxxl,-2%);top:37%;width:var(--xxxl,calc(var(--scale-text-px)*76)) var(--n-xxxl,var(--md,calc(var(--scale-text-px)*56)) var(--n-md,calc(var(--scale-text-px)*35)))}.section-2__title-icon-2{right:var(--xxxl,-23%) var(--n-xxxl,-13%);top:28%;width:var(--xxxl,calc(var(--scale-text-px)*60)) var(--n-xxxl,var(--md,calc(var(--scale-text-px)*40)) var(--n-md,calc(var(--scale-text-px)*25)))}.section-2__description{align-self:var(--md,flex-end) var(--n-md,flex-start);max-width:var(--xxxxl,calc(var(--scale-text-px)*540)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*340)) var(--n-md,none))}.section-2__content{display:flex;flex-direction:column;position:relative}.section-2__content-top{flex:var(--md,1) var(--n-md,0)}.section-2__content-bottom{display:flex;flex:1;flex-direction:column;justify-content:space-between}.section-2__video-player-wrapper{align-items:center;display:flex;height:100svh;justify-content:center;position:relative}.section-2__video-player-wrapper iframe{pointer-events:auto!important}.section-2__video-player{align-items:center;display:flex;height:var(--md,79.4871794872svh) var(--n-md,auto);justify-content:center;width:var(--md,75.3424657534vw) var(--n-md,100%)}.section-2__video-player iframe{height:100%;width:100%}}@layer components{.section-5{align-items:stretch;display:flex;flex-direction:column;margin-bottom:var(--cookie-message-mobile-height,0);min-height:100svh;position:relative;z-index:var(--md,unset) var(--n-md,1)}.section-5__header{height:var(--md,51vw) var(--n-md,200vw);position:relative}.section-5__header-webgl{height:var(--md,60vw) var(--n-md,200vw);left:0;position:absolute;right:0;top:var(--md,0) var(--n-md,30vw)}.section-5__title--desktop{position:relative;top:-4px}.section-5__title-decoration{left:var(--md,6.5%) var(--n-md,11%);position:absolute;top:var(--md,23.5%) var(--n-md,5%);width:var(--md,9.7183098592%) var(--n-md,29.1428571429%)}.section-5__title-img{left:50%;position:absolute;top:var(--md,13%) var(--n-md,40%);transform:translate(-50%);width:var(--md,65vw) var(--n-md,130vw)}.section-5__description{align-self:var(--md,flex-end) var(--n-md,flex-start);max-width:var(--xxxxl,calc(var(--scale-text-px)*540)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*320)) var(--n-md,none))}.section-5__content{align-items:stretch;flex:1;min-height:var(--md,66.6666666667svh) var(--n-md,0)}.section-5__content-side{display:flex;flex-direction:column;justify-content:space-between}.section-5__description-1{max-width:var(--xxxxl,calc(var(--scale-text-px)*560)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*380)) var(--n-md,none))}.section-5__description-2{max-width:var(--xxxxl,calc(var(--scale-text-px)*640)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*420)) var(--n-md,none))}.section-5__btn-grid{display:flex;justify-content:flex-end}.section-5__btn-wrapper{position:relative}.section-5__btn-icon{position:absolute;right:var(--md,122%) var(--n-md,-2%);top:var(--md,-57%) var(--n-md,-105%);transform:var(--md,none) var(--n-md,rotate(-194deg) rotateX(155deg));width:var(--md,6.1643835616vw) var(--n-md,calc(var(--scale-px)*93))}}@layer components{.section-4{margin-bottom:var(--cookie-message-mobile-height,0)}.section-4__title{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw);position:relative;width:-moz-fit-content;width:fit-content}.section-4__title-word--inline-block{display:inline-block}.section-4__title-word{display:inline-flex;position:relative}.section-4__title-word:after{aspect-ratio:1/1;content:"";display:block;width:6vw}.section-4__title-word-decoration{height:45%;position:absolute;right:var(--md,18%) var(--n-md,0);top:31%;width:var(--md,34%) var(--n-md,40%)}.section-4__content,.section-4__content-texts{display:flex;flex-direction:column}.section-4__description{align-self:var(--md,flex-end) var(--n-md,flex-start);max-width:var(--xxxxl,calc(var(--scale-text-px)*540)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*320)) var(--n-md,none))}.section-4__cards-wrapper{align-items:center;display:flex;flex-direction:column;justify-content:center;position:relative}.section-4__cards-wrapper-decoration{aspect-ratio:1/1;position:absolute;width:var(--md,85%) var(--n-md,125%);z-index:-1}.section-4__cards-wrapper-decoration img,.section-4__cards-wrapper-decoration picture{height:100%;width:100%}.section-4__cards{aspect-ratio:var(--xxxl,1/.6) var(--n-xxxl,var(--md,1/.77145) var(--n-md,1/1.174));display:grid;gap:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10));grid-template:repeat(2,1fr)/repeat(6,1fr);width:100%;marker:none;list-style-type:none;margin:0;padding:0}.section-4__card{height:100%;perspective:1000px;width:100%}.section-4__card span:first-child,.section-4__card-back{color:var(--t-small)}.section-4__card:nth-child(-2n+3){grid-column:var(--md,2/span 2) var(--n-md,1/span 3)}.section-4__card:nth-child(2n){grid-column:var(--md,4/span 2) var(--n-md,4/span 3)}.section-4__card:hover .section-4__card-inner{transform:rotateY(180deg)}.section-4__card-inner{background:var(--t-background);height:100%;position:relative;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.55,0,.1,1);width:100%;will-change:transform}.section-4__card-back,.section-4__card-front{backface-visibility:hidden;display:flex;flex-direction:column;height:100%;justify-content:space-between;padding:var(--spacing);position:absolute;width:100%}.section-4__card-back{transform:rotateY(180deg)}}@layer components{.section-3{display:flex;flex-direction:column;margin-bottom:var(--cookie-message-mobile-height,0)}.section-3__content{flex:1}.section-3__title{position:relative;width:-moz-fit-content;width:fit-content}.section-3__title h2{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw)}.section-3__title-decoration{aspect-ratio:1/.9;left:var(--md,16.4%) var(--n-md,22%);position:absolute;top:30%;width:var(--xxxl,calc(var(--scale-text-px)*207)) var(--n-xxxl,var(--md,calc(var(--scale-text-px)*147)) var(--n-md,22.5641025641vw))}.section-3__texts{display:flex;flex-direction:column;justify-content:var(--md,space-between) var(--n-md,flex-start)}.section-3__description{max-width:var(--xxxxl,calc(var(--scale-text-px)*600)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*400)) var(--n-md,none));order:var(--md,0) var(--n-md,-1)}.section-3__sub-description{align-items:var(--md,flex-end) var(--n-md,flex-start);align-self:var(--md,flex-end) var(--n-md,flex-start);display:flex;flex-direction:column;gap:var(--md,calc(var(--scale-px)*24)) var(--n-md,calc(var(--scale-px)*20));max-width:var(--xxxxl,calc(var(--scale-text-px)*280)) var(--n-xxxxl,calc(var(--scale-text-px)*170))}.section-3__loop-carousel{display:flex;overflow:hidden;width:100%}@media (hover:hover){.section-3__loop-carousel:has(.section-3__card:hover) .section-3__loop-group{animation-play-state:paused}.section-3__loop-carousel:has(.section-3__card:hover) .section-3__card:not(:hover){opacity:10%}}.section-3__loop-group{animation:loop-carousel-animation 50s linear infinite;display:grid;gap:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10));grid-auto-flow:var(--md,column) var(--n-md,none);grid-template-columns:var(--md,none) var(--n-md,repeat(5,1fr));list-style-type:none;margin:0;padding-left:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10));will-change:transform}.section-3__card{aspect-ratio:1/1;position:relative;transition:opacity .3s cubic-bezier(.25,.74,.22,.99);width:var(--xxxl,10.4166666667vw) var(--n-xxxl,var(--md,calc(var(--scale-px)*160)) var(--n-md,28.2051282051vw))}.section-3__card:nth-child(n+6){transform:var(--md,none) var(--n-md,translateX(-50px))}@media (hover:hover){.section-3__card:hover .section-3__card-content{opacity:100%}}.section-3__card-content{top:0;right:0;bottom:0;left:0;opacity:0;position:absolute;transition:opacity .3s cubic-bezier(.25,.74,.22,.99);z-index:1}.section-3__card-content-item{position:absolute}.section-3__card-content-name{left:-10px;top:10px}.section-3__card-content-role{bottom:13px;right:-8px}.section-3__card-content-role .section-3__card-content-item-icon{color:var(--c-orange)}.section-3__card-content-item-text{padding:0 19px 0 8px;position:relative;z-index:1}.section-3__card-content-item-icon{color:var(--c-black);height:var(--xxxl,calc(var(--scale-px)*40)) var(--n-xxxl,calc(var(--scale-px)*30));left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);width:100%}@keyframes loop-carousel-animation{0%{transform:translate(-100%)}to{transform:translate(0)}}}@layer components{.section-9{align-items:stretch;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:var(--cookie-message-mobile-height,0);min-height:100svh;position:relative;z-index:var(--md,unset) var(--n-md,1)}.section-9__title-decoration{left:var(--md,6%) var(--n-md,4.5%);position:absolute;top:var(--md,35.5%) var(--n-md,15.5%);width:var(--md,16.8309859155%) var(--n-md,33.1428571429%)}.section-9__header{position:relative}.section-9__title--desktop{position:relative;top:-5px}.section-9__cards{height:var(--md,31.5068493151vw) var(--n-md,112.8205128205vw);inset:var(--md,24.5% 0 auto) var(--n-md,0 calc(var(--scale-px)*-20));margin-top:var(--md,0) var(--n-md,calc(var(--scale-px)*-110));position:var(--md,absolute) var(--n-md,relative);width:100vw}.section-9__card{transition:transform .8s cubic-bezier(.55,0,.1,1)}.section-9__description{color:var(--md,var(--t-text)) var(--n-md,var(--t-heading))}}@layer components{.section-7{align-items:stretch;display:flex;flex-direction:column;margin-bottom:var(--cookie-message-mobile-height,0);min-height:100svh;position:relative;z-index:var(--md,unset) var(--n-md,1)}.section-7__header{height:var(--md,64vw) var(--n-md,auto);padding-bottom:var(--md,0) var(--n-md,62.8205128205vw)}.section-7__subtitle{color:var(--c-black);text-align:var(--md,center) var(--n-md,left)}.section-7__title--desktop{position:relative;top:-5px}.section-7__title-decoration{left:var(--md,12.5%) var(--n-md,14%);position:absolute;top:var(--md,28.5%) var(--n-md,32%);width:var(--md,9.7183098592%) var(--n-md,39.4285714286%)}.section-7__content{align-items:stretch;flex:1}.section-7__content-side{display:flex;flex-direction:column;justify-content:space-between}.section-7__description-1,.section-7__description-2{max-width:var(--xxxxl,calc(var(--scale-text-px)*560)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*340)) var(--n-md,none))}.section-7__btn-grid{display:grid;gap:var(--spacing);grid-template-columns:repeat(6,1fr)}.section-7__btn-wrapper{grid-column:5/span 2;position:relative}.section-7__btn-icon{position:absolute;right:var(--md,122%) var(--n-md,-2%);top:var(--md,-57%) var(--n-md,-105%);transform:var(--md,none) var(--n-md,rotate(-194deg) rotateX(155deg));width:var(--md,6.1643835616vw) var(--n-md,calc(var(--scale-px)*93))}}.fixed-sign-up-button{bottom:calc(var(--spacing) + var(--cookie-message-mobile-height, 0px));display:grid;position:fixed;right:var(--spacing);width:var(--md,15.0684931507vw) var(--n-md,calc(100% - var(--spacing)*2));z-index:var(--md,4) var(--n-md,1)}.fixed-sign-up-button--transition-header{transition:transform 1.5s cubic-bezier(.55,0,.1,1)}.fixed-sign-up-button--transition-card-flipping{transition:transform .8s cubic-bezier(.55,0,.1,1)}.fixed-sign-up-button--hidden{opacity:0;z-index:-20!important}.fixed-sign-up-button__btn{width:100%}.fixed-sign-up-button-stub{height:var(--sign-up-height);width:var(--sign-up-width)}
+
+/* --------------------------------------------------------------------------
+   7. home.join — .wrapper-section-10 / .section-10 / .image-trail.
+   Evidence: Landing10JoinUs.DFvKynsT.css (whole chunk).
+   -------------------------------------------------------------------------- */
+@layer components{.image-trail{top:0;right:0;bottom:0;left:0;position:absolute}.image-trail__photo{left:0;position:absolute;top:0;transition:.4s ease;transition-property:scale,opacity;translate:-50% -50%;width:var(--md,10.9589041096vw) var(--n-md,28.2051282051vw)}.image-trail__photo--1,.image-trail__photo--active-1{left:var(--md,31.1428571429%) var(--n-md,24.2857142857%);scale:.5625;top:var(--md,36.941580756%) var(--n-md,78.5256410256%);z-index:3}.image-trail__photo--2,.image-trail__photo--active-2{left:var(--md,47.4285714286%) var(--n-md,47.1428571429%);scale:.625;top:var(--md,50.3436426117%) var(--n-md,94.5512820513%);z-index:2}.image-trail__photo--3,.image-trail__photo--active-3{left:var(--md,39.7142857143%) var(--n-md,37.1428571429%);scale:1;top:var(--md,61.8556701031%) var(--n-md,112.1794871795%);z-index:1}.image-trail--active .image-trail__photo{opacity:0;scale:.4545454545}.image-trail--active .image-trail__photo--active-1,.image-trail__photo--1{opacity:1;scale:1}.image-trail--active .image-trail__photo--active-2,.image-trail__photo--2{opacity:1;scale:.6363636364}.image-trail--active .image-trail__photo--active-3,.image-trail__photo--3{opacity:1;scale:.5454545455}.image-trail .image-trail:not(.image-trail--active) :not(.image-trail__photo--1,.image-trail__photo--2,.image-trail__photo--3){display:none}}@layer components{.wrapper-section-10{overflow:hidden}.section-10{align-items:stretch;display:flex;flex-direction:column;margin-bottom:var(--cookie-message-height,0)}.section-10__content{flex:1}.section-10__content-col{position:relative}.section-10__title--desktop{position:relative;top:-5px}.section-10__title-decoration{position:absolute;right:var(--md,24.1%) var(--n-md,17.2%);top:var(--md,18%) var(--n-md,13%);width:var(--md,12.676056338%) var(--n-md,24.2857142857%)}.section-10__title-photo{position:absolute}.section-10__title-photo-1{bottom:var(--md,0) var(--n-md,-22.7%);left:var(--md,19.9%) var(--n-md,28.5%);width:var(--md,6.095890411vw) var(--n-md,15.3846153846vw)}.section-10__title-photo-2{bottom:var(--md,12%) var(--n-md,-6.8%);left:var(--md,25.7%) var(--n-md,37%);width:var(--md,6.8493150685vw) var(--n-md,17.9487179487vw)}.section-10__title-photo-3{bottom:var(--md,20.7%) var(--n-md,2.8%);left:var(--md,5%) var(--n-md,8.5%);width:var(--md,10.9589041096vw) var(--n-md,28.2051282051vw)}.section-10__content-side{display:flex;flex-direction:column;justify-content:space-between}.section-10__description{max-width:var(--xxxxl,calc(var(--scale-text-px)*680)) var(--n-xxxxl,var(--md,calc(var(--scale-text-px)*460)) var(--n-md,none))}.section-10__btn-grid{display:grid;gap:var(--spacing);grid-template-columns:repeat(6,1fr)}.section-10__btn-wrapper{grid-column:var(--md,5/span 2) var(--n-md,1/span 12);position:relative}.section-10__btn-icon{position:absolute;right:var(--md,122%) var(--n-md,-2%);top:var(--md,-57%) var(--n-md,-105%);transform:var(--md,none) var(--n-md,rotate(-194deg) rotateX(155deg));width:var(--md,6.1643835616vw) var(--n-md,calc(var(--scale-px)*93))}.section-10__footer,.section-10__footer-side{display:flex;justify-content:space-between}.section-10__footer-side{align-items:flex-start}.section-10__footer-side-left{display:flex;flex-direction:column;gap:calc(var(--scale-px)*8)}.section-10__footer-social{display:flex;flex-direction:row;gap:calc(var(--scale-px)*10)}.section-10__footer-nav{display:flex;flex-direction:column;gap:var(--md,calc(var(--scale-px)*6)) var(--n-md,calc(var(--scale-px)*11));list-style-type:none;margin:0;padding:0}.section-10__signup-btn-wrapper--hidden{opacity:0}.section-10__made-by{display:flex;gap:calc(var(--scale-px)*10)}.section-10__made-by-icon{aspect-ratio:1/1;position:relative;width:calc(var(--scale-px)*18);z-index:1}}
+
+/* --------------------------------------------------------------------------
+   8. WebGL mount wrappers — the canvas is decoration, the DOM owns the layout.
+   Evidence: Landing1IntroWebGl.DZK6hbZ4.css, Landing5NexusWebGl.DUcfhe4o.css,
+   Landing7ConnectoryWebGl.Bm0q7C44.css, Landing9TestimonialsWebGl.RzTllNCW.css,
+   LoadingScreen.ByeB9m5w.css.
+   NOTE: the Landing2GetSeenWebGl CSS chunk is not present in
+   evidence/reference/raw/_nuxt/ (asset-manifest.json lists it but the file was
+   never downloaded), so .landing-2-get-seen-webgl geometry is declared in
+   block 9 instead, from the measured canvas box in
+   evidence/reference/webgl-scenes.json (canvasCss 584x686, ratio .8518 — the
+   md branch of .section-2__media-wrapper) and from the reference DOM in
+   wH0WNvJv.js (<div class="landing-2-get-seen-webgl" ref="container"> inside
+   .section-2__video-preview-wrapper; .section-2__media owns the layout size).
+   -------------------------------------------------------------------------- */
+@layer components{.landing-1-intro-webgl{flex:1}.landing-1-intro-webgl canvas,.landing-1-intro-webgl__canvas-wrapper{top:0;right:0;bottom:0;left:0;position:absolute}.landing-1-intro-webgl canvas:first-child{z-index:-1}}
+@layer components{.landing-5-nexus-webgl{align-items:stretch;display:flex;justify-content:center}.landing-5-nexus-webgl__content{aspect-ratio:var(--md,1.25/1) var(--n-md,1/1);height:100%}}
+@layer components{.landing-7-connectory-webgl{height:var(--md,75vw) var(--n-md,140vw);left:calc(var(--spacing)*-1);position:absolute;top:var(--md,0) var(--n-md, calc(100% - 50vw) );width:100vw}}
+@layer components{.landing-9-testimonials-webgl{bottom:-5vw;cursor:grab;left:0;position:absolute;right:0;top:-5vw}.landing-9-testimonials-webgl.is-dragging{cursor:grabbing}.landing-9-testimonials-webgl__navigation{align-items:center;bottom:var(--md,calc(var(--scale-px)*-30 + 5vw)) var(--n-md,calc(var(--scale-px)*7 + 5vw));display:flex;justify-content:space-between;left:50%;padding:var(--md,0) var(--n-md,0 calc(var(--scale-px)*20));position:absolute;transform:translate(-50%);width:var(--md,31.5068493151vw) var(--n-md,100%)}.landing-9-testimonials-webgl__navigation .is-disabled{opacity:.5}}
+@layer components{.loading-screen{top:0;right:0;bottom:0;left:0;position:fixed;z-index:9999}.loading-screen__decoration{animation:changingElements 1.5s linear infinite;left:50%;opacity:0;position:absolute;top:50%;transform:translate(-50%,-50%);width:var(--xxxxl,7vw) var(--n-xxxxl,var(--md,calc(var(--scale-px)*100)) var(--n-md,18vw))}.loading-screen__decoration-1{animation-delay:0s}.loading-screen__decoration-2{animation-delay:.3s}.loading-screen__decoration-3{animation-delay:.6s}.loading-screen__decoration-4{animation-delay:.9s}.loading-screen__decoration-5{animation-delay:1.2s}@keyframes changingElements{0%{opacity:0}10%{opacity:1}20%{opacity:0}to{opacity:0}}.loading-screen--background{background:var(--t-background)}}
+
+/* --------------------------------------------------------------------------
+   9. CLONE-LOCAL additions — no reference equivalent exists; each one is
+   required by the brief and is marked in the DOM with a data-evidence
+   attribute so the gap is visible in an audit instead of silently faked.
+     .landing-2-get-seen-webgl  geometry (measured, see block 8 NOTE)
+     .webgl-fallback            static poster shown until the first WebGL frame
+     .demo-notice               /signin /signup /gift-card local-demo notice
+     .pending-region            sub-page content region (pending-T00-subpage)
+     [data-evidence]            visibly-incomplete audit marker
+     prefers-reduced-motion     drops decorative motion, keeps every word of
+                                content (DOM_CONTRACT text is never hidden)
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* 9a — .landing-2-get-seen-webgl. Its CSS chunk is missing from the capture
+     (see block 8 NOTE), so this rule is derived, not lifted: wH0WNvJv.js renders
+     <div class="landing-2-get-seen-webgl" ref="container"> and sizes the Three.js
+     renderer from that element, and webgl-scenes.json measures canvasCss
+     584x686 (ratio .8518) inside the md branch of .section-2__media-wrapper
+     (31.5068493151vw x 36.9863013699vw). It therefore fills the
+     .section-2__media box, which is the element that owns the layout size. */
+  .landing-2-get-seen-webgl{inset:0;position:absolute}
+  .landing-2-get-seen-webgl canvas{display:block;height:100%;width:100%}
+
+  /* 9b — static poster, required by the brief: a WebGL section keeps a real
+     image visible until its first frame renders, then [data-webgl=live] is set
+     on the mount and the poster is dropped from the box entirely. */
+  .webgl-fallback{display:block;inset:0;pointer-events:none;position:absolute;z-index:0}
+  .webgl-fallback img{height:100%;-o-object-fit:cover;object-fit:cover;width:100%}
+  [data-webgl=live] .webgl-fallback{display:none}
+
+  /* 9c — local demo notice for /signin /signup /gift-card. position:fixed, and
+     rendered outside .scrollable__area, so it can never scroll away. */
+  .demo-notice{background:var(--c-black);border-radius:calc(var(--scale-px)*8);bottom:var(--spacing);color:var(--c-white);inset-inline:calc(var(--spacing)*2);max-width:calc(var(--scale-px)*520);padding:calc(var(--scale-px)*12) calc(var(--scale-px)*16);position:fixed;z-index:1001}
+  .demo-notice__title{color:var(--c-orange);letter-spacing:-.03em}
+  .demo-notice p+p{margin-top:calc(var(--scale-px)*6)}
+
+  /* 9d — sub-page / unmeasured region. No copy is invented here; the dashed
+     outline (block: overrides) makes the gap visible in the audit. */
+  .pending-region{align-items:center;display:flex;flex-direction:column;gap:var(--spacing-small);justify-content:center;min-height:calc(var(--scale-px)*260);padding:var(--spacing) 0}
+  .pending-region__label{color:var(--t-small);letter-spacing:-.03em}
+
+  /* 9e — local-only form area for the two auth pages (no network, no storage). */
+  .local-form{display:flex;flex-direction:column;gap:var(--spacing-small);max-width:calc(var(--scale-text-px)*420);width:100%}
+  .local-form__field{display:flex;flex-direction:column;gap:calc(var(--scale-px)*6)}
+  .local-form__label{color:var(--t-small)}
+  .local-form__input{background:transparent;border:0;border-bottom:1px solid var(--t-line);color:var(--t-text);font-family:inherit;font-size:inherit;letter-spacing:inherit;line-height:inherit;padding:calc(var(--scale-px)*10) 0;width:100%}
+  .local-form__input:focus-visible{border-bottom-color:var(--t-accent);outline:none}
+}
+
+@layer overrides {
+  [data-evidence^=pending]{outline:1px dashed var(--t-line-thin);outline-offset:calc(var(--scale-px)*6)}
+}
+
+/* 9f — prefers-reduced-motion: all content stays, only decorative motion stops.
+   The reveal states the reference reaches through animation are pinned to their
+   end values so nothing (underline, hero title, footer line) stays hidden. */
+@media (prefers-reduced-motion:reduce) {
+@layer overrides {
+  .icon-shake,.icon-shake-reverse,.section-3__loop-group,.loading-screen *,.promo-header__row,.scrollable{animation:none!important;transition:none!important}
+  .underline-text-piece__decoration{clip-path:inset(0 0 0 0)!important;transition:none!important}
+  .intro__title,.intro__footer,.intro__title-decoration,.intro .landing-1-intro-webgl__canvas-wrapper canvas{transform:none!important;transition:none!important}
+  /* 10b — the scroll-driven title squash is pinned to its end value (1) */
+  .section-3__title h2{transform:none!important}
+  .section-4__card-inner{transition:none!important}
+  .section-2__video-preview-wrapper,.section-2__video-preview-wrapper-inner{transform:none!important}
+  html{scroll-behavior:auto}
+}
+}
+
+/* --------------------------------------------------------------------------
+   10. CLONE-LOCAL cascade repair — the unguarded PRINT THEME block in
+   src/styles/tokens.css (line 800-802).
+   Evidence: entry.D4FdtiYZ.css ships the print token re-map INSIDE
+   `@media print{…}`. tokens.css lifted it verbatim but dropped the guard and
+   left it inside `@layer base` (which spans lines 142-803), so on screen the
+   later-in-layer rule wins over the real theme blocks at lines 530-700 and
+   every theme class resolves to the print matrix:
+     .ui-orange{--t-background:#fff}  -> .ui-background paints #ffffff
+   which is exactly why the hero layer, the fixed header and the cookie bar
+   rendered white over the orange `div.scrollable--root`
+   (hero-geometry.json -> root.bg = rgb(244,121,58), header.bg = rgb(244,121,58)).
+   tokens.css is out of scope for this clone task, so the fix re-states the
+   reference's on-screen values in the SAME layer, later in source order
+   (home-overrides.css is imported last by src/main.ts) behind `@media not
+   print`, which leaves the print behaviour of the leaked rule untouched.
+   Every declaration below is copied from the theme block it restores
+   (tokens.css .ui-orange 530, .ui-blue 559, .ui-pink 588, .ui-green 617,
+   .ui-dark 646, default matrix 144) — nothing is invented.
+   -------------------------------------------------------------------------- */
+@layer base {
+@media not print {
+  .ui-orange{--t-background:var(--c-orange);--t-background-rgb:var(--c-orange-rgb);--t-line:var(--c-white-30);--t-line-rgb:var(--c-white-30-rgb);--t-small:var(--c-white-60);--t-small-rgb:var(--c-white-60-rgb);--t-text:var(--c-white);--t-text-rgb:var(--c-white-rgb);--t-heading:var(--c-black);--t-heading-rgb:var(--c-black-rgb);--t-primary:var(--c-white);--t-primary-rgb:var(--c-white-rgb);--t-accent:var(--c-black);--t-accent-rgb:var(--c-black-rgb)}
+  .ui-blue{--t-background:var(--c-blue);--t-background-rgb:var(--c-blue-rgb);--t-line:var(--c-white-30);--t-line-rgb:var(--c-white-30-rgb);--t-small:var(--c-white-60);--t-small-rgb:var(--c-white-60-rgb);--t-text:var(--c-white);--t-text-rgb:var(--c-white-rgb);--t-heading:var(--c-black);--t-heading-rgb:var(--c-black-rgb);--t-primary:var(--c-white);--t-primary-rgb:var(--c-white-rgb);--t-accent:var(--c-black);--t-accent-rgb:var(--c-black-rgb)}
+  .ui-pink{--t-background:var(--c-pink);--t-background-rgb:var(--c-pink-rgb);--t-line:var(--c-white-30);--t-line-rgb:var(--c-white-30-rgb);--t-small:var(--c-white-60);--t-small-rgb:var(--c-white-60-rgb);--t-text:var(--c-white);--t-text-rgb:var(--c-white-rgb);--t-heading:var(--c-black);--t-heading-rgb:var(--c-black-rgb);--t-primary:var(--c-white);--t-primary-rgb:var(--c-white-rgb);--t-accent:var(--c-black);--t-accent-rgb:var(--c-black-rgb)}
+  .ui-green{--t-background:var(--c-green);--t-background-rgb:var(--c-green-rgb);--t-line:var(--c-white-30);--t-line-rgb:var(--c-white-30-rgb);--t-small:var(--c-white-60);--t-small-rgb:var(--c-white-60-rgb);--t-text:var(--c-white);--t-text-rgb:var(--c-white-rgb);--t-heading:var(--c-black);--t-heading-rgb:var(--c-black-rgb);--t-primary:var(--c-white);--t-primary-rgb:var(--c-white-rgb);--t-accent:var(--c-black);--t-accent-rgb:var(--c-black-rgb)}
+  .ui-dark{--t-background:var(--c-black);--t-background-rgb:var(--c-black-rgb);--t-line:var(--c-white-30);--t-line-rgb:var(--c-white-30-rgb);--t-small:var(--c-white-60);--t-small-rgb:var(--c-white-60-rgb);--t-text:var(--c-white);--t-text-rgb:var(--c-white-rgb);--t-heading:var(--c-white);--t-heading-rgb:var(--c-white-rgb);--t-primary:var(--c-white);--t-primary-rgb:var(--c-white-rgb);--t-accent:var(--c-orange);--t-accent-rgb:var(--c-orange-rgb)}
+  /* .ui-light / .ui-print have no override block in the reference: they alias
+     the default matrix (tokens.css line 144), as does `body` itself. */
+  .ui-light,.ui-print,:root body{--t-background:var(--c-white);--t-background-rgb:var(--c-white-rgb);--t-line:var(--c-black-15);--t-line-rgb:var(--c-black-15-rgb);--t-small:var(--c-grey);--t-small-rgb:var(--c-grey-rgb);--t-text:var(--c-black);--t-text-rgb:var(--c-black-rgb);--t-heading:var(--c-black);--t-heading-rgb:var(--c-black-rgb);--t-primary:var(--c-orange);--t-primary-rgb:var(--c-orange-rgb);--t-accent:var(--c-orange);--t-accent-rgb:var(--c-orange-rgb)}
+  /* the same leak clobbers the background helpers at tokens.css line 802 */
+  .ui-dark-background{background:var(--c-black)}
+  .ui-orange-background{background:var(--c-orange)}
+  .ui-blue-background{background:var(--c-blue)}
+  .ui-pink-background{background:var(--c-pink)}
+  .ui-green-background{background:var(--c-green)}
+  .ui-background{background:var(--t-background)}
+}
+}
+
+/* --------------------------------------------------------------------------
+   11. Display words and brush marks (defect 2 / defect 3 hardening).
+   The reference's giant words are inline SVG glyph sets sized by
+   `.title svg{width:100%;height:auto}` (typography.css, @layer components);
+   the accessible string is the `h1/h2.sr-only` sibling, measured 1x1px at
+   rect [19,75,1,1] in hero-geometry.json. The clone keeps that split, so the
+   visual wrapper must never introduce a box of its own or let a word exceed
+   the column it is laid out in.
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* the glyph set fills its column and nothing overflows it */
+  .title svg{max-width:100%}
+  .title .display-heading__visual svg{display:block;height:auto;width:100%}
+  /* the hero word is the one display SVG that is NOT inside a sized column:
+     it must stay under the fixed promo header it collided with. */
+  .intro__title{max-width:100%}
+}
+
+@layer overrides {
+  /* Every brush mark is decoration: it is sized off its own component, is
+     taken out of flow, and must not be painted outside the element it accents
+     (the reference relies on `.btn--accent .btn__hover-accent{opacity:0}` plus
+     the section's own box; the clone adds the clip so a missing hover state can
+     never smear across the page). */
+  .btn__hover-accent,.underline-text-piece__decoration{max-width:100%;pointer-events:none}
+  .intro__title-decoration,.section-2__media-decoration,.section-3__title-decoration,.section-4__title-word-decoration,.section-4__cards-wrapper-decoration,.section-5__title-decoration,.section-7__title-decoration,.section-9__title-decoration,.section-10__title-decoration,.section-2__title-icon-1,.section-2__title-icon-2,.section-5__btn-icon,.section-7__btn-icon,.section-10__btn-icon,.intro__text-icon{max-width:100%}
+  /* the SVG word groups are decorative duplicates of the sr-only heading */
+  .display-heading__visual svg,.section-2__title-icon-wrap svg{overflow:visible}
+}
+
+/* --------------------------------------------------------------------------
+   12. Fixed header geometry — the rules between `.promo-header{}` and
+   `.title{}` in entry.D4FdtiYZ.css @layer components.
+   Evidence: offsets 183905-185900 of entry.D4FdtiYZ.css. layout.css §? lifts
+   only `.promo-header` and `.promo-header__row`, so `.promo-header__desktop-
+   links{display:flex}` was missing and the seven nav links stacked vertically
+   instead of sitting on one 9px-tall row (hero-geometry.json -> header.navLinks
+   all at y=15, height 9).
+   NOTE the `.promo-header__animated-button` font-size rule is lifted WITH its
+   `@media (max-width:567px)…` guard: unguarded it would beat
+   `.btn--text-smaller` (components-base < components) and shrink the desktop
+   nav to 1.2rem, where the reference measures 12.6534px = 1.3 x
+   --scale-text-rem at 1376 (linkStyle in hero-geometry.json).
+   -------------------------------------------------------------------------- */
+@layer components {
+  .promo-header__previous-bg{top:0;right:0;bottom:0;left:0;position:absolute}
+  .promo-header__logo{position:relative}
+  .promo-header__logo-text{left:0;opacity:0;pointer-events:none;position:absolute;top:calc(100% + .53846em);transition:opacity 1.5s cubic-bezier(.55,0,.1,1)}
+  .promo-header__animated-button{transition:font-size 1.5s cubic-bezier(.55,0,.1,1)}
+  .promo-header__desktop-links{display:flex;gap:calc(var(--spacing)*2)}
+  .promo-header__content-right{display:flex;justify-content:flex-end}
+}
+@media (max-width:567px) and (max-aspect-ratio:13/9),(max-width:667px) and (min-aspect-ratio:13/9),(max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9){
+@layer components {
+  .promo-header__animated-button{font-size:calc(var(--scale-text-rem)*1.2);--lh:calc(var(--scale-text-rem)*1.6);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none;--fos:-.169em;--foe:-.088em}
+  .win .promo-header__animated-button{--fos:-.169em;--foe:-.088em}
+}
+}
+
+/* --------------------------------------------------------------------------
+   13. Spacing / grid utilities the authored layout.css ladder stops short of.
+   Evidence: entry.D4FdtiYZ.css @layer utilities.
+     .pt-promo-header            (offset 36606 tier) — the hero, get-seen, card,
+                                 centralize, audience, testimonials, connectory
+                                 and join-us layers all carry `pt-promo-header`
+                                 to clear the fixed 60px bar. With the class
+                                 undefined the hero word sat at y=-4 and slid
+                                 straight under the header (defect 2's
+                                 "collide with the header"); the reference's
+                                 h1.sr-only sits at y=75 = 80 x --scale-px.
+     .mt-auto                    — used by .intro__footer's row.
+     .row>.col--N:xl             — layout.css lifts the `:xs` and `:md` tiers
+                                 but stops before `:xl`, which is ON at both the
+                                 1376x772 oracle and 1440x900 capture
+                                 (tokens.css line 71). Without it the header's
+                                 nav column keeps col--5 instead of col--4 and
+                                 every nav link x is ~1 column early.
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .pt-promo-header,.pt-promo-header\:xs{padding-top:var(--spacing-promo-header)}
+  .mt-auto,.mt-auto\:xs,.my-auto,.my-auto\:xs{margin-top:auto}
+}
+@media (min-width:1200px) and (min-height:500px) and (min-aspect-ratio:10/11),(min-width:1440px) and (min-height:700px){
+@layer utilities {
+  .row>.col--4\:xl{--grid-col-size:4}
+  .row>.col--6\:xl{--grid-col-size:6}
+}
+}
+
+/* --------------------------------------------------------------------------
+   14. .btn__text optical trim — entry.D4FdtiYZ.css offset 162200,
+   @layer components-base. The clone lifted the whole .btn family except this
+   trio, so `.btn__text` kept its full line box and every header link measured
+   15.57px tall instead of the reference's 9px (hero-geometry.json ->
+   header.navLinks[*].rect height 9 at font-size 12.6534px, i.e. cap-height to
+   baseline). With the trim the link box is cap→baseline, which also drops the
+   rect top by (line-height - capHeight)/2 and lands y on the measured 15.
+   -------------------------------------------------------------------------- */
+@layer components-base {
+  .btn__text{position:relative}
+}
+@supports (text-box-trim:trim-both) {
+@layer components-base {
+  .btn__text{text-box:trim-both cap alphabetic}
+}
+}
+@supports not (text-box-trim:trim-both) {
+@layer components-base {
+  .btn__text:after,.btn__text:before{content:"";display:block;height:0;overflow:hidden;position:relative}
+  .btn__text:before{margin-bottom:calc((var(--lh, 1em) - 1em)/-2 + var(--fos, 0em))}
+  .btn__text:after{margin-top:calc((var(--lh, 1em) - 1em)/-2 + var(--foe, 0em))}
+}
+}
+
+
+
+
+
+/* ---------------------------------------------------------------------------
+   Fixed "Join" button geometry (DIFF-007)
+   The reference sizes its in-flow stubs from --sign-up-width / --sign-up-height,
+   but those two custom properties are injected inline by the component: they are
+   only *used* in the 12 captured stylesheets, never defined there, so they cannot
+   be transcribed verbatim. The values below are therefore DERIVED from measurement
+   and written in the reference's own `var(--token, vw-fallback)` idiom:
+     stub rect [634,676,207x76] at viewport 1376  ->  207/1376 = 15.0436vw,
+     and the reference's own .fixed-sign-up-button already carries
+     var(--md, 15.0684931507vw) which resolves to 207.3px at the same width, so the
+     width is the shared --md step rather than a bespoke number.
+     76/1376 = 5.5233vw for the height.
+   The 220x127 stubs measured at [884,3054] and [834,6908] are the in-card variants;
+   they override the two tokens locally rather than changing these defaults.
+   ------------------------------------------------------------------------ */
+:root {
+  --sign-up-width: var(--md, 15.0684931507vw);
+  --sign-up-height: 5.523255814vw;
+}
+
+/* ---------------------------------------------------------------------------
+   15. PagePromoFooter (DIFF-015) — src/components/PromoFooter.vue.
+   Evidence: evidence/reference/raw/_nuxt/PagePromoFooter.4X9VGMLH.css, transcribed
+   byte-for-byte (selector order, declaration order and the two-fallback
+   `var(--md,X) var(--n-md,Y)` idiom included — that pair is how the reference
+   flips a value at the md switch: `--md` is guaranteed-empty above the break so
+   its fallback wins, whitespace-empty below it so the second var() wins, see the
+   switch table in tokens.css).
+   This is the whole stylesheet for the component; the rest of its geometry comes
+   from classes the clone already ships (.row, .col, .px-1, .py-1, .mb-1, .mt-auto,
+   the is-hidden family of display switches, the btn-- family, .social-networks and
+   .icon-videinfra).
+
+   Padding-bottom arithmetic, measured at 1376x772 with body.cookie-message-active:
+     .py-1        -> var(--spacing)            = 19.1099px
+     .footer-padding (later in this same layer, so it wins)
+                  -> calc(var(--spacing) + env(safe-area-inset-bottom)
+                          + var(--cookie-message-height, 0px))
+                  =  19.1099 + 0 + 57.3297     = 76.4396px
+   If a route ever measures 57.33px short, CookieConsent is not setting the body
+   class - that is a cookie-bar defect, not a number to fold into this rule.
+   ------------------------------------------------------------------------ */
+@layer components{.promo-footer{padding-bottom:var(--cookie-message-height,0)}.footer-links{display:flex;flex-direction:column;gap:var(--md,calc(var(--scale-px)*6)) var(--n-md,calc(var(--scale-px)*11))}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.footer-links--text-right{align-items:flex-end}}.footer-copyright{position:relative}.footer-author{align-items:center;display:flex;gap:calc(var(--scale-px)*9)}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.footer-author{align-self:flex-start;justify-content:flex-end}}.footer-author--no-justify-content{justify-content:flex-start}.footer-author__icon{position:relative;z-index:1}.footer-padding{padding-bottom:calc(var(--spacing) + env(safe-area-inset-bottom) + var(--cookie-message-height, 0px))}.footer-side-left{display:flex;flex-direction:column;gap:calc(var(--scale-px)*8);height:100%}.footer-social{display:flex;flex-direction:row;gap:calc(var(--scale-px)*10)}}

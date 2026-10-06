@@ -1,0 +1,270 @@
+/* ==========================================================================
+   typography.css — follow.art desktop clone
+   ==========================================================================
+   Provenance: evidence/reference/raw/_nuxt/entry.D4FdtiYZ.css plus the 11
+   route/component chunks, captured 2026-09-29T16:12Z (Nuxt build
+   63c1e131-150b-472a-8fd2-ea1d2a3b59fb); reference viewport 1376x772 @ dpr 1.5.
+
+   Every declaration in this file is a verbatim lift from those chunks. Values
+   that could not be located are flagged  UNKNOWN - pending measurement  and
+   carry a conservative default. Machine-readable evidence per token lives in
+   design/tokens.reference.json.
+
+   The reference authors six named layers and the order is load-bearing. The
+   order statement is repeated at the top of every file in src/styles/ so the
+   cascade is right whatever the eventual import order is.
+   ========================================================================== */
+
+@layer reset, base, utilities, components-base, components, overrides;
+
+/* --------------------------------------------------------------------------
+   @font-face
+   Both faces ship woff2 + woff in the reference; only the two .woff2 files
+   were downloaded into public/fonts/, so the woff url() entry is dropped
+   rather than invented. Paths retargeted from ../fonts/ to the local /fonts/.
+   font-display:swap is kept from the source.
+   HeadingNow 400 -> the UI/body face.  Hardbop 700 -> the display face.
+   -------------------------------------------------------------------------- */
+@layer base {
+  @font-face{font-display:swap;font-family:HeadingNow;font-style:normal;font-weight:400;src:url(/fonts/HeadingNow-73Book.woff2) format("woff2"),url(/fonts/HeadingNow-73Book.woff) format("woff")}
+  @font-face{font-display:swap;font-family:Hardbop;font-style:normal;font-weight:700;src:url(/fonts/Hardbop-Bold.woff2) format("woff2"),url(/fonts/Hardbop-Bold.woff) format("woff")}
+}
+
+/* --------------------------------------------------------------------------
+   BASE ELEMENT TYPE  (@layer base)
+   `--lh` is the private line-height slot paired with every type style so that
+   `.text-box-trim` can compute cap / overshoot offsets. `--fos` / `--foe` are
+   the optical first / last sidebearings, and each rule is duplicated under
+   `.win` because the Windows metrics differ from the default ones.
+   Resolved at 1376x772 (--scale-text-rem = 0.9734rem = 9.7336px):
+     body copy = 2.6 x 9.7336 = 25.31px, line-height 3 x 9.7336 = 29.20px
+     h3 = 2.6 units, h4 = 2 units, small = 2 units  (md branch)
+   -------------------------------------------------------------------------- */
+@layer base {
+  body,button,input,select,textarea{color:var(--t-text);font-size:var(--xxxxl,calc(var(--scale-text-rem)*3.8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.6)) var(--n-md,calc(var(--scale-text-rem)*2.1)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*4.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*3)) var(--n-md,calc(var(--scale-text-rem)*2.5)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none;--fos:-.169em;--foe:-.088em}
+  h1,h2,h3,h4,h5{color:var(--t-heading)}
+  h1{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*30.1)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*25.7)) var(--n-md,calc(var(--scale-text-rem)*14.3))));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*23)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*20)) var(--n-md,calc(var(--scale-text-rem)*11))));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  h2{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*22.8)) var(--n-md,calc(var(--scale-text-rem)*14.3)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*18)) var(--n-md,calc(var(--scale-text-rem)*11)));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  h3{font-size:var(--xxxxl,calc(var(--scale-text-rem)*3.8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.6)) var(--n-md,calc(var(--scale-text-rem)*2.1)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*4.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*3)) var(--n-md,calc(var(--scale-text-rem)*2.5)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  h4{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  small{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  hr{border:0;border-top:1px solid var(--t-line)}
+  cite{font-style:inherit}
+}
+
+@layer base {
+  /* .win metric corrections - identical --fos/--foe pairs */
+  .win body,.win button,.win input,.win select,.win textarea{--fos:-.169em;--foe:-.088em}
+  .win h1,h1{--fos:-.167em;--foe:-.133em}
+  .win h2,h2{--fos:-.167em;--foe:-.133em}
+  .win h3,h3{--fos:-.169em;--foe:-.088em}
+  .win h4,h4{--fos:-.169em;--foe:-.088em}
+  .win small,small{--fos:-.169em;--foe:-.088em}
+}
+
+/* --------------------------------------------------------------------------
+   TYPE SCALE UTILITIES  (@layer utilities)
+   Each style owns font-family / font-size / --lh / letter-spacing /
+   text-transform, so a component only picks a class. Sizes are multiples of
+   --scale-text-rem, which makes the scale contract with the viewport exactly
+   the way the spacing scale does. The var() nests read
+   xxxxl -> xxxl -> md -> below-md; at 1376x772 the md branch is live.
+
+   Quick reference, computed at 1376x772 (x 9.7336px):
+     .text-h2       22.8 -> 221.93px / lh 18  -> 175.20px   Hardbop 700 UPPER
+     .text-h2-sm    11.4 -> 110.96px / lh 9   ->  87.60px   Hardbop 700 UPPER
+     .text-lead      5.1 ->  49.64px / lh 5.5 ->  53.54px   HeadingNow 400
+     .text-base      2.6 ->  25.31px / lh 3    ->  29.20px
+     .text-small     2.0 ->  19.47px / lh 2.5  ->  24.33px
+     .text-smaller   1.3 ->  12.65px / lh 1.6  ->  15.57px
+     .text-card      2.0 ->  19.47px / lh 2.5  ->  24.33px
+     .text-card-base 1.3 ->  12.65px / lh 2    ->  19.47px
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .text-h1{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*30.1)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*25.7)) var(--n-md,calc(var(--scale-text-rem)*14.3))));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--xxxl,calc(var(--scale-text-rem)*23)) var(--n-xxxl,var(--md,calc(var(--scale-text-rem)*20)) var(--n-md,calc(var(--scale-text-rem)*11))));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  .text-h2{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*22.8)) var(--n-md,calc(var(--scale-text-rem)*14.3)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*18)) var(--n-md,calc(var(--scale-text-rem)*11)));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  .text-h2-sm{font-size:var(--xxxxl,calc(var(--scale-text-rem)*38.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*22.8)) var(--n-md,calc(var(--scale-text-rem)*11.4)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*30)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*18)) var(--n-md,calc(var(--scale-text-rem)*9)));font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  .text-h4{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-h5{font-size:calc(var(--scale-text-rem)*8.5);--lh:calc(var(--scale-text-rem)*9);font-family:Hardbop,Helvetica,Arial,sans-serif;font-weight:700;letter-spacing:0;line-height:var(--lh);text-transform:uppercase}
+  .text-base{font-size:var(--xxxxl,calc(var(--scale-text-rem)*3.8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.6)) var(--n-md,calc(var(--scale-text-rem)*2.1)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*4.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*3)) var(--n-md,calc(var(--scale-text-rem)*2.5)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-lead{font-size:var(--xxxxl,calc(var(--scale-text-rem)*7.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*5.1)) var(--n-md,calc(var(--scale-text-rem)*3.2)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*5.5)) var(--n-md,calc(var(--scale-text-rem)*3.5)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:var(--md,-.06em) var(--n-md,-.03em);line-height:var(--lh);text-transform:none}
+  .text-small{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*3)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-bit-small{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2)) var(--n-xxxxl,calc(var(--scale-text-rem)*1.6));--lh:var(--xxxxl,calc(var(--scale-text-rem)*2.5)) var(--n-xxxxl,calc(var(--scale-text-rem)*2));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-bit-smaller{font-size:var(--md,calc(var(--scale-text-rem)*1.6)) var(--n-md,calc(var(--scale-text-rem)*1.2));--lh:var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-smaller{font-size:var(--xxxxl,calc(var(--scale-text-rem)*1.6)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*1.3)) var(--n-md,calc(var(--scale-text-rem)*1.2)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*2)) var(--n-xxxxl,calc(var(--scale-text-rem)*1.6));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-smaller-xl{font-size:var(--xxxxl,calc(var(--scale-text-rem)*2)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*1.3)) var(--n-md,calc(var(--scale-text-rem)*1.2)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*2.5)) var(--n-xxxxl,calc(var(--scale-text-rem)*1.6));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-subtitle{font-size:var(--xxxxl,calc(var(--scale-text-rem)*3.8)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*2.6)) var(--n-md,calc(var(--scale-text-rem)*1.6)));--lh:var(--xxxxl,calc(var(--scale-text-rem)*4.5)) var(--n-xxxxl,var(--md,calc(var(--scale-text-rem)*3)) var(--n-md,calc(var(--scale-text-rem)*2)));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card{font-size:calc(var(--scale-text-rem)*2);--lh:calc(var(--scale-text-rem)*2.5);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card-h1{font-size:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*3.2));--lh:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*3.5));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.04em;line-height:var(--lh);text-transform:none}
+  .text-card-h1-sm{font-size:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*2));--lh:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*2.5));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:var(--md,-.04em) var(--n-md,-.03em);line-height:var(--lh);text-transform:none}
+  .text-card-h2{font-size:var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6));--lh:var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card-h2-lg{font-size:calc(var(--scale-text-rem)*2);--lh:calc(var(--scale-text-rem)*2.5);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card-h2-sm{font-size:var(--md,calc(var(--scale-text-rem)*2)) var(--n-md,calc(var(--scale-text-rem)*1.6));--lh:var(--md,calc(var(--scale-text-rem)*2.5)) var(--n-md,calc(var(--scale-text-rem)*2));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card-h2-text{font-size:var(--md,calc(var(--scale-text-rem)*4)) var(--n-md,calc(var(--scale-text-rem)*2));--lh:var(--md,calc(var(--scale-text-rem)*4.5)) var(--n-md,calc(var(--scale-text-rem)*2.5));font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:var(--md,-.04em) var(--n-md,-.03em);line-height:var(--lh);text-transform:none}
+  .text-card-base{font-size:calc(var(--scale-text-rem)*1.3);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.02em;line-height:var(--lh);text-transform:none}
+  .text-card-lead{font-size:calc(var(--scale-text-rem)*1.6);--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.03em;line-height:var(--lh);text-transform:none}
+  .text-card-lead-sm{font-size:var(--md,calc(var(--scale-text-rem)*1.6)) var(--n-md,calc(var(--scale-text-rem)*1.3));--lh:calc(var(--scale-text-rem)*2);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:var(--md,-.03em) var(--n-md,-.02em);line-height:var(--lh);text-transform:none}
+  .text-card-small{font-size:calc(var(--scale-text-rem)*1.1);--lh:calc(var(--scale-text-rem)*1.5);font-family:HeadingNow,Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:-.02em;line-height:var(--lh);text-transform:none}
+}
+
+@layer utilities {
+  /* .win metric corrections for the scale */
+  .text-h1,.win .text-h1{--fos:-.167em;--foe:-.133em}
+  .text-h2,.win .text-h2{--fos:-.167em;--foe:-.133em}
+  .text-h2-sm,.win .text-h2-sm{--fos:-.167em;--foe:-.133em}
+  .text-h4,.win .text-h4{--fos:-.169em;--foe:-.088em}
+  .text-h5,.win .text-h5{--fos:-.167em;--foe:-.133em}
+  .text-base,.win .text-base{--fos:-.169em;--foe:-.088em}
+  .text-lead,.win .text-lead{--fos:-.169em;--foe:-.088em}
+  .text-small,.win .text-small{--fos:-.169em;--foe:-.088em}
+  .text-bit-small,.win .text-bit-small{--fos:-.169em;--foe:-.088em}
+  .text-bit-smaller,.win .text-bit-smaller{--fos:-.169em;--foe:-.088em}
+  .text-smaller,.win .text-smaller{--fos:-.169em;--foe:-.088em}
+  .text-smaller-xl,.win .text-smaller-xl{--fos:-.169em;--foe:-.088em}
+  .text-subtitle,.win .text-subtitle{--fos:-.169em;--foe:-.088em}
+  .text-card,.win .text-card{--fos:-.169em;--foe:-.088em}
+  .text-card-h1,.win .text-card-h1{--fos:-.169em;--foe:-.088em}
+  .text-card-h1-sm,.win .text-card-h1-sm{--fos:-.169em;--foe:-.088em}
+  .text-card-h2,.win .text-card-h2{--fos:-.169em;--foe:-.088em}
+  .text-card-h2-lg,.win .text-card-h2-lg{--fos:-.169em;--foe:-.088em}
+  .text-card-h2-sm,.win .text-card-h2-sm{--fos:-.169em;--foe:-.088em}
+  .text-card-h2-text,.win .text-card-h2-text{--fos:-.169em;--foe:-.088em}
+  .text-card-base,.win .text-card-base{--fos:-.169em;--foe:-.088em}
+  .text-card-lead,.win .text-card-lead{--fos:-.169em;--foe:-.088em}
+  .text-card-lead-sm,.win .text-card-lead-sm{--fos:-.169em;--foe:-.088em}
+  .text-card-small,.win .text-card-small{--fos:-.169em;--foe:-.088em}
+}
+
+/* colour, alignment, clipping and a11y helpers */
+@layer utilities {
+  .text-color-primary{color:var(--t-primary)}
+  .text-color-background{color:var(--t-background)}
+  .text-color-heading{color:var(--t-heading)}
+  .text-color-text{color:var(--t-text)}
+  .text-color-small{color:var(--t-small)}
+  .text-color-error{color:var(--c-error)}
+  .text-nowrap{white-space:nowrap}
+  .text-right{text-align:right}
+  .text-center{text-align:center}
+  .text-class-ellipsis{display:block;margin-bottom:-20px;margin-top:-20px;max-width:100%;min-width:0;overflow:hidden;padding-bottom:20px;padding-right:.02em;padding-top:20px;position:relative;text-overflow:ellipsis;white-space:nowrap}
+  .text-right>.btn--block{justify-self:end}
+  .sr-only{border:0;clip:rect(0 0 0 0);clip-path:inset(100%);height:1px;margin:-1px 0 0;overflow:hidden;padding:0;position:absolute!important;white-space:nowrap;width:1px}
+}
+
+/* responsive text alignment: the reference toggles these through the
+   var(--md,x) var(--n-md,y) pair, not through a media query */
+@layer utilities {
+    .text-right\:md{text-align:var(--md,right) var(--n-md,left)}
+    .text-left\:md{text-align:var(--md,left) var(--n-md,right)}
+    .text-right\:md>.btn--block{justify-self:var(--md,end) var(--n-md,start)}
+}
+
+/* --------------------------------------------------------------------------
+   OPTICAL MARGIN TRIM - `text-box:trim-both` where the engine supports it,
+   otherwise a ::before/::after correction driven by --lh / --fos / --foe.
+   -------------------------------------------------------------------------- */
+@supports (text-box-trim:trim-both) {
+@layer utilities {
+  .text-box-trim{text-box:trim-both cap alphabetic}
+}
+}
+
+@supports not (text-box-trim:trim-both) {
+@layer utilities {
+  .text-box-trim:after,.text-box-trim:before{content:"";display:block;height:0;overflow:hidden;position:relative}
+  .text-box-trim:before{margin-bottom:calc((var(--lh, 1em) - 1em)/-2 + var(--fos, 0em))}
+  .text-box-trim:after{margin-top:calc((var(--lh, 1em) - 1em)/-2 + var(--foe, 0em))}
+}
+}
+
+/* --------------------------------------------------------------------------
+   THE GIANT DISPLAY HEADINGS
+   --------------------------------------------------------------------------
+   The `FOLLOW.ART` hero word is NOT text. The reference renders it as an
+   inline
+     <svg class="intro__title is-hidden:sm-down svg-fix"
+          width="1420" height="500" viewBox="0 0 1420 500">
+   made of one <path> per glyph, each carrying data-scale-y (0.679877 ..
+   0.877945) for the vertical reveal. Its geometry therefore comes entirely
+   from `.title svg{display:block;height:auto;width:100%}`: the word always
+   fills its column and its height follows the locked 1420:500 ratio. There is
+   no font-size on the hero word at all.
+   At 1376x772, inside .px-1 (var(--spacing) = 19.11px per side):
+     1337.78px wide x 471.05px tall.
+   `.intro__title` itself only adds `position:relative; top:-4px` at md-up, and
+   the reveal transform `translateY(-80%) scaleY(0)` -> `translateY(0) scaleY(1)`
+   on `.intro--show`. The svg is hidden below md (`is-hidden:sm-down`); the
+   small-screen branch sizes it with svh instead (height:48.75svh / 51.538svh,
+   max-height:402px, min-height:312px) - not reproduced here, desktop only.
+
+   The wrapper is still a real <h1 class="title"> with
+   title="FOLLOW.ART One Practice. One Card", so the h1 / .text-h1 scale
+   governs the text fallback:
+     font-size   --xxxxl 38.5 | --xxxl 30.1 | --md 25.7 | --n-md 14.3
+     --lh        --xxxxl 30   | --xxxl 23   | --md 20   | --n-md 11
+     Hardbop 700, letter-spacing 0, text-transform uppercase
+   At 1376x772 (md branch): 25.7 x 9.7336 = 250.15px, line-height 194.67px.
+
+   `CENTRA LIZE` and `AUDIENCE SUPPORT` are `.text-h2` that @layer components
+   then overrides with a raw vw literal off the 1460 design width (228/1460,
+   180/1460):
+     font-size:   var(--md,15.6164383562vw) var(--n-md,36.6666666667vw)
+     line-height: var(--md,12.3287671233vw) var(--n-md,28.2051282051vw)
+   = 228px / 180px on a 1460 canvas, 214.88px / 169.61px at the 1376 capture.
+   @layer components outranks @layer utilities, so this beats .text-h2.
+
+   `CONNECTORY`, `JOIN US`, `TESTIMONIALS`, `CARD` use .text-h2 / .text-h2-sm
+   unmodified. The --xxxxl branch (38.5) only fires at width >= 2400px AND
+   height >= 700px, so at 1376x772 they compute 22.8 x 9.7336 = 221.93px
+   (.text-h2) or 11.4 x 9.7336 = 110.96px (.text-h2-sm).
+
+   No scaleX() trick is used on any heading. The only scaleX() in the reference
+   is the button hover-sweep (.btn--accent .btn__hover-accent) and
+   .promo-header--border-auto:after. Font width is controlled with
+   letter-spacing only: -.03em body scale, -.04em .text-card-h1, 0 for the
+   Hardbop display styles.
+   -------------------------------------------------------------------------- */
+@layer components {
+  .section-2__title h2{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw)}
+  .section-3__title h2{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw)}
+  .section-4__title{font-size:var(--md,15.6164383562vw) var(--n-md,36.6666666667vw);line-height:var(--md,12.3287671233vw) var(--n-md,28.2051282051vw);position:relative;width:-moz-fit-content;width:fit-content}
+}
+
+/* heading wrapper, glyph transform origin, raster-flicker guard */
+@layer components {
+  .title{position:relative}
+  .title svg{display:block;height:auto;width:100%}
+  .title path{transform-origin:50% 0}
+}
+
+/* raster-flicker guards. The reference ships three variants of the
+   .svg-fix/.flicker-fix group (a plain one, an ms-hack one and a
+   will-change one); all reproduced with their original at-contexts. */
+/* at: layer=utilities context=- */
+.flicker-fix,.svg-fix img,.svg-fix svg,img.svg-fix,svg.svg-fix{backface-visibility:hidden}
+
+/* at: layer=utilities context=- */
+.flicker-fix,.flicker-fix _::-webkit-full-page-media,.flicker-fix _:future,.svg-fix img,.svg-fix img _::-webkit-full-page-media,.svg-fix img _:future,.svg-fix svg,.svg-fix svg _::-webkit-full-page-media,.svg-fix svg _:future,img.svg-fix,img.svg-fix _::-webkit-full-page-media,img.svg-fix _:future,svg.svg-fix,svg.svg-fix _::-webkit-full-page-media,svg.svg-fix _:future{backface-visibility:unset;will-change:transform}
+
+@layer components {
+  .img-full,.img-full img,.img-full svg{height:auto;width:100%}
+}
+
+/* heading underline reveal - TextUnderlineAnimation.DJa__wPY.css */
+@layer components-base {
+  .underline-text-piece,.underline-text-piece__content{display:inline-block;position:relative}
+  .underline-text-piece__decoration{bottom:var(--md,calc(var(--scale-px)*-4)) var(--n-md,calc(var(--scale-px)*-3));clip-path:inset(0 100% 0 0);color:var(--t-heading);content:"";display:inline-block;height:var(--md,calc(var(--scale-px)*4)) var(--n-md,calc(var(--scale-px)*3));left:0;position:absolute;transition:clip-path .4s cubic-bezier(.55,0,.1,1);width:100%}
+  .underline-text-piece--shown .underline-text-piece__decoration{clip-path:inset(0 0 0 0)}
+  .underline-text-piece--primary .underline-text-piece__decoration{color:var(--t-primary)}
+  .underline-text-piece--accent .underline-text-piece__decoration{color:var(--t-accent)}
+}
+
+/* word rotator - measured on /pricing 2026-10-01 (evidence/reference/raw/text-swap-rules.json).
+   The reference also defines --drift and --*-forced variants of these states; nothing in the clone
+   emits them yet, so they are recorded in the spec instead of written as dead CSS. */
+@layer components-base {
+  .text-swap{display:inline-grid;grid-auto-rows:1fr;grid-template-areas:"text-swap_content";grid-template-columns:1fr;grid-template-rows:auto}
+  .text-swap-item{align-self:start;clip-path:inset(-25% 0);display:inline-block;grid-row-start:text-swap_content;grid-column-start:text-swap_content;grid-row-end:text-swap_content;grid-column-end:text-swap_content;transition:transform 1.5s cubic-bezier(.55,0,.1,1),clip-path 1.5s cubic-bezier(.55,0,.1,1)}
+  .text-swap-item--clip.text-swap-item--out-top{clip-path:inset(0 0 150%);transform:translateY(0)}
+  .text-swap-item--clip.text-swap-item--out-bottom{clip-path:inset(0 0 150%);transform:translateY(150%)}
+}
