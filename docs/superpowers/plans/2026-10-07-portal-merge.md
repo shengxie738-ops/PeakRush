@@ -2788,7 +2788,24 @@ Expected: `exit=0`，且 JSON 里
 3. WebGL 静默失效（首页 14 个检查点大面积差异）→ Task 3 的 glob 修改没生效，
    查 dev server 日志有没有 `createMotionRuntime is not on disk yet`
 
-- [ ] **Step 5: 复核 WebGL 真的活着（不能只看像素）**
+- [ ] **Step 5: 正面证明 motion runtime 真的被构造了（Task 3 的生效证据）**
+
+**这道闸原来设计错了，先说清楚为什么。** 初稿用 `document.querySelectorAll('[data-webgl="live"]').length > 0`
+当作"Task 3 的 glob 修好了"的证据。实测 `data-webgl="live"` 有**三条互不相干的来源**：
+
+- `welcome/app/App.vue:128` —— `host.setAttribute('data-webgl','live')`，只有 motion runtime
+  真的构造并注册上才会走到
+- `welcome/webgl/mountScenes.ts:165` —— 同样 `setAttribute(…, 'live')`，由
+  `sceneRegistry.ts:117` 的 `void import('./mountScenes')` 独立驱动，**完全不经过 App.vue**
+- `HomeCard.vue:60`、`HomeGetSeen.vue:95`、`HomeHero.vue:98` —— 组件自己用
+  `:data-webgl="live ? 'live' : 'pending'"` 绑定
+
+所以 `liveCanvases > 0` 在 Task 3 修没修的情况下**都可能为正**，它证明不了任何事。
+（顺带：`App.vue:123` 那句注释"data-webgl is owned here (never bound by the section
+components)"本身是不成立的，三个组件确实在绑它。）
+
+改用直接证据：Vite dev 下 `await import('@/motion/createMotionRuntime')` 会真的发一个
+HTTP 请求去取那个模块。请求到了，就说明这行动态 import 执行了。
 
 ```bash
 cd "G:/高并发大作业项目/PeakRush/logn in"
@@ -2797,30 +2814,37 @@ const {chromium}=require('@playwright/test');
 (async()=>{
   const b=await chromium.launch(); const p=await b.newPage({viewport:{width:1376,height:772}});
   const issues=[]; p.on('console',m=>{if(m.type()==='error'||m.type()==='warning')issues.push(m.type()+': '+m.text())});
+  p.on('requestfailed',r=>issues.push('requestfailed: '+r.url()));
+  const requested=[]; p.on('request',r=>{ if(/createMotionRuntime/.test(r.url())) requested.push(r.url()); });
   await p.goto('http://127.0.0.1:5179/',{waitUntil:'networkidle'});
   await p.waitForTimeout(3000);
   const info=await p.evaluate(()=>({
     canvases:document.querySelectorAll('canvas').length,
-    liveCanvases:document.querySelectorAll('[data-webgl=\"live\"]').length,
+    liveAttr:document.querySelectorAll('[data-webgl=\"live\"]').length,
+    pendingAttr:document.querySelectorAll('[data-webgl=\"pending\"]').length,
     scrollArea:!!document.querySelector('.scrollable__area'),
-    lenisOnDom:document.querySelector('.scrollable__area')?.classList.contains('lenis')??false,
     rootFontSize:getComputedStyle(document.documentElement).fontSize,
     bodyFont:getComputedStyle(document.body).fontFamily,
+    emptyImgSrc:document.querySelectorAll('img[src=\"\"], img:not([src])').length,
   }));
-  console.log(JSON.stringify({info,consoleIssues:issues.slice(0,10)},null,2));
+  console.log(JSON.stringify({motionModuleRequested:requested.length, urls:requested.slice(0,3),
+                              info, consoleIssues:issues.slice(0,12)},null,2));
   await b.close();
 })();
 " | tee /tmp/merged-env.json
 ```
 
 Expected：
-- `canvases > 0` 且 `liveCanvases > 0` → WebGL 真挂载了。
-  **`liveCanvases` 为 0 就是 Task 3 那个陷阱没修好** ——
-  `welcome/app/App.vue:136` 的 `data-webgl="live"` 是首帧成功信号
-- `scrollArea: true`、`lenisOnDom: true` → 滚动外壳与 Lenis 就位
-- `rootFontSize: "10px"` → `reset.css:28` 的 `html{font-size:.625em}` 在克隆站文档里生效
-- `bodyFont` 以 `HeadingNow` 开头 → `typography.css:44` 生效
-- `consoleIssues` 里**不含** `createMotionRuntime is not on disk yet`
+- **`motionModuleRequested >= 1`** —— 这是 Task 3 生效的正证。若为 0，说明 `App.vue` 那次
+  动态 import 没执行（别名没接、或 `reducedMotion` 为真、或 `welcome/app/App.vue:139` 之前
+  就 return 了），必须先查清楚再往下走
+- `consoleIssues` 里**不含** `createMotionRuntime is not on disk yet`（旧文案，代码已删，
+  出现即说明跑的是旧构建），也不含解析不出 `@/motion/createMotionRuntime` 的报错
+- `canvases > 0`、`rootFontSize: "10px"`、`bodyFont` 以 `HeadingNow` 开头
+- `emptyImgSrc` **记下来但不当失败**：`assetRegistry` 的 schema 不匹配是本轮明确不修的
+  已知缺陷（spec §11），基线里同样是空的，两侧应当一致
+
+**`liveAttr` 只作辅助记录，不作为 Task 3 的判据**，理由见上。
 
 - [ ] **Step 6: 验主应用文档没被克隆站 CSS 污染（运行时证据，补 Task 9 Step 4 的构建期证据）**
 
@@ -3239,9 +3263,17 @@ bodyOverflow （填，期望非 clip）、hasScrollableArea （填，期望 fals
 - expectedChanged: （填，期望恰好 /signin 与 /signup 两条，附 diffRatio）
 - UNEXPECTED: （填，期望空数组）
 
-采集环境（基线 / 合并后）：webgl （填）、renderer （填）、canvases （填）、
-liveCanvases （填，**必须 >0**）、three （填）、lenis （填）。
-若 renderer 含 SwiftShader/Software，注明"软件渲染，WebGL 章节像素不具代表性"。
+采集环境（基线 / 合并后）：webgl （填）、masked renderer （填）、
+**unmasked renderer** （填，用 `WEBGL_debug_renderer_info`，掩码值分辨不出软硬件）、
+canvases （填）、liveWebglAttr （填，仅记录，不作判据）、three （填）、lenis （填）、
+浏览器二进制与版本 （填）。
+两侧 unmasked renderer 必须逐字相同，否则整份像素比对作废（Step 3b）。
+若含 SwiftShader/Software，注明"软件渲染，WebGL 章节像素不具代表性"。
+
+Task 3 生效证据：motionModuleRequested （填，**必须 ≥1**）、
+consoleIssues 是否含 `createMotionRuntime is not on disk yet` （填，必须不含）。
+已知缺陷核对：emptyImgSrc （填，两侧都应约 22，来自 spec §11 的 assetRegistry 缺陷，
+本轮明确不修，只核对两侧一致）。
 
 ## auth 功能（Task 17 Step 3）
 
@@ -3494,7 +3526,10 @@ git commit -m "docs: 补最终验证结果"
    同一 SwiftShader 非掩码 renderer），且 Step 4 的 `UNEXPECTED` 是空数组、
    `byteIdentical ≥ 28`。结论必须按 Step 3b 的口径写：这只证明"同一份代码在同一个
    软件光栅化器下渲染一致"，不得写成"渲染在真实 GPU 上正确"
-5. Task 16 Step 5 的 `liveCanvases > 0`（WebGL 真的活着，不是静态 poster）
+5. Task 16 Step 5 的 `motionModuleRequested >= 1`（动态 import 真发出了请求，是 Task 3
+   生效的正证）。**不再用 `liveCanvases > 0` 当判据** —— `data-webgl="live"` 还由
+   `webgl/mountScenes.ts:165` 与 HomeCard/HomeGetSeen/HomeHero 自己的 `:data-webgl`
+   绑定设置，Task 3 修没修都可能为正
 6. Task 16 Step 6 的 `/app/` 运行时探针：`rootFontSize: "16px"`、
    `elPrimary: "#ff4e16"`、`hasScrollableArea: false`
 7. Task 17 Step 3 的 13 项全 PASS，其中开放重定向那项**必须**全回落 `/app/`

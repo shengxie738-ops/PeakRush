@@ -700,8 +700,9 @@ WebGL 需要真实 GPU 上下文。若采集环境是软件渲染，WebGL 内容
 | 缺陷 | 位置 | 处理时机 |
 |---|---|---|
 | newsletter 勾选框勾了没效果 | `content/subpages/auth.ts:80` | 子项目 2 随中文化删除（§8.2） |
-| `requireLogin` 的三句上下文提示语丢失 | `session.ts:27`、`PurchaseDialog.vue:142` | 文档级隔离的固有代价，无法在不用 cookie/URL 传参的前提下解决（§7.5）。若日后认为不可接受，需改为同源单入口方案 |
-| 登录后整页刷新（非 SPA 跳转） | §7.5 | 同上，双入口的固有代价 |
+| `requireLogin` 的三句上下文提示语丢失 | `session.ts:27`、`PurchaseDialog.vue:142` | **已消掉，不再是缺陷**。`window.location.href` 到同源 URL 是同标签页导航，sessionStorage 存活；实施改为写 `peakrush.authMessage` 再由门户读回（见实施计划偏离表 #1）。本行保留只为记录判断的更正过程 |
+| 登录后整页刷新（非 SPA 跳转） | §7.5 | 双入口的固有代价，保留 |
+| **`assetRegistry` 字段名与 `assets.manifest.json` schema v2 不匹配，22 处图片从未渲染** | `welcome/content/assetRegistry.ts:19-24`（声明 `reference`/`local`/`localExists`/`note`）、`:37`（`record.reference` 作 Map 键）、`:33`（`as unknown as AssetManifest` 主动骗过类型检查）；manifest 的 107 条实际是 `referenceUrl`/`servedAt`/`localPath`/`status` | **本轮不修**（用户 2026-10-07 决定），留给子项目 2。理由：Task 1 基线是在图片已坏的状态下采的，本轮修好会让首页系列检查点大面积合理变化，Task 16 的像素门就失去"证明搬迁与构建零渲染变化"的能力。修法是适配 schema v2 约 10 行（键换 `referenceUrl`、返回 `servedAt`、以 `status === 'MEASURED'` 判存在），且 `welcome/**` 即便纳入 tsconfig 也抓不到它——那层 `as unknown as` 是故意绕过检查的 |
 | 全站仍是 follow.art 英文品牌 | 全站 | 子项目 2 |
 | 法务页是 follow.art 的条款文本 | `/terms-and-conditions` 等 3 条 | 子项目 2 |
 | `logn in/README.md:5` 引用的 `evidence/reference/pending.json` 在 git 里不存在（`evidence/` 已忽略） | — | 接受，属溯源材料的已知缺口 |
