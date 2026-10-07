@@ -713,6 +713,7 @@ WebGL 需要真实 GPU 上下文。若采集环境是软件渲染，WebGL 内容
 | **`assetRegistry` 字段名与 `assets.manifest.json` schema v2 不匹配，22 处图片从未渲染** | `welcome/content/assetRegistry.ts:19-24`（声明 `reference`/`local`/`localExists`/`note`）、`:37`（`record.reference` 作 Map 键）、`:33`（`as unknown as AssetManifest` 主动骗过类型检查）；manifest 的 107 条实际是 `referenceUrl`/`servedAt`/`localPath`/`status` | **本轮不修**（用户 2026-10-07 决定），留给子项目 2。理由：Task 1 基线是在图片已坏的状态下采的，本轮修好会让首页系列检查点大面积合理变化，Task 16 的像素门就失去"证明搬迁与构建零渲染变化"的能力。修法是适配 schema v2 约 10 行（键换 `referenceUrl`、返回 `servedAt`、以 `status === 'MEASURED'` 判存在），且 `welcome/**` 即便纳入 tsconfig 也抓不到它——那层 `as unknown as` 是故意绕过检查的 |
 | 全站仍是 follow.art 英文品牌 | 全站 | 子项目 2 |
 | 法务页是 follow.art 的条款文本 | `/terms-and-conditions` 等 3 条 | 子项目 2 |
+| **`core.autocrlf=true` 且无 `.gitattributes`：一次全新 checkout 会让 20 个文本类资产多出 CR** | `frontend/public/` 下 19 个 SVG + `icons.svg`。实测 `icons.svg` 的 blob 是 `114527` 字节，检出后变 `114610`（+83）；`git cat-file --filters` 逐个模拟确认恰好 20 个文件大小变化 | 本轮**只记录不修**。渲染与 XML 合法性都不受影响（35 个 SVG 两种形态均可解析），但**任何按字节 sha256/文件尺寸做的资产校验，在换机或重新 clone 后会假红**——manifest 记的正是 16 位 sha256 前缀加 `bytes`。结论：资产完整性一律用 **blob 哈希**（`git rev-parse HEAD:<path>`）比对，不要用工作树字节。本设计原以"怕与仓库既有 content filter 互撞"为由否决 `.gitattributes`，Task 5 审计核实该前提**不成立**：`git config --get-regexp '^filter\.'` 只返回 Git LFS 那四个 filter，而 LFS 按属性启用，无 `.gitattributes` 时根本不被触发。所以加一份 `.gitattributes` 其实是安全的正解，但属本分支范围外，交发起人定夺 |
 | `logn in/README.md:5` 引用的 `evidence/reference/pending.json` 在 git 里不存在（`evidence/` 已忽略） | — | 接受，属溯源材料的已知缺口 |
 
 ## 12. 授权与风险（记录在案）

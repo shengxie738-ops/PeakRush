@@ -1124,11 +1124,16 @@ Expected: `/`、`/pricing`、`/signin` 三条给 **`/welcome/main.ts`**；
 
 ```bash
 kill "$(cat /tmp/t8-dev.pid)" 2>/dev/null; sleep 2
-netstat -ano | grep ":5179" || echo "port 5179 closed"
+netstat -ano | grep ":5179 .*LISTENING" || echo "port 5179 not listening"
 ```
 
-Expected: `port 5179 closed`。杀父进程不代表子进程死了，必须实测确认
+Expected: `port 5179 not listening`。杀父进程不代表子进程死了，必须实测确认
 （Task 1 就撞过一次：`kill` 掉记录的 pid 后 5175 仍在响应，要用 netstat 找真 PID）。
+
+**判据必须限定 LISTENING。** 初稿写的是 `netstat -ano | grep ":5179"`，实测server 已经真死了
+它仍然打印十几行——因为那是我自己那些 curl 客户端端口（6147–6216）连向 5179 留下的
+**TIME_WAIT** 套接字，不是有人在监听。于是"确认已关闭"这一步会在成功时报失败，
+而执行人会去做一轮根本没有必要的排查。要判"还有人在监听"，只看 LISTENING。
 
 **失败面划分（重要）**：某条 URL 映射到**错的**入口，是 Task 8 的缺陷，在本任务四个文件里修。
 若 dev server 起不来、或页面 200 但克隆站自己的模块在运行时报错
@@ -1163,6 +1168,26 @@ EOF
 spec §9.2 与 §14 步骤 7。**这是不能移位的第二个锚点。** 若构建在 Vite 7 / plugin-vue 6 下失败且无法在合理代价内修复，**停止子项目 1，报告并退回拓扑 C**（spec §9.2 末段），不要临时改方案继续。
 
 **Files:** 无（纯验证）
+
+### Task 8 交接过来的两条预判（Step 2 若红，先按这两条定位）
+
+Task 8 已实跑过 dev server 并确认六个 URL 的入口映射全对，但 `vite build` 没跑过（就是本任务）。
+它留下的两条观察：
+
+1. **`build.sourcemap` 被丢掉了。** 克隆站原来 `logn in/vite.config.ts` 有 `sourcemap: true`，
+   合并后的配置没写，取默认 `false`。这不是故障，但若 Step 3/4 里出现"和克隆站产物对比"
+   之类的检查，产物结构会因此不同。本轮没有任何一步依赖 source map，所以保持现状即可，
+   除非 Step 2 直接失败。
+2. **`rollupOptions.input` 拿到的是含反斜杠与非 ASCII 目录的绝对路径**
+   （`fileURLToPath(new URL("./index.html", import.meta.url))` 在本机会展开成
+   `G:\高并发大作业项目\PeakRush\frontend\index.html`）。dev server 两个入口都解析正常，
+   但构建期的入口解析与产物 HTML 命名从未在这条路径上验证过。
+   **若 `vite build` 报入口解析/找不到 html，先怀疑这里**，再考虑是不是 Vite 7 本身的问题。
+   试过的修法按代价从低到高：改成相对路径 `'index.html'`/`'app.html'`（Vite 本就支持相对
+   root 的 input，且这是最可能直接可用的）；或去掉显式 `input`，靠 `mpa` 默认发现多入口。
+   这两者都属于"修配置里的路径写法"，不算架构改动，可以在本任务内做；
+   但如果需要动 `welcome/**` 源码、换依赖版本、或削弱 tsconfig 才能过闸，
+   那就是 spec §9.2 说的 abort 条件，停下来报告。
 
 - [ ] **Step 1: typecheck**
 
@@ -1207,35 +1232,101 @@ Expected: 两个 HTML 都在；`dist/_app` 有内容；`dist/assets`、`dist/fon
 
 - [ ] **Step 4: 验 CSS 隔离（spec §10.1 的关键项）**
 
+**这一步的初稿是错的，会误杀整个子项目，先说清楚。** 初稿只从两个入口 HTML 里抓
+`href="…\.css"`，然后断言 `.layout-split` 在克隆站侧为 true。但实测克隆站
+**13 条路由全部是懒加载**（`welcome/app/router.ts:18,24,…,93` 一律
+`component: () => import('@/pages/…')`），而 `.layout-split` 只存在于
+`welcome/components/AuthPanel.vue`，经 `SignInPage`/`SignUpPage` 才可达。
+Vite 默认 `cssCodeSplit` 会把这个 `<style>` 块发到**异步 chunk 的 CSS 文件**，
+由 JS 在运行时加载，**根本不会出现在 `dist/index.html` 的 `<link>` 里**。
+于是初稿的探针读出 false，而期望表写着 true，
+按初稿的指令"任一格不符即说明 CSS 串了，停下来查是哪个共享模块同时 import 了两边样式"
+——执行人会去追一个不存在的原因，而真实原因只是分包。
+
+所以判据换成**与分包无关的那条真实不变量**：没有任何一个 CSS 文件同时含有
+两侧的规则。这才是"文档级隔离"的本意，而且不受 entry/async 划分影响。
+
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend"
 node -e "
 const fs=require('fs'),path=require('path');
-const cssOf=(h)=>[...h.matchAll(/href=\"([^\"]+\.css)\"/g)].map(m=>m[1]);
-for (const entry of ['dist/index.html','dist/app.html']) {
+const CLONE=['HeadingNow','--scale-text-rem','@layer reset','.layout-split','.auth-form','.input-text'];
+const MAIN=['--el-color-primary','#ff4e16','.el-button','.site-header','.state-panel'];
+const walk=(d)=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>
+  e.isDirectory()?walk(path.join(d,e.name)):(e.name.endsWith('.css')?[path.join(d,e.name)]:[]));
+const files=walk('dist');
+console.log('dist 下 CSS 文件数:',files.length);
+const mixed=[];
+for(const f of files){
+  const c=fs.readFileSync(f,'utf8');
+  const hitL=CLONE.filter(t=>c.includes(t)), hitM=MAIN.filter(t=>c.includes(t));
+  if(hitL.length&&hitM.length) mixed.push({file:f,clone:hitL,main:hitM});
+  else if(hitL.length||hitM.length)
+    console.log('  ',f.padEnd(34), hitL.length?'CLONE  '+hitL.join(','):'MAIN   '+hitM.join(','));
+}
+console.log(JSON.stringify({cssFiles:files.length, mixedBundles:mixed},null,2));
+process.exit(mixed.length===0?0:1);
+"; echo "isolation exit=${PIPESTATUS[0]}"
+```
+
+Expected: `exit=0` 且 `mixedBundles` 为 **空数组**——没有一个 CSS 文件同时含两侧规则。
+每个被识别出的文件都应干净地归到 CLONE 或 MAIN 一侧。
+
+**这 11 个探针是逐个审过的**（写这一步时实测），两条必须同时成立：
+
+1. **每侧的标记都真存在**，否则"无混装"会因为一个都不匹配而空转得绿。
+   CLONE 侧命中数：`HeadingNow` 6、`--scale-text-rem` 9、`@layer reset` 5、
+   `.layout-split` 2、`.auth-form` 1、`.input-text` 1。
+   MAIN 侧：`--el-color-primary`/`.el-button` 各在 `src/style.css` 与
+   `element-plus/dist/index.css` 命中，`#ff4e16`/`.site-header`/`.state-panel` 在
+   `src/style.css` 命中。
+   初稿列的 `.auth-panel` **根本不存在**（AuthPanel.vue 的真实类名是
+   `.auth-form`/`.auth-column`/`.auth-or`/`.auth-submit` 等），是个死标记，已换掉。
+2. **每个标记只属于一侧**，否则一次合法的构建会被判成"CSS 串了"。
+   11 个逐个交叉验证：clone 侧 6 个在 `src/` 全部 0 命中，main 侧 5 个在 `welcome/`
+   全部 0 命中。像 `.col` 这种两边都有的通用名绝不能当探针用。
+
+另外，核对标记时要用 `grep -rlF -e "$t"`。写成 `grep -rlF "$t"` 会被
+以 `--` 开头的标记（`--el-color-primary`、`--scale-text-rem`）当成选项解析，
+实测会**假报成"不存在"**——我第一遍就是这么误判了 `--el-color-primary`，
+差点把一个好标记换成坏的。
+
+**这一条不通过才是真的串了**，停下来查是哪个共享模块同时 import 了两边的样式。
+
+再补一份"入口级"的记录（**只作可见性报告，不作闸**，因为 async chunk 天然不在这里）：
+
+```bash
+cd "G:/高并发大作业项目/PeakRush/frontend"
+node -e "
+const fs=require('fs'),path=require('path');
+for(const entry of ['dist/index.html','dist/app.html']){
   const html=fs.readFileSync(entry,'utf8');
-  const files=cssOf(html);
-  const css=files.map(f=>fs.readFileSync(path.join('dist',f.replace(/^\//,'')),'utf8')).join('\n');
-  console.log('---',entry,'->',files.length,'css file(s),',(css.length/1024).toFixed(0)+'KB');
-  for (const probe of ['--el-color-primary','#ff4e16','.el-button','HeadingNow','--scale-text-rem','.layout-split'])
-    console.log('   ', probe.padEnd(22), css.includes(probe));
+  const files=[...html.matchAll(/href=\"([^\"]+\.css)\"/g)].map(m=>m[1]);
+  const css=files.map(f=>fs.readFileSync(path.join('dist',f.replace(/^\\//,'')),'utf8')).join('\n');
+  console.log('---',entry,'->',files.length,'entry-level css,',Math.round(css.length/1024)+'KB');
+  for(const p of ['--el-color-primary','#ff4e16','.el-button','HeadingNow','--scale-text-rem','.layout-split'])
+    console.log('   ',p.padEnd(22),css.includes(p));
 }
 "
 ```
 
-Expected（这是 spec §4.1 文档级隔离的直接证据）：
+期望值（**注意最后两格与初稿不同**）：
 
 | 探针 | `dist/index.html`（克隆站） | `dist/app.html`（主应用） |
 |---|---|---|
-| `--el-color-primary` | **false** | true |
-| `#ff4e16` | **false** | true |
-| `.el-button` | **false** | true |
-| `HeadingNow` | true | **false** |
-| `--scale-text-rem` | true | **false** |
-| `.layout-split` | true | **false** |
+| `--el-color-primary` | false | true |
+| `#ff4e16` | false | true |
+| `.el-button` | false | true |
+| `HeadingNow` | true | false |
+| `--scale-text-rem` | true | false |
+| `.layout-split` | **false 也算正常** | false |
 
-**任一格的期望值不符，说明两个入口的 CSS 串了。** 停下来查是哪个共享模块同时
-import 了两边的样式，不要继续。
+`HeadingNow` 与 `--scale-text-rem` 能出现在入口侧，是因为它们来自
+`welcome/styles/typography.css`、`tokens.css`——由 `welcome/main.ts` 顶层直接 import，
+在 entry chunk 里；`.layout-split` 来自组件的 `<style>`，在 async chunk 里。
+**这两者的区别是构建产物分块的结果，不是隔离破没破。** 所以本步唯一的硬判据是上面的
+`mixedBundles` 为空；下表若出现"某侧出现了另一侧的探针"才算失败，
+"某侧缺了自己那一侧的 async 探针"不算失败。
 
 - [ ] **Step 5: 单测仍绿**
 
@@ -1244,12 +1335,147 @@ cd "G:/高并发大作业项目/PeakRush/frontend"
 npm test 2>&1 | tail -12
 ```
 
-Expected: PASS，`api.test.mjs` 7 个 + `resolve-entry.test.mjs` 6 个全绿。
+Expected: PASS，`api.test.mjs` 7 + `resolve-entry.test.mjs` 6 = 13 个全绿。
 
-- [ ] **Step 6: 留档**
+- [ ] **Step 6: 把 Task 5 的一次性人工审计固化成测试**
+
+Task 5 的"每个根绝对资产路径都能解析"是靠临时脚本手工证的，**没有任何已提交测试守护它**
+（当时 `frontend/tests/` 只有 `api.test.mjs` 与 `resolve-entry.test.mjs`，全仓 grep
+`frontend/public` 在测试与脚本里 0 命中）。日后丢一个资产不会变红，而 `<img>` 404 是静默的
+——没有 console error，页面看着正常。
+
+创建 `frontend/tests/public-assets.test.mjs`：
+
+```js
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+/**
+ * Guards the premise of the portal merge: the clone site's CSS and source were moved
+ * with ZERO path edits because every asset URL is root-absolute and publicDir is the
+ * shared root. If one asset goes missing, an <img> 404s silently — no console error,
+ * page looks plausible. Task 5's audit proved this once by hand; this keeps it proved.
+ */
+const PUBROOT = fileURLToPath(new URL('../public/', import.meta.url))
+const WELROOT = fileURLToPath(new URL('../welcome/', import.meta.url))
+const has = (p) => fs.existsSync(PUBROOT + p)
+
+const files = []
+;(function walk(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name)
+    if (e.isDirectory()) walk(p)
+    else if (/\.(vue|ts|css|json|glsl)$/.test(e.name)) files.push(p)
+  }
+})(WELROOT)
+
+// Block /* */ , // and <!-- --> so comment prose cannot be mistaken for a reference.
+const maskComments = (src) =>
+  src
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length))
+    .replace(/<!--[\s\S]*?-->/g, (m) => ' '.repeat(m.length))
+    .replace(/(^|[^:\\)'"])\/\/[^\n]*/g, (m, p1) => p1 + ' ')
+
+// Greedy, and deliberately stops at `$ { ' " ) , space` so an interpolated path is
+// collected as its stem (e.g. `/assets/cards/Card-`) rather than as a fake file.
+const FILE_LIKE = /\.[a-z0-9]+$/i
+
+const collect = (src) => {
+  const out = new Set()
+  const code = maskComments(src)
+  for (const m of code.matchAll(/\/(?:assets|fonts)\/[^\s'"`)${},]+|\/icons\.svg/g)) {
+    const t = m[0]
+    // Only real files are asserted here. Base constants (`/assets/subpages/about/`)
+    // and interpolation stems (`/assets/cards/Card-`) are covered by the range tests.
+    if (FILE_LIKE.test(t)) out.add(t)
+  }
+  return out
+}
+
+const scanned = new Map()
+for (const f of files) for (const t of collect(fs.readFileSync(f, 'utf8'))) {
+  if (!scanned.has(t)) scanned.set(t, path.relative(WELROOT, f))
+}
+
+test('every static root-absolute asset URL in welcome/ resolves under public/', () => {
+  const missing = [...scanned.entries()].filter(([t]) => !has(t))
+  assert.deepEqual(missing, [], `${missing.length} unresolved asset path(s)`)
+})
+
+test('the scanner is actually finding asset paths, not spinning green on an empty set', () => {
+  // A guard that matches nothing is indistinguishable from a passing guard.
+  assert.ok(scanned.size >= 100, `only ${scanned.size} asset paths found — scanner regressed`)
+  for (const probe of ['/assets/cards/Card-1.png', '/fonts/HeadingNow-73Book.woff2', '/icons.svg']) {
+    assert.ok(scanned.has(probe), `expected to discover ${probe}`)
+  }
+  assert.equal(has('/assets/cards/Card-1.png'), true)
+  assert.equal(has('/assets/definitely-not-here.png'), false, 'has() must be able to report a miss')
+})
+
+// Three families are built by string interpolation, so the static scan skips them.
+// Each has one fixed range, pinned here with the source that decides it.
+const DYNAMIC = [
+  { dir: '/assets/cards/', prefix: 'Card-', count: 9, suffix: '.png', why: 'webgl/createCardRing.ts:151 cardCount default 9; content/home.ts:68' },
+  { dir: '/assets/decor/', prefix: 'Review-', count: 8, suffix: '.png', why: 'webgl/createTestimonialCarousel.ts:129 default 8; sceneRegistry.ts:100 count:8' },
+  { dir: '/assets/people/', prefix: 'trail-', count: 18, suffix: '.png', why: 'content/subpages/product.ts:215 trailOrder max 18' },
+]
+for (const fam of DYNAMIC) {
+  test(`${fam.dir}${fam.prefix}1..${fam.count} all exist`, () => {
+    const absent = []
+    for (let i = 1; i <= fam.count; i++) if (!has(`${fam.dir}${fam.prefix}${i}${fam.suffix}`)) absent.push(`${fam.prefix}${i}${fam.suffix}`)
+    assert.deepEqual(absent, [], `missing generated asset(s); range justified by ${fam.why}`)
+  })
+}
+```
+
+```bash
+cd "G:/高并发大作业项目/PeakRush/frontend"
+npm test 2>&1 | grep -E "^ℹ (tests|pass|fail)"
+```
+
+Expected: **18 tests, 18 pass**（Step 5 的 13 + 本文件 5）。
+
+**第二个测试不是冗余，是这道闸唯一的有效性证明。** 写这段时第一版正则漏了一个 `+` 量词
+（`[^…]+` 写成 `[^…]`），于是每个 token 只匹配到 2 个字符（`/assets/c`、`/fonts/H`），
+`FILE_LIKE` 一过滤只剩 1 条——**第一条测试照样全绿**，因为那 1 条恰好存在。
+没有第二条"扫到 ≥100 条、必须含三个指定探针、且 `has()` 能对不存在的文件返回 false"的自检，
+这个守卫就是一个看起来在工作的空壳。另做过反向验证：复制一份 public 并删掉
+`Card-1.png`，第一、二条同时变红并点名该文件。
+
+`PUBROOT`/`WELROOT` 必须用 `fileURLToPath`，**不要用 `new URL(...).pathname`** ——
+后者在 Windows 上返回 `/G:/…` 这种带前导斜杠的形式，`fs.existsSync` 恒为 false，
+测试会红在一件与资产无关的事情上。
+
+- [ ] **Step 7: 留档并提交这道闸**
 
 `/tmp/typecheck.txt` 与 `/tmp/build.txt` 的实际输出要在 Task 19 的报告里引用。
-本任务无源码变更，**不产生 commit**。
+
+```bash
+cd "G:/高并发大作业项目/PeakRush"
+git add frontend/tests/public-assets.test.mjs
+git commit -m "$(cat <<'EOF'
+test: 把资产路径可解析性从人工审计固化成测试
+
+Task 5 合并 public 后靠临时脚本证明 welcome/ 里每个根绝对资产路径都在
+frontend/public/ 下有真文件，但没有任何已提交测试守护这条结论。丢一个资产是静默故障：
+img 404 不报 console error，页面看着正常。
+
+扫描 welcome/ 的 vue/ts/css/json/glsl，屏蔽注释后取 /assets/**、/fonts/**、/icons.svg
+的真实文件 token 逐个断言存在；三族插值路径（Card-1..9、Review-1..8、trail-1..18）
+按源码决定的固定范围单独验，并在注释里写明范围出处。
+
+第二条测试断言"扫到 >=100 条且必须含三个指定探针、has() 能对缺失文件返回 false"。
+它的作用是证明这道闸有效：实测漏写一个量词会让 token 只剩两字符、第一条测试全绿
+而实际什么都没检查。反向验证过删掉 Card-1.png 会立刻变红。
+EOF
+)"
+```
+
+**注意**：本任务除这道闸之外无源码变更；Step 1–5 若触发 spec §9.2 的 abort 条件，
+**不要提交这道闸**，先停下来报告——测试是收尾加固，不是判据的一部分。
 
 ---
 
