@@ -17,10 +17,10 @@
  *
  * Motion: `createMotionRuntime({container})` from @/motion/createMotionRuntime is
  * created once on mount and disposed on unmount; every WebGL section of the page is
- * registered with its scroll range. The module is being written concurrently, so it
- * is resolved through import.meta.glob — that keeps `vite build` green while the
- * file is absent and picks it up the moment it lands, with the alias resolved by
- * Vite rather than by hand.
+ * registered with its scroll range. It is a plain dynamic import now — the module is
+ * on disk, so the glob-keyed runtime-module indirection this file used to carry (and
+ * whose absolute /src/… module path silently resolves to nothing once the tree lives
+ * under welcome/) is gone.
  */
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -32,10 +32,6 @@ import { WEBGL_SECTIONS, canvasCountFor, createWebGLScene } from '@/webgl/sceneR
 import type { MotionRuntime, SceneController, ScrollRange } from '@/motion/motion.types';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 import { SEO } from '@/content/home';
-
-interface RuntimeFactory {
-  (options?: { container?: HTMLElement }): MotionRuntime;
-}
 
 const THEME_COLORS: Record<string, string> = {
   light: '#FFFFFF',
@@ -59,10 +55,6 @@ const MOUNT_BY_SCENE: Record<string, { selector: string; kind: WebGLMount['kind'
   'landing-7-connectory': { selector: '.landing-7-connectory-webgl', kind: 'connectory-panel' },
   'landing-9-testimonials': { selector: '.landing-9-testimonials-webgl', kind: 'testimonial-carousel' },
 };
-
-const runtimeModules = import.meta.glob<{ createMotionRuntime?: RuntimeFactory }>(
-  '/src/motion/createMotionRuntime.ts',
-);
 
 const route = useRoute();
 const scrollArea = ref<HTMLElement | null>(null);
@@ -144,19 +136,9 @@ onMounted(async () => {
   scrollArea.value?.addEventListener('scroll', syncScrollbar, { passive: true });
   window.addEventListener('resize', syncScrollbar);
 
-  /* the reference mounts its SVG sprite and teleports outside the scroll area */
-  const loader = runtimeModules['/src/motion/createMotionRuntime.ts'];
-  if (!loader) {
-    if (import.meta.env.DEV) {
-      console.warn('[clone] @/motion/createMotionRuntime is not on disk yet — WebGL scenes stay on their static posters.');
-    }
-    return;
-  }
   if (reducedMotion) return;
-  const module = await loader();
-  const factory = module.createMotionRuntime;
-  if (typeof factory !== 'function') return;
-  const runtime = factory({ container: scrollArea.value ?? undefined });
+  const { createMotionRuntime } = await import('@/motion/createMotionRuntime');
+  const runtime = createMotionRuntime({ container: scrollArea.value ?? undefined });
   root.value = runtime;
   await registerScenes(runtime);
 });
