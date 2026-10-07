@@ -1097,6 +1097,44 @@ ls -d shared build
 
 Expected: 两个目录都在（`build/` 由 Task 7 创建）。`shared/safe-redirect.ts` 在
 Task 10 创建；目录先建好，否则 Vite 解析 `@shared` 会报无法解析。
+`git` 不跟踪空目录，所以 Step 6 的提交里**不会**出现 `shared/`——这是预期的，
+不要为此加 `.gitkeep` 或任何占位文件。
+
+- [ ] **Step 5b: 窄域实跑——只验 Task 8 自己的交付物（入口映射）**
+
+本任务把回退判定从 Vite 默认 SPA 手里接管过来，所以必须真跑一次确认**映射对**，
+而不是只靠 `resolve-entry.test.mjs` 的纯函数绿。范围严格限定在"哪个 URL 给了哪个入口"，
+不包含克隆站运行时健康——那是 Task 9 构建闸的事。
+
+```bash
+cd "G:/高并发大作业项目/PeakRush/frontend"
+node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5179 --strictPort > /tmp/t8-dev.log 2>&1 &
+echo $! > /tmp/t8-dev.pid
+for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:5179/ && { echo "ready after ${i}s"; break; }; sleep 1; done
+for p in "/" "/pricing" "/signin" "/app/" "/app/orders" "/app/nope"; do
+  printf "%-16s http=%s  entry=%s\n" "$p" \
+    "$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept: text/html' http://127.0.0.1:5179$p)" \
+    "$(curl -s -H 'Accept: text/html' http://127.0.0.1:5179$p | grep -oE '/(welcome|src)/main\.ts' | head -1)"
+done
+```
+
+Expected: `/`、`/pricing`、`/signin` 三条给 **`/welcome/main.ts`**；
+`/app/`、`/app/orders`、`/app/nope` 三条给 **`/src/main.ts`**；全部 200。
+`/app/nope` 必须落进主应用而不是克隆站——它与 `/app/orders` 走同一条 `isApp` 分支。
+
+```bash
+kill "$(cat /tmp/t8-dev.pid)" 2>/dev/null; sleep 2
+netstat -ano | grep ":5179" || echo "port 5179 closed"
+```
+
+Expected: `port 5179 closed`。杀父进程不代表子进程死了，必须实测确认
+（Task 1 就撞过一次：`kill` 掉记录的 pid 后 5175 仍在响应，要用 netstat 找真 PID）。
+
+**失败面划分（重要）**：某条 URL 映射到**错的**入口，是 Task 8 的缺陷，在本任务四个文件里修。
+若 dev server 起不来、或页面 200 但克隆站自己的模块在运行时报错
+（three.js / WebGL / Lenis），那属于 **Task 9 构建闸的判据范围，不在本任务修**——
+不动 `welcome/**`、不改依赖版本、不改别名架构、不削弱 tsconfig；杀掉 server、
+把原始报错交回来即可。一次诚实的 BLOCKED 正是这道闸想要的信息。
 
 - [ ] **Step 6: 提交**
 
