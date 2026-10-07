@@ -362,21 +362,35 @@ const runtimeModules = import.meta.glob<{ createMotionRuntime?: RuntimeFactory }
  * Motion: `createMotionRuntime({container})` from @/motion/createMotionRuntime is
  * created once on mount and disposed on unmount; every WebGL section of the page is
  * registered with its scroll range. It is a plain dynamic import now — the module is
- * on disk, so the import.meta.glob indirection this file used to carry (and whose
- * absolute '/src/…' path silently resolves to nothing once the tree lives under
- * welcome/) is gone.
+ * on disk, so the glob-keyed runtime-module indirection this file used to carry (and
+ * whose absolute /src/… module path silently resolves to nothing once the tree lives
+ * under welcome/) is gone.
+ */
 ```
+
+**措辞是有意选的，别改回字面 token。** 本节初稿写的是 "the `import.meta.glob` indirection"
+和 "absolute `'/src/…'` path"，那两句会同时踩中 Step 6 的两道闸——grep 分不清注释散文和
+代码，于是"照 Step 5 逐字写完"这件事本身就让 Step 6 永远红。实施时已按上面这版
+（`glob-keyed runtime-module indirection`、不带引号的 `absolute /src/…`）落地，语义不变。
 
 - [ ] **Step 6: 验证 glob 与绝对 /src/ 引用已从 welcome/ 彻底消失**
 
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend"
-grep -rn "import.meta.glob\|runtimeModules\|RuntimeFactory" welcome/ && echo "FAIL: 仍有残留" || echo "OK: glob 间接已彻底移除"
-grep -rn "'/src/\|\"/src/" welcome/ && echo "FAIL: 仍有绝对 /src/ 引用" || echo "OK: welcome/ 内无绝对 /src/ 引用"
+grep -rnE "runtimeModules|RuntimeFactory" welcome/ && echo "FAIL: glob 间接的符号仍在" || echo "OK: glob 符号已彻底移除"
+grep -rnE "'/src/|\"/src/" welcome/ && echo "FAIL: 仍有绝对 /src/ 模块说明符" || echo "OK: welcome/ 内无绝对 /src/ 说明符"
+grep -rnE "import\.meta\.glob[(<]" welcome/ && echo "FAIL: 仍有 glob 调用" || echo "OK: 无 import.meta.glob 调用"
 ```
 
-Expected: 两行都打印 `OK: …`。第二条尤其重要 —— spec §5.6 实测这是克隆站源码里
-**唯一**的路径脆弱点，这里确认它确实只有一处。
+Expected: 三行都打印 `OK: …`。
+
+**闸口查的是代码形态，不是词面。** `runtimeModules` / `RuntimeFactory` 这两个符号只为 glob
+而存在，它们消失即等价于间接消失，且不会被散文误触发；`'/src/` 只匹配带引号的模块说明符，
+注释里提一句"absolute /src/… path"（不带引号）不算命中；第三条用 `import.meta.glob` 后
+紧跟 `(` 或 `<` 来只抓真实调用。这样后来人在注释里解释这段历史时不会把检查弄红——
+初稿正是没做这个区分，才让 Step 5 与 Step 6 互相矛盾。
+
+第三条尤其重要——spec §5.6 实测这是克隆站源码里**唯一**的路径脆弱点，这里确认它确实只有一处。
 
 - [ ] **Step 7: 提交**
 
