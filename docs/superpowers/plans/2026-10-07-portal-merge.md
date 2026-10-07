@@ -476,17 +476,42 @@ const webgl = ref<HTMLElement | null>(null);
 其余四个文件同理。`ref` 属性编译后不进 DOM，所以**零运行时、零渲染影响**，
 Task 16 的像素对照不受这一步影响。
 
-- [ ] **Step 3: 若 ref 导入变为未使用，一并清理**
+实测五处的准确位置（声明行 / 模板绑定行，模板行是**删除前的当前行号**）：
+
+| 文件 | 死声明 | 模板 `ref=` 绑定 | 绑定形态 |
+|---|---|---|---|
+| `components/SiteHeader.vue` | `:40` `const headerEl` | `:172` `<header ref="headerEl" :class="rootClass">` | 行内，删属性保留标签其余部分 |
+| `features/home/HomeCard.vue` | `:21` `const content` | `:61` `<div ref="content" class="landing-5-nexus-webgl__content">` | 行内 |
+| `features/home/HomeConnectory.vue` | `:22` `const webgl` | `:80` 独占一行 `ref="webgl"` | 整行删 |
+| `features/home/HomeGetSeen.vue` | `:28` `const webgl` | `:93` 独占一行 `ref="webgl"` | 整行删 |
+| `features/home/HomeTestimonials.vue` | `:25` `const webgl` | `:80` 独占一行 `ref="webgl"` | 整行删 |
+
+**先按内容定位，别照抄行号连删两次** —— 删掉声明会让下面所有行号上移 1。
+同一批文件里**还有别的 `ref=` 绑定是活的，绝对不能碰**：`ref="root"`（四个 home 组件
+各一处：HomeCard `:42`、HomeConnectory `:66`、HomeGetSeen `:83`、HomeTestimonials `:55`；
+`SiteHeader.vue` 没有 root，它全文只有 `ref="headerEl"` 这一个绑定）、
+`ref="canvasEl"`（HomeCard `:66`、HomeGetSeen `:100`、HomeTestimonials `:88`）、
+`ref="dialog"`（HomeGetSeen `:166`）。上表第五列只列了每个文件要删的那一个，
+其余一律保留。判据是"这个标识符在 script 里有没有 `.value` 读取"，表中五个已逐个确认没有。
+
+列绑定时要用 `(^|[[:space:]])ref="` 而不是裸 `ref="` —— 后者会命中 `href="`，
+`SiteHeader.vue` 用裸模式会多出 `:238`、`:272` 两处 `BrushLink :href="…"` 假阳性。
+
+- [ ] **Step 3: 确认 `ref` 导入仍被使用（本任务里是空操作，但仍要跑）**
 
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend/welcome"
 for f in components/SiteHeader.vue features/home/HomeCard.vue features/home/HomeConnectory.vue features/home/HomeGetSeen.vue features/home/HomeTestimonials.vue; do
-  printf "%-46s ref-call:%s\n" "$f" "$(grep -oE "\bref[(<]" "$f" | wc -l)"
+  printf "%-26s 删后剩余 ref( 调用:%s\n" "$(basename $f)" \
+    "$(( $(grep -oE '\bref[(<]' "$f" | wc -l) - 1 ))"
 done
 ```
 
-对每个文件：若 `ref-call` 为 0 而 `import { … } from 'vue'` 里仍列着 `ref`，
-把 `ref` 从 import 里删掉（`noUnusedLocals` 会报错）。若还有其他 `ref()` 用途则保留。
+实测**五个文件删掉那一个死声明后都还剩 ≥2 处 `ref(...)`**（SiteHeader 3、HomeCard 3、
+HomeConnectory 2、HomeGetSeen 5、HomeTestimonials 2），所以 **`ref` 必须留在
+`import { … } from 'vue'` 里，一个都不许删**。这一步是防手滑：若把 `ref` 从 import
+删了，其余 `ref()` 调用会立刻报错；反之若某个文件真的只剩那一个 `ref()`，
+`noUnusedLocals` 才会要求清掉导入。跑完确认五个数都 > 0 即可。
 
 - [ ] **Step 4: 提交**
 
@@ -500,7 +525,7 @@ vue-tsc 3.3.11 对这 5 处报 TS6133，vue-tsc 2.2.12 不报：后者把模板�
 ref="x" 算作对绑定 x 的使用，前者不算。
 
 逐个核实过：都是 const x = ref<HTMLElement|null>(null) 声明 + 模板 ref="x" 绑定，
-script 内从未读取。WebGL 挂载走的是 App.vue:105 的
+script 内从未读取。WebGL 挂载走的是 App.vue:97 的
 document.querySelector('[data-section-id="…"]')，不经过这些 ref。
 ref 属性编译后不进 DOM，故删除零运行时、零渲染影响。
 
