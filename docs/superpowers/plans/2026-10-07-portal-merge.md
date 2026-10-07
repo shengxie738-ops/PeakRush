@@ -3761,8 +3761,12 @@ npm test 2>&1 | tee /tmp/final-test.txt | tail -15
 echo "test exit=${PIPESTATUS[0]}"
 ```
 
-Expected: 两个 `exit=0`。测试总数应为 **37**（原 `api.test.mjs` 7 +
-`resolve-entry` 6 + `safe-redirect` 6 + `auth-validation` 8 + `auth-api` 10 = 37；
+Expected: 两个 `exit=0`。测试总数应为 **46**（原 `api.test.mjs` 7 +
+`resolve-entry` 6 + `safe-redirect` 6 + `auth-validation` 8 + `auth-api` 10 +
+`public-assets` 5 + `entry-isolation` 4 = 46（Task 9 落地时补的两道闸各做过反向验证，
+所以它们不是凑数的测试：删掉一张资产图会让 public-assets 变红，
+往 `src/App.vue` 塞一句 `from '@/webgl/sceneRegistry'` 会让 entry-isolation 变红
+而 `vue-tsc` 仍是 exit 0）；
 这四组新测试的 30 个用例已在写计划时对着实现逐条跑绿过）。
 以实际输出为准，**逐个数清并写进报告**，不要只看"全绿"。
 
@@ -3799,7 +3803,18 @@ echo "--- 改动文件统计 ---"
 git diff --stat -M main..HEAD | tail -5
 echo "--- @ 别名独占性守卫（Task 6 建立的隐含契约，必须仍为 0）---"
 grep -rnE "from ['\"]@/" frontend/src/ | tee /tmp/alias-collision.txt | wc -l
+node --test frontend/tests/entry-isolation.test.mjs 2>&1 | grep -E "^ℹ (tests|pass|fail)"
 ```
+
+Expected: grep 命中 **0**，且 `entry-isolation` **4 tests / 4 pass**。
+
+**这条 grep 单独用是不够的，已在 Task 9 之后补成测试。** 它只匹配 `from '@/…'`，
+对动态 `import('@/…')` 完全失明——而克隆站自己就有 16 处这种写法
+（`welcome/app/router.ts` 的 13 条懒加载路由 + `App.vue:140` 的 motion runtime），
+按 `from` 形式统计是 99/117，**漏掉 15% 的别名用法**。
+`frontend/tests/entry-isolation.test.mjs` 覆盖 `from`、`import()`、`export *`、
+裸 `import '…'` 四种形态，另外还管跨入口相对穿越（`../welcome/…`）与
+`node:`/`Buffer`/`process.env`。上面这条 grep 保留作为"不依赖测试运行器"的快速复核。
 
 Expected: `git status --short` **为空**。
 
