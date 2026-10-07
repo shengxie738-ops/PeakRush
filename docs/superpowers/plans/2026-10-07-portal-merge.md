@@ -715,11 +715,29 @@ EOF
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend"
 npm install --no-audit --no-fund 2>&1 | tail -15
-node -p "['three','lenis','pinia','vite','vue-tsc','typescript'].map(p=>p+' '+require(p+'/package.json').version).join('\n')"
+echo "install exit=${PIPESTATUS[0]}"
+node -e "const fs=require('fs');for(const p of ['three','lenis','pinia','vite','vue-tsc','typescript','@types/three','@types/node'])console.log(p, JSON.parse(fs.readFileSync('node_modules/'+p+'/package.json')).version)"
 ```
 
 Expected: 无 `ERESOLVE` 冲突；打印 `three 0.176.0`、`lenis 1.3.3`、`pinia 3.x`、
 `vite 7.x`、`vue-tsc 3.x`、`typescript 5.9.x`。
+
+**不要用 `require(p+'/package.json')` 读版本** —— 初稿那样写，实测在
+`three@0.176.0` 上直接失败：它的 `package.json` 有 `exports` 封装，子路径
+`./package.json` 没有导出，`require` 报
+`ERR_PACKAGE_PATH_NOT_EXPORTED`（或 MODULE_NOT_FOUND），一次正确的安装会被这条
+核对命令自己弄红。改用 `fs.readFileSync` 绕过封装，或 `npm ls --depth=0`。
+
+顺带核对**没有**被引入的东西（spec §5.7 的排除项）：
+
+```bash
+cd "G:/高并发大作业项目/PeakRush/frontend"
+for d in playwright @playwright/test vitest eslint jsdom pixelmatch pngjs @vue/test-utils; do
+  printf "  %-22s %s\n" "$d" "$(ls -d "node_modules/$d" 2>/dev/null >/dev/null && echo PRESENT-BAD || echo absent)"
+done
+```
+
+Expected: 全部 `absent`。
 
 - [ ] **Step 3: 整份替换 tsconfig.json**
 
@@ -3407,9 +3425,11 @@ Write-Host 'PeakRush ready: http://127.0.0.1:5179'
 Write-Host 'PeakRush ready: portal http://127.0.0.1:5179/  app http://127.0.0.1:5179/app/'
 ```
 
-**注意**：`scripts/app-start.ps1` 已有上次会话遗留的未提交修改。改之前先
-`git diff scripts/app-start.ps1` 看清遗留内容，本次改动只加 URL，不动其他行；
-提交时在 message 里说明该文件同时含遗留修改。
+**注意（已更新）**：本计划初稿写这一段时，`scripts/app-start.ps1` 上趴着上次会话
+遗留的未提交修改（端口 5173→5179 与一处 PS 5.1 的 `ConvertFrom-Json` 数组缺陷修复）。
+那份遗留工作**已在 Task 6 之前作为独立提交 `031c3ec` 落地**，`docs/STARTUP_GUIDE.md`
+也同时纳入版本控制，所以现在 `git status` 应当是干净的，`:64` 与 `:72` 的行号即当前值。
+若你开工时发现这两个文件又出现非本任务产生的改动，停下来报告，不要顺带提交。
 
 - [ ] **Step 4: 改文档里的 URL 说明**
 
@@ -3424,8 +3444,8 @@ Write-Host 'PeakRush ready: portal http://127.0.0.1:5179/  app http://127.0.0.1:
 `index.html` → `welcome/main.ts`（12 条门户路由），`app.html` → `src/main.ts`
 （`/app/` 下 4 条路由），回退由 `build/mpa-fallback.ts` 判定。
 
-`docs/STARTUP_GUIDE.md` 目前是**未跟踪**文件（上次会话产物）。本轮需要改它，
-所以一并 `git add` 纳入版本控制，并在 commit message 里说明。
+`docs/STARTUP_GUIDE.md` 现已是**已跟踪**文件（在 `031c3ec` 里随端口改动一并入库），
+本任务直接改它即可，不需要再 `git add` 首次入库。
 
 - [ ] **Step 5: 重启验证脚本改动生效**
 
@@ -3453,8 +3473,9 @@ docs: 双入口 URL 分工写进启动脚本与文档
 app-start.ps1 的健康检查加 /app/ —— 原来只检查 /，而 / 现在是门户，
 主应用挂了也发现不了。就绪提示语同时给出两个入口。
 
-注：app-start.ps1 与 STARTUP_GUIDE.md 含上次会话（前端端口改 5179）的遗留改动，
-本次一并纳入。design-qa.md 按既有惯例保留历史 5173 不改。
+注：本任务只写双入口分工这一件事。上次会话遗留的"前端端口 5173→5179"改动
+已在 Task 6 之前作为独立提交 031c3ec 落地，不混进本提交。
+design-qa.md 按既有惯例保留历史 5173 不改。
 EOF
 )"
 ```
@@ -3512,16 +3533,25 @@ echo "--- 本分支相对 main 的提交 ---"
 git log --oneline main..HEAD
 echo "--- 改动文件统计 ---"
 git diff --stat -M main..HEAD | tail -5
+echo "--- @ 别名独占性守卫（Task 6 建立的隐含契约，必须仍为 0）---"
+grep -rnE "from ['\"]@/" frontend/src/ | tee /tmp/alias-collision.txt | wc -l
 ```
 
-Expected: `git status --short` 里**只剩**上次会话遗留的 8 个未提交修改
-（`README.md`、`docs/API_CONTRACT.md`、`docs/ARCHITECTURE.md`、`frontend/README.md`、
-`frontend/package.json`、`frontend/vite.config.ts`、`scripts/app-start.ps1`、
-`scripts/app-status.ps1`）中**尚未被本轮提交带走的那些**。
-逐项核对：本轮已提交过 `README.md`、`docs/ARCHITECTURE.md`、`frontend/README.md`、
-`frontend/package.json`、`frontend/vite.config.ts`、`scripts/app-start.ps1`，
-所以剩下的应当只有 `docs/API_CONTRACT.md` 与 `scripts/app-status.ps1`。
-**若剩下的比这多，说明有本轮产物漏提交；若比这少，说明误提交了遗留改动 —— 两种都要查清。**
+Expected: `git status --short` **为空**。
+
+本计划初稿在这里写的是"只剩上次会话遗留的 8 个未提交修改"，那个前提已不成立：
+这批遗留改动（前端端口 5173→5179、`app-start.ps1` 的 PS 5.1 修复、新增
+`docs/STARTUP_GUIDE.md`）**已在 Task 6 之前作为独立提交 `031c3ec` 落地**，
+所以本轮从开工起工作区就是干净的。若此处出现任何非本轮产生的改动，停下来报告，
+不要顺手提交别人的在途工作。
+
+最后一条是**别名独占守卫**。Task 6 写的 `paths: {"@/*": ["welcome/*"]}` 对整个
+tsconfig 生效，不只对 `welcome/**`。于是主应用 `frontend/src/**` 里一旦出现
+`import … from '@/foo'`，它会静默解析到**克隆站**的 `welcome/foo`——同名模块时拿到
+错的那一个，文档级样式隔离也随之破掉，而且不会报错。实测本轮开工时主应用用 `@/`
+是 **0 次**，`@` 才能独占给克隆站；但这是一个需要持续成立的前提，不是一次性事实，
+所以在收尾再钉一次：命中数必须仍为 0。若不为 0，说明有主应用文件开始用 `@/`，
+必须改成相对路径或 `@shared/`，不能让主应用隔着入口 import 克隆站的模块。
 
 - [ ] **Step 5: 把最终数字补进验收报告并提交**
 

@@ -606,7 +606,15 @@ vue-tsc 2 把字符串 `ref="x"` 算作对绑定 `x` 的使用，vue-tsc 3 不�
 
 ### 9.2 未验证：Vite 7 + plugin-vue 6 的实际构建
 
-typecheck 覆盖了最高风险的面（93 个严格模式 TS/Vue 文件），但**构建无法在不做合并
+typecheck 覆盖了最高风险的面（**68 个**严格模式 TS/Vue 文件：36 个 `.vue` + 32 个 `.ts`。
+本文初稿写的是 93，那是克隆站自己仓库里的数字，把 `scripts/**/*.mjs` 与
+`tests/**/*.ts` 也算了进去，而这两类目录本轮既不搬也不纳入 `include`。
+Task 6 用 `vue-tsc --listFilesOnly` 实测程序集共 1783 个文件，其中 `welcome/` 恰为
+32 个 `.ts`（含 `webgl/shaders/glsl.d.ts`）+ 36 个 `.vue` + 2 个 `.json`；
+`welcome/` 下没有任何 `.js`/`.mjs`/`.cjs`/`.tsx`，所以没有可检查的文件逃在 `include` 之外，
+12 个 `.glsl` 由 `glsl.d.ts` 的 `declare module '*.glsl?raw'` 覆盖。
+零错误是"真覆盖了 68 个文件"的零错误，不是"少检查了 20 个文件"的零错误），
+但**构建无法在不做合并
 脚手架的前提下忠实测试**：直接拿主应用的 Vite 7 二进制跑克隆站配置，
 `@vitejs/plugin-vue` 会从克隆站自己的 `node_modules` 解析成 v5，
 那不是合并后的真实组合，测出来的结果无论成败都会误导。
