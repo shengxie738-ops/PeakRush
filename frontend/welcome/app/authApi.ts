@@ -89,6 +89,22 @@ export async function submitAuth(
         body?.code || String(response.status),
       );
     }
+    if (
+      typeof data !== 'object' ||
+      data === null ||
+      typeof (data as AuthResult).token !== 'string' ||
+      (data as AuthResult).token === '' ||
+      typeof (data as AuthResult).user?.username !== 'string' ||
+      typeof (data as AuthResult).user?.id !== 'number'
+    ) {
+      // `return data as AuthResult` alone would resolve a 200 carrying `{}` and let the
+      // caller persist an undefined token, i.e. a login that is visibly broken.
+      throw new AuthRequestError(
+        'The server did not return a session. Try again.',
+        response.status,
+        'INVALID_RESPONSE',
+      );
+    }
     return data as AuthResult;
   } catch (error) {
     if (error instanceof AuthRequestError) throw error;

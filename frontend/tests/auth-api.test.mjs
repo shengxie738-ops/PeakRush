@@ -115,3 +115,22 @@ test('a 503 gets an actionable message', async () => {
     (error) => error instanceof AuthRequestError && error.status === 503,
   )
 })
+
+test('a 200 without a usable token is NOT a login', async () => {
+  // The transport's success path was `return data as AuthResult` — an unchecked cast.
+  // A gateway that answers 200 with `{}` (or a bare envelope) resolved happily and the
+  // caller wrote undefined into localStorage, producing a broken "logged in" state.
+  for (const body of ['{}', 'null', '{"user":{"id":1,"username":"a","role":"USER"}}', '{"token":"","user":null}', '[]', '"ok"']) {
+    globalThis.fetch = async () => new Response(body, { status: 200, headers: { 'Content-Type': 'application/json' } })
+    await assert.rejects(
+      () => submitAuth('signin', 'admin_01', 'longenough'),
+      (error) => error instanceof AuthRequestError && error.code === 'INVALID_RESPONSE',
+      `should have rejected a 200 carrying ${body}`,
+    )
+  }
+})
+
+test('a 200 carrying a real token and user still succeeds', async () => {
+  globalThis.fetch = async () => new Response(JSON.stringify(TOKEN_RESULT), { status: 200 })
+  assert.deepEqual(await submitAuth('signin', 'admin_01', 'longenough'), TOKEN_RESULT)
+})
