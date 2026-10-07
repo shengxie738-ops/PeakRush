@@ -502,10 +502,13 @@ Task 16 的像素对照不受这一步影响。
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend/welcome"
 for f in components/SiteHeader.vue features/home/HomeCard.vue features/home/HomeConnectory.vue features/home/HomeGetSeen.vue features/home/HomeTestimonials.vue; do
-  printf "%-26s 删后剩余 ref( 调用:%s\n" "$(basename $f)" \
-    "$(( $(grep -oE '\bref[(<]' "$f" | wc -l) - 1 ))"
+  printf "%-26s 删后剩余 ref( 调用:%s\n" "$(basename $f)" "$(grep -oE '\bref[(<]' "$f" | wc -l)"
 done
 ```
+
+**这一步跑在 Step 2 之后，数的是删完声明以后的真实文件，所以不要再 `- 1`。**
+初稿写的是 `$(… | wc -l) - 1`，那是给"删除前的文件"做补偿的；Step 3 的位置在删除之后，
+两个补偿叠在一起会把每个数都少数 1（实测报出 2/2/1/4/1，真实值是 3/3/2/5/2）。
 
 实测**五个文件删掉那一个死声明后都还剩 ≥2 处 `ref(...)`**（SiteHeader 3、HomeCard 3、
 HomeConnectory 2、HomeGetSeen 5、HomeTestimonials 2），所以 **`ref` 必须留在
@@ -533,6 +536,19 @@ ref 属性编译后不进 DOM，故删除零运行时、零渲染影响。
 EOF
 )"
 ```
+
+- [ ] **Step 5: 记一条 Task 9 的已知非问题**
+
+`HomeTestimonials.vue` 的模板有 `ref="canvasEl"`（现 `:86`）但 script 内**没有**
+`const canvasEl` 声明，与 `HomeCard.vue:21` / `HomeGetSeen.vue:28` 不同（那两个既声明又读
+`canvasEl.value` 来造 scene descriptor）。
+
+这**不是缺陷，别去补声明**。该组件 `:44` 的 `mount()` 直接 `return null`，注释写明
+"no captured scene: the poster/placeholder stays visible by design"，`markLive()` 也是空转
+——它本就没有 WebGL 场景，那个 `<canvas>` 只是量出来的占位。所以 `ref="canvasEl"` 是惰性的。
+
+写进 Task 9 的口径：等 `welcome/**` 进 tsconfig 后若这里报任何模板 ref 相关的错，
+按"该组件无场景"处理，不要新增变量。
 
 ---
 
