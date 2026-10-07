@@ -2039,6 +2039,37 @@ npm test 2>&1 | tail -15
 ```
 
 Expected: PASS，10 个新测试全绿。
+
+- [ ] **Step 4b: 补成功分支的形状校验（落地时新增，计划原稿有洞）**
+
+上面 Step 3 的实现成功路径是 `return data as AuthResult` —— 不做任何检查的强制断言。
+`INVALID_RESPONSE` 只在 `JSON.parse` 抛异常时才触发，所以网关返回 **200 + `{}`** 会正常
+resolve，调用方把 `undefined` 当 token 写进 localStorage，得到"看着已登录、其实全坏"的
+状态。先加测试确认这条真的在放行（六种不可用响应体：`{}`、`null`、只有 user 没 token、
+`token:""`、数组、裸字符串；另加一条"带真 token 的 200 仍须成功"防止把守卫写过头），
+跑红后在 `return data as AuthResult` 之前插入：
+
+```ts
+    if (
+      typeof data !== 'object' ||
+      data === null ||
+      typeof (data as AuthResult).token !== 'string' ||
+      (data as AuthResult).token === '' ||
+      typeof (data as AuthResult).user?.username !== 'string' ||
+      typeof (data as AuthResult).user?.id !== 'number'
+    ) {
+      throw new AuthRequestError(
+        'The server did not return a session. Try again.',
+        response.status,
+        'INVALID_RESPONSE',
+      );
+    }
+```
+
+判据与后端实际返回对齐：`Auth.java:35` 是
+`Json.map("token", token(user), "user", user)`，`user` 为 `record User(long id,
+String username, String role)`，序列化成对象，所以 token 非空字符串、username 字符串、
+id 数字三条都必然满足。本步之后 `auth-api` 是 **12** 个用例。
 若 `a timeout aborts at 18s…` 失败在 `seenMs` 上，检查实现用的是 `window.setTimeout`
 而非裸 `setTimeout` —— 测试 stub 的是 `window.setTimeout`，与 `api.test.mjs:16`
 的既有范式一致。
@@ -3761,9 +3792,9 @@ npm test 2>&1 | tee /tmp/final-test.txt | tail -15
 echo "test exit=${PIPESTATUS[0]}"
 ```
 
-Expected: 两个 `exit=0`。测试总数应为 **46**（原 `api.test.mjs` 7 +
-`resolve-entry` 6 + `safe-redirect` 6 + `auth-validation` 8 + `auth-api` 10 +
-`public-assets` 5 + `entry-isolation` 4 = 46（Task 9 落地时补的两道闸各做过反向验证，
+Expected: 两个 `exit=0`。测试总数应为 **48**（原 `api.test.mjs` 7 +
+`resolve-entry` 6 + `safe-redirect` 6 + `auth-validation` 8 + `auth-api` 12 +
+`public-assets` 5 + `entry-isolation` 4 = 48（Task 9 落地时补的两道闸各做过反向验证，
 所以它们不是凑数的测试：删掉一张资产图会让 public-assets 变红，
 往 `src/App.vue` 塞一句 `from '@/webgl/sceneRegistry'` 会让 entry-isolation 变红
 而 `vue-tsc` 仍是 exit 0）；
