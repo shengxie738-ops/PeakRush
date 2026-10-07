@@ -2671,6 +2671,58 @@ console.log('records:',r.length,'| viewports:',[...new Set(r.map(x=>x.viewport))
 Expected: `records: 30 | viewports: 1376x772@1.5` —— 与基线**完全一致**，否则比对无意义。
 `capture-local.mjs` 只校验 loopback 源，5179 合法。
 
+**Step 3b: 先证明两侧用的是同一个光栅化器，否则后面的像素差没有意义**
+
+Task 1 实测本机基线是**软件渲染**：`chromium.launch()` 解析到
+`chrome-headless-shell.exe`（Playwright `chromium-headless_shell-1243`，Chrome 153.0.8010.12），
+`WEBGL_debug_renderer_info` 的非掩码值是
+`ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)`。
+基线目录里的 `env-deep.json` 记了这些。而 Step 6 原设计的 `gl.getParameter(gl.RENDERER)`
+只会返回 Chromium 的隐私掩码串 `"WebKit WebGL"`，**分辨不出硬件还是软件渲染**，
+所以必须另外采非掩码值并和基线对齐：
+
+```bash
+cd "G:/高并发大作业项目/PeakRush/logn in"
+node -e "
+const {chromium}=require('@playwright/test');const fs=require('fs');
+(async()=>{
+  const b=await chromium.launch(); const p=await b.newPage({viewport:{width:1376,height:772}});
+  await p.goto(process.env.U||'http://127.0.0.1:5179/',{waitUntil:'networkidle'});
+  await p.waitForTimeout(2000);
+  const g=await p.evaluate(()=>{const c=document.createElement('canvas');
+    const gl=c.getContext('webgl2')||c.getContext('webgl'); if(!gl) return {webgl:false};
+    const dbg=gl.getExtension('WEBGL_debug_renderer_info');
+    return {webgl:true, masked:gl.getParameter(gl.RENDERER),
+      unmaskedRenderer:dbg?gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL):null,
+      unmaskedVendor:dbg?gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL):null};});
+  console.log(JSON.stringify({...g, executable:chromium.executablePath()},null,2));
+  await b.close();
+})();
+" > evidence/local/env-deep.json && cat evidence/local/env-deep.json
+node -e "
+const a=require('./evidence/baseline-premerge/env-deep.json');
+const b=require('./evidence/local/env-deep.json');
+const same=(x,y)=>JSON.stringify(x)===JSON.stringify(y);
+const checks={
+  unmaskedRenderer:same(a.unmaskedRenderer,b.unmaskedRenderer),
+  browserSame:/headless_shell-1243/.test(b.executable||''),
+};
+console.log(JSON.stringify(checks));
+process.exit(Object.values(checks).every(Boolean)?0:1);
+" && echo "RASTERISER MATCHES BASELINE" || echo "STOP: 光栅化器与基线不一致，像素比对无效"
+```
+
+Expected: `RASTERISER MATCHES BASELINE`，且 `unmaskedRenderer` 仍是 SwiftShader 那条。
+
+**这一条不通过就停下，不要开始 Step 4。** 换了 GPU、换了浏览器构建、加了
+`--use-angle=d3d11` 之类开关，都会让两侧像素整体漂移或整体一致，两种结果都不能结论化。
+
+**读结果的口径**（写进 Task 19 报告时不许含糊）：两侧同用一个软件光栅化器时，像素一致
+只能证明**「同一份代码在同一个软件光栅化器下输出相同」**，即搬迁与构建没改变渲染；
+它**不证明**真实 GPU 上渲染正确。SwiftShader 静默降级的 shader 会在两侧同时降级，
+所以"两边一样黑/一样破"绝不能记为通过。WebGL 章节（Task 1 实测是 V01–V14，
+其余 16 个检查点 `liveWebgl` 为 0）要判硬件正确性仍需人工用真 GPU 看一次。
+
 - [ ] **Step 4: 逐检查点比对**
 
 ```bash
@@ -3394,7 +3446,10 @@ git commit -m "docs: 补最终验证结果"
 1. `npm run build` exit 0，`vue-tsc --noEmit` 零错误
 2. `npm test` 全绿，且测试总数与逐条清单对得上
 3. Task 9 Step 4 的 CSS 隔离表 12 格全部符合期望
-4. Task 16 Step 4 的 `UNEXPECTED` 是空数组，`byteIdentical ≥ 28`
+4. Task 16 Step 3b 的 `RASTERISER MATCHES BASELINE` 成立（两侧同一 headless-shell 构建、
+   同一 SwiftShader 非掩码 renderer），且 Step 4 的 `UNEXPECTED` 是空数组、
+   `byteIdentical ≥ 28`。结论必须按 Step 3b 的口径写：这只证明"同一份代码在同一个
+   软件光栅化器下渲染一致"，不得写成"渲染在真实 GPU 上正确"
 5. Task 16 Step 5 的 `liveCanvases > 0`（WebGL 真的活着，不是静态 poster）
 6. Task 16 Step 6 的 `/app/` 运行时探针：`rootFontSize: "16px"`、
    `elPrimary: "#ff4e16"`、`hasScrollableArea: false`
