@@ -561,9 +561,21 @@ spec §12 末段。**这一步把 23MB 抓取资产（含 `assets/people/` 12MB 
 - Move: `logn in/public/fonts/` → `frontend/public/fonts/`（git mv）
 - Move: `logn in/public/icons.svg` → `frontend/public/icons.svg`（git mv）
 
-- [ ] **Step 0: 单向门确认**
+- [x] **Step 0: 单向门确认（已获授权，2026-10-07）**
 
-向发起本计划的人确认：23MB 抓取资产入 git 历史是否接受。**未得到明确确认前不要执行 Step 1。**
+向发起人确认后定案：**全部提交进 git 历史**。已否决的两条退路记录在案——
+"LFS 跟踪 assets"（本任务严禁 push，无远端时 LFS 只剩工具链负担，且 `.gitattributes`
+会与仓库已配置的 content filter 相互影响）；"留磁盘不进历史"（可逆但换机即失效）。
+
+授权前实测的规模，供日后评估撤除成本：`logn in/public/assets/` **102 个文件、23MB**，
+其中 `people/` 12MB / 36 张真实人物照片，单文件最大的是 `product/video-preview.png` 4.5MB；
+另有 `fonts/` 244KB（4 个文件）与 `icons.svg` 114,527 字节。manifest 里 107 条记录的
+`rights` 全部是 `permission-required`，`nextAction` 写着
+"confirm redistribution rights before any public deployment"。
+
+注意 `.gitignore:29` 的 `logn in/public/assets/` 使这 102 个文件**从未进过版本控制**
+（`git ls-files -- 'logn in/public'` 只有 5 个：4 个字体 + icons.svg），
+本任务它们是第一次入历史。目的地 `frontend/public/assets/` 不在忽略规则内，`git add` 正常。
 
 - [ ] **Step 1: 复核无文件名冲突（Task 前的实测结论要重跑，不能沿用）**
 
@@ -613,13 +625,24 @@ Expected: 目标文件数 = 源文件数 + 4；`fonts` 下 4 个文件
 
 ```bash
 cd "G:/高并发大作业项目/PeakRush/frontend"
-for f in $(grep -o "/fonts/[^)\"']*" welcome/styles/typography.css | sort -u); do
-  [ -f "public$f" ] && echo "OK       $f" || echo "MISSING  $f"
-done
+grep -oE "url\(/fonts/[^)'\"]+\)" welcome/styles/typography.css | sed -E "s|url\((.*)\)|\1|" | sort -u > /tmp/fonturls.txt
+echo "抓到 $(wc -l < /tmp/fonturls.txt) 条（期望 4）"
+while read -r f; do [ -f "public$f" ] && echo "OK       $f" || echo "MISSING  $f"; done < /tmp/fonturls.txt
 ```
 
-Expected: 4 条全部 `OK`。`@font-face` 用的是根绝对路径，publicDir 合并后仍在根，
-**CSS 一行都不用改**。
+Expected: 恰好 4 条，全部 `OK`（`Hardbop-Bold.woff`、`Hardbop-Bold.woff2`、
+`HeadingNow-73Book.woff`、`HeadingNow-73Book.woff2`）。
+
+**初稿这里设计错了，别用裸 grep。** 原写法是
+`for f in $(grep -o "/fonts/[^)\"']*" welcome/styles/typography.css | sort -u)`，
+实测它抓到 **14 条而不是 4 条**：`typography.css:23` 的注释散文
+`were downloaded into public/fonts/, so the woff url()` 里含 `/fonts/`，
+`[^)"']*` 把整句按非引号字符一路吃进去，再被 shell 的单词分割炸成
+`to` / `the` / `local` / `so` / `woff` / `url(` 这些垃圾项。
+于是这道闸**永远红**——照原样跑会把一次正确的搬迁判成失败。
+改成只吃 `url(/fonts/….woff2)` 这种真实声明，并且用文件而不是命令替换来迭代。
+
+`@font-face` 用的是根绝对路径，publicDir 合并后仍在根，**CSS 一行都不用改**。
 
 - [ ] **Step 5: 提交**
 
