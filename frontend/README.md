@@ -4,7 +4,7 @@ Stack: Vue 3, TypeScript, Vite, Vue Router, Element Plus and Element Plus icons.
 ## Run
 Use the workspace app-start.ps1 for coordinated local startup. For standalone frontend work:
 - npm ci
-- npm run dev (127.0.0.1:5173; /api and /actuator proxy to gateway port 8080)
+- npm run dev (127.0.0.1:5179; /api and /actuator proxy to gateway port 8080)
 - npm run build
 - npm test
 

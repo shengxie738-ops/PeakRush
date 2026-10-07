@@ -4,7 +4,7 @@
 
 ## 系统入口与版本路径
 
-浏览器使用 Vue 3，默认访问本机 5173。Gateway 在 8080 转发到 8081 的 Spring Boot 后端。MySQL 保存活动、请求、订单、库存变更和恢复任务；Redis 保存动态路径、V2/V3 预占库存及请求工作集；Kafka 为 V3 异步下单传递事件。全部服务默认绑定回环地址。
+浏览器使用 Vue 3，默认访问本机 5179。Gateway 在 8080 转发到 8081 的 Spring Boot 后端。MySQL 保存活动、请求、订单、库存变更和恢复任务；Redis 保存动态路径、V2/V3 预占库存及请求工作集；Kafka 为 V3 异步下单传递事件。全部服务默认绑定回环地址。
 
 ~~~mermaid
 flowchart LR
@@ -90,7 +90,7 @@ Gateway 在购买 POST 上使用 Redis Lua 同时检查全局、socket 来源 IP
 | MySQL | 8.0.30，127.0.0.1:13306 | 独立数据目录、SELECT VERSION() |
 | Redis | Windows 5.0.9，127.0.0.1:16379 | 原生版本及真实 Lua 测试 |
 | Kafka | 4.3.0，127.0.0.1:19092 | 原生 broker；真实发布与指定 offset 消费校验 |
-| Node.js | 22.17.1，前端端口 5173 | 本机版本；Vue 3 / Vite 版本以 package-lock.json 为准 |
+| Node.js | 22.17.1，前端端口 5179 | 本机版本；Vue 3 / Vite 版本以 package-lock.json 为准 |
 | OS | Windows 测试机 | 单机本地验证 |
 
 MySQL、Redis、Kafka 及应用和负载发生器都在同一台主机，结果不能直接外推到独立压测机或集群。原生 Redis 使用 AOF appendfsync=always、256 MiB、noeviction；Kafka 为单 broker/controller、512 MiB 堆、单副本。进程重启保留数据不等于多副本高可用，也不能抵御磁盘损坏或人为删除卷；acks=all 在单副本下仅确认这一台 broker。

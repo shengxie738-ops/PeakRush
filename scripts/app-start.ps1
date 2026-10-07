@@ -30,7 +30,11 @@ if(!$SkipBuild) {
 }
 $manifest=Join-Path $runRoot 'app-processes.json'
 $owned=@()
-if(Test-Path $manifest){$owned=@(Get-Content $manifest -Raw|ConvertFrom-Json)}
+# Do not wrap ConvertFrom-Json in @(): in Windows PowerShell 5.1 the JSON array arrives as a
+# single Object[], so $owned becomes a nested one-element array and the "already running"
+# branch below can never match a name. Re-running this script with services up then fails with
+# "Port 8081 is occupied by a process not verified as this project's backend".
+if(Test-Path $manifest){foreach($o in (Get-Content $manifest -Raw|ConvertFrom-Json)){$owned+=$o}}
 function Start-App($Name,$File,$Arguments,$Directory,$Port,$Marker) {
  $listener=Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
  if($listener) {
@@ -55,9 +59,9 @@ foreach($module in @('backend','gateway')){
 }
 $vite=Join-Path $projectRoot 'frontend\node_modules\vite\bin\vite.js'
 if(!(Test-Path $vite)){throw 'Vite not installed; run without -SkipBuild'}
-$started+=Start-App 'frontend' $node "`"$vite`" --host 127.0.0.1 --port 5173 --strictPort" (Join-Path $projectRoot 'frontend') 5173 $vite
+$started+=Start-App 'frontend' $node "`"$vite`" --host 127.0.0.1 --port 5179 --strictPort" (Join-Path $projectRoot 'frontend') 5179 $vite
 $started|ConvertTo-Json|Set-Content -LiteralPath $manifest -Encoding utf8
-foreach($url in @('http://127.0.0.1:8081/actuator/health','http://127.0.0.1:8080/actuator/health','http://127.0.0.1:5173')){
+foreach($url in @('http://127.0.0.1:8081/actuator/health','http://127.0.0.1:8080/actuator/health','http://127.0.0.1:5179')){
  $ready=$false
  for($attempt=0;$attempt -lt 60;$attempt++){
   try {$r=Invoke-WebRequest -Uri $url -TimeoutSec 2 -UseBasicParsing;if($r.StatusCode -eq 200){$ready=$true;break}}catch{}
@@ -65,7 +69,7 @@ foreach($url in @('http://127.0.0.1:8081/actuator/health','http://127.0.0.1:8080
  }
  if(!$ready){throw "Not ready: $url. Inspect logs in $runRoot"}
 }
-Write-Host 'PeakRush ready: http://127.0.0.1:5173'
+Write-Host 'PeakRush ready: http://127.0.0.1:5179'
 Write-Host 'Local demo users: demo / demo12345, admin / admin12345'
 Write-Host "Lab faults enabled: $Lab"
 
