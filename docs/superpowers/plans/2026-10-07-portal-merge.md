@@ -243,19 +243,24 @@ echo "--- 源目录剩余 ---"; find "logn in/src" -type f | sed 's|^|  |'
 echo "--- welcome 顶层 ---"; ls frontend/welcome
 ```
 
-Expected: `welcome 文件数: 87`（93 减 `testing/` 的 6 个）；`源目录剩余` 只列出
+Expected: `welcome 文件数: 88`（8 个目录共 87 个文件，加 `main.ts` 1 个。实测
+`logn in/src` 总计 94 = 87 + 1 + `testing/` 的 6）；`源目录剩余` 只列出
 `logn in/src/testing/` 下的 6 个文件；`welcome 顶层` = `app components content features motion pages styles webgl main.ts`。
 
 - [ ] **Step 3: 确认 git 识别为重命名而非删+增**
 
 ```bash
 cd "G:/高并发大作业项目/PeakRush"
-git status --short | head -5
+echo "R 条目数: $(git status --short | grep -c '^R')"
+git status --short | grep '^R' | head -3
 git diff --cached --stat -M | tail -3
 ```
 
-Expected: `git status` 显示 `R  logn in/src/... -> frontend/welcome/...`（R = renamed）；
-`--stat -M` 末行的改动行数远小于全量重写（重命名检测生效）。
+Expected: `R 条目数: 88`；`--stat -M` 末行为 `88 files changed, 0 insertions(+), 0 deletions(-)`。
+
+**不要用 `git status --short | head -5` 来看重命名** —— 短格式按路径排序，
+`README.md`、`docs/*`、`frontend/*` 这些**本任务之前就存在的脏文件**会排在
+`logn in/*` 前面，前 5 行一条 `R` 都看不到，会误判成"重命名检测没生效"。
 
 - [ ] **Step 4: 提交**
 
