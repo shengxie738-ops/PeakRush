@@ -435,9 +435,15 @@ if(!name.matches("[A-Za-z0-9_]{3,40}")||password.length()<8
 复刻站的 `.btn` 没有 disabled 视觉（它从不真正提交），需新增一条规则并标 `CLONE-LOCAL`。
 
 **克隆站没有 API 层** —— 它是 zero-network 的演示站。需要新建一个最小的
-`welcome/app/authApi.ts`，只做 `POST /api/auth/login|register`，
-不复用主应用的 `src/api.ts`（那会形成两个入口共享模块，破坏 §4.1 的隔离前提）。
-错误文案在这个文件里独立给一份英文的（本轮不中文化）。
+`welcome/app/authApi.ts`，只做 `POST /api/auth/login|register`，不复用主应用的
+`src/api.ts`。理由不是"共享模块破坏隔离"——§4.1 的隔离条件（见 §4.1 末）是
+**没有模块同时 import 两边的 CSS**，纯逻辑模块共享是允许的，§7.6 的
+`shared/safe-redirect.ts` 正是这么做的。不复用 `src/api.ts` 的真实理由有三条：
+① `api.ts:20-21` 给每个请求挂 `Authorization`，而 login/register 是未认证端点，
+不该带上一次的陈旧 token；② `api.ts:42` 在非 `/api/auth/` 的 401 上派发
+`peakrush:expired`，那是主应用会话概念，门户文档里没有监听者；③ `api.ts:46-52`
+的状态码兜底文案是中文、按主应用语气写的。
+错误文案在 `authApi.ts` 里独立给一份英文的（本轮不中文化）。
 
 ### 7.4 密码可见切换
 
@@ -496,20 +502,32 @@ export function requireLogin(message = "登录后，开启你的好物时刻。"
 ### 7.6 redirect 校验（安全）
 
 `redirect` 来自 URL query，用户可控，**必须校验**，否则构成开放重定向。
-且它现在是跨文档跳转的目标，`window.location.href` 会接受绝对 URL，风险更实际：
+且它现在是跨文档跳转的目标，`window.location.href` 会接受绝对 URL，风险更实际。
+
+放在 `frontend/shared/safe-redirect.ts`，**两个入口 import 同一份**。安全函数不复制两份：
+一边修了另一边没修就是漏洞。这不违反 §4.1——那里的隔离条件是"没有模块同时 import
+两边的 CSS"，纯逻辑模块共享是允许的。
 
 ```ts
-function safeRedirect(value: unknown): string {
-  if (typeof value !== "string") return "/app/";
-  if (!value.startsWith("/") || value.startsWith("//")) return "/app/";
-  if (!value.startsWith("/app")) return "/app/";   // 只允许回主应用
-  return value;
+export function safeRedirect(value: unknown, fallback = "/app/"): string {
+  if (typeof value !== "string") return fallback;
+  const isAppPath =
+    value === "/app" ||
+    value.startsWith("/app/") ||
+    value.startsWith("/app?") ||
+    value.startsWith("/app#");
+  return isAppPath ? value : fallback;
 }
 ```
 
-比旧文档更严：不仅拒绝 `//evil.com` 与 `https://evil.com`，还**只接受 `/app` 前缀** ——
-登录后没有正当理由把人送到克隆站的展示页。
-query 参数经解析可能是数组（`?redirect=a&redirect=b`），故先做类型判定。
+比旧文档更严：**只接受 `/app` 这一个路由前缀**——登录后没有正当理由把人送到克隆站的
+展示页。query 参数经解析可能是数组（`?redirect=a&redirect=b`），故先做类型判定。
+
+前缀必须按边界匹配，不能写成 `value.startsWith("/app")`。那样会把 `/application`、
+`/appfoo` 一并放行——它们是同源路径，落到克隆站的路由上，虽然不构成跳到外站的开放
+重定向，但绕过了"只回主应用"这条策略，也让 `safeRedirect` 的返回值不再是可预期的
+主应用地址。`//evil.com`、`https://evil.com`、`/`、`/signin` 都不满足上面四种边界，
+自然回落，所以不需要额外的前置判断。
 
 ### 7.7 删除 AuthDialog
 
