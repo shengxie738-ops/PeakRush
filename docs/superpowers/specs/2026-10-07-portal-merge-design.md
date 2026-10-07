@@ -713,7 +713,11 @@ WebGL 需要真实 GPU 上下文。若采集环境是软件渲染，WebGL 内容
 | **`assetRegistry` 字段名与 `assets.manifest.json` schema v2 不匹配，22 处图片从未渲染** | `welcome/content/assetRegistry.ts:19-24`（声明 `reference`/`local`/`localExists`/`note`）、`:37`（`record.reference` 作 Map 键）、`:33`（`as unknown as AssetManifest` 主动骗过类型检查）；manifest 的 107 条实际是 `referenceUrl`/`servedAt`/`localPath`/`status` | **本轮不修**（用户 2026-10-07 决定），留给子项目 2。理由：Task 1 基线是在图片已坏的状态下采的，本轮修好会让首页系列检查点大面积合理变化，Task 16 的像素门就失去"证明搬迁与构建零渲染变化"的能力。修法是适配 schema v2 约 10 行（键换 `referenceUrl`、返回 `servedAt`、以 `status === 'MEASURED'` 判存在），且 `welcome/**` 即便纳入 tsconfig 也抓不到它——那层 `as unknown as` 是故意绕过检查的 |
 | 全站仍是 follow.art 英文品牌 | 全站 | 子项目 2 |
 | 法务页是 follow.art 的条款文本 | `/terms-and-conditions` 等 3 条 | 子项目 2 |
-| **`core.autocrlf=true` 且无 `.gitattributes`：一次全新 checkout 会让 20 个文本类资产多出 CR** | `frontend/public/` 下 19 个 SVG + `icons.svg`。实测 `icons.svg` 的 blob 是 `114527` 字节，检出后变 `114610`（+83）；`git cat-file --filters` 逐个模拟确认恰好 20 个文件大小变化 | 本轮**只记录不修**。渲染与 XML 合法性都不受影响（35 个 SVG 两种形态均可解析），但**任何按字节 sha256/文件尺寸做的资产校验，在换机或重新 clone 后会假红**——manifest 记的正是 16 位 sha256 前缀加 `bytes`。结论：资产完整性一律用 **blob 哈希**（`git rev-parse HEAD:<path>`）比对，不要用工作树字节。本设计原以"怕与仓库既有 content filter 互撞"为由否决 `.gitattributes`，Task 5 审计核实该前提**不成立**：`git config --get-regexp '^filter\.'` 只返回 Git LFS 那四个 filter，而 LFS 按属性启用，无 `.gitattributes` 时根本不被触发。所以加一份 `.gitattributes` 其实是安全的正解，但属本分支范围外，交发起人定夺 |
+| **`core.autocrlf=true` 且无 `.gitattributes`：一次全新 checkout 会让 20 个文本类资产多出 CR** | `frontend/public/` 下 19 个 SVG + `icons.svg`。实测 `icons.svg` 的 blob 是 `114527` 字节，检出后变 `114610`（+83）；`git cat-file --filters` 逐个模拟确认恰好 20 个文件大小变化 | 本轮**只记录不修**。渲染与 XML 合法性都不受影响（35 个 SVG 两种形态均可解析），但**任何按字节 sha256/文件尺寸做的资产校验，在换机或重新 clone 后会假红**——manifest 记的正是 16 位 sha256 前缀加 `bytes`。结论：资产完整性一律用 **blob 哈希**（`git rev-parse HEAD:<path>`）比对，不要用工作树字节。本设计原以"怕与仓库既有 content filter 互撞"为由否决 `.gitattributes`，Task 5 审计核实该前提**不成立**：`git config --get-regexp '^filter\.'` 只返回 Git LFS 那四个 filter，而 LFS 按属性启用，无 `.gitattributes` 时根本不被触发。所以加一份 `.gitattributes` 其实是安全的正解，但**发起人 2026-10-07 决定本轮不加**，
+改用上述 blob 哈希口径。另实测：83/288 个文本文件的工作树字节已不等于自己的 blob
+（`core.autocrlf=true` 所致），但 `git status` 干净、往其中已漂移的 `session.ts`
+追加一行后 `git diff --numstat` 只报 `2 0`——**clean 过滤器在提交时归一化，
+所以漂移不会污染任何一次 diff**，Task 13/14/15 的大改因此是安全的。
 | `logn in/README.md:5` 引用的 `evidence/reference/pending.json` 在 git 里不存在（`evidence/` 已忽略） | — | 接受，属溯源材料的已知缺口 |
 
 ## 12. 授权与风险（记录在案）
@@ -738,9 +742,33 @@ WebGL 需要真实 GPU 上下文。若采集环境是软件渲染，WebGL 内容
 **若本作业需要公开部署或对外分发，23MB 抓取资产与商用字体的授权状态必须先解决。**
 子项目 2 的品牌替换只改文案与字模，**不会**降低资产与字体的授权风险。
 
-另需注意：把 23MB 资产提交进 git 历史后，即使日后删除，历史里仍占空间。
-若这不可接受，应在实施第 3 步（搬 public）**之前**提出，改用 Git LFS 或
-把资产留在 `logn in/public/` 由构建脚本软链/复制。
+上面这句触发条件写得太窄，补两条实测过的事实：
+
+- **最可能的泄漏路径不是"部署"，而是"交作业"。** 本仓库是一个高并发课程大作业
+  （`PeakRush_SRS.docx`、`PeakRush_SDD.docx`、项目报告都在 `.gitignore` 里），
+  最常见的动作是把**整个仓库连 `.git` 一起**打包或克隆交给课程平台、助教或队友——
+  12MB 真实人物照片与 HeadingNow 商用字体跟着 `.git` 一起走，而这完全落在
+  "公开部署"这个词的字面范围之外。另外 `origin` 是一个真实的 GitHub 仓库、
+  `main` 已跟踪 `origin/main`（`git branch -vv`），所以泄漏只需一次
+  `git push --all` 或 IDE 的 "Publish Branch"，不需要任何有意的部署动作。
+  **交付/打包整个仓库同样算"对外分发"。**
+- **撤除成本在"第一次 push"这一点上不连续地跳一个数量级。** 现在（本地、无 upstream、
+  未 push）撤除只要一条 rebase；一旦推出去，就变成 `git filter-repo`/BFG + 强推 +
+  平台侧旧对象 GC 工单，而且别人已克隆走的副本撤不回。
+
+撤除时必须处理的一个**不对称**，此前没有任何地方记录：
+`git log --oneline -- frontend/public` 只有两条提交，`505c0c7` 之后没人再碰过这些路径，
+所以 `git rebase --onto 7474986 505c0c7` 实测无冲突；且 `git count-objects -vH` 显示
+这 23.58 MiB 还在 465 个 loose object 里、**尚未被 gc/repack 折进 pack**，此刻是物理上
+最接近可撤销的时点。**但是**：`logn in/public/fonts/` 的 4 个字体与 `icons.svg` 是
+`git mv` 进来的，`git ls-files -- 'logn in/public'` 现为 0 —— 那 5 个文件在仓库里的
+**唯一副本就是 `frontend/public/`**，丢掉 `505c0c7` 会连字体一起没，
+而 `welcome/styles/typography.css` 的 `url(/fonts/…)` 需要它们。相反那 102 个 `cp`
+过来的资产磁盘上原样还在 `logn in/public/assets/`，重新获取零成本。
+任何撤除方案都要**单独给这 5 个文件安排归宿**。
+
+换行符问题的处置已定（发起人 2026-10-07）：**不加 `.gitattributes`**，
+资产完整性一律用 **blob 哈希**（`git rev-parse HEAD:<path>`）而不是工作树字节比对。
 
 ## 13. 子项目 2 的待决问题（本轮不展开，仅登记）
 
