@@ -19,7 +19,6 @@ import { canvasCountFor } from '@/webgl/sceneRegistry';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 
 const root = ref<HTMLElement | null>(null);
-const webgl = ref<HTMLElement | null>(null);
 const show = ref(false);
 
 const canvasCount = canvasCountFor(CONNECTORY.sectionId);
@@ -77,7 +76,6 @@ defineExpose({
             >
               <img class="section-7__title-decoration img-full" :src="asset(IMG.the) ?? ''" alt="" />
               <div
-                ref="webgl"
                 class="landing-7-connectory-webgl"
                 data-evidence="pending-T00-webgl-scene"
               >

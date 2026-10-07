@@ -18,7 +18,6 @@ import { asset } from '@/content/assetRegistry';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 
 const root = ref<HTMLElement | null>(null);
-const content = ref<HTMLElement | null>(null);
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const live = ref(false);
 
@@ -58,7 +57,7 @@ defineExpose({
             </DisplayHeading>
 
             <div class="landing-5-nexus-webgl section-5__header-webgl" :data-webgl="live ? 'live' : 'pending'">
-              <div ref="content" class="landing-5-nexus-webgl__content">
+              <div class="landing-5-nexus-webgl__content">
                 <span v-if="!live && poster" class="webgl-fallback">
                   <img :src="poster" alt="" width="780" height="1560" />
                   <img v-if="posterAlt" class="webgl-fallback__second" :src="posterAlt" alt="" width="780" height="1560" />

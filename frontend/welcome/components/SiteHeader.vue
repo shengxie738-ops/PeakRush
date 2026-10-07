@@ -37,7 +37,6 @@ const props = withDefaults(
 );
 
 const route = useRoute();
-const headerEl = ref<HTMLElement | null>(null);
 
 const activeTheme = ref<string>(props.theme);
 const previousTheme = ref<string>(props.theme);
@@ -169,7 +168,7 @@ watch(
 </script>
 
 <template>
-  <header ref="headerEl" :class="rootClass">
+  <header :class="rootClass">
     <div :class="previousClass" :style="previousBackgroundStyle" />
     <div class="row row--gx row--middle promo-header__row">
       <div class="col col--8 col--5:md col--6:xl promo-header__logo">

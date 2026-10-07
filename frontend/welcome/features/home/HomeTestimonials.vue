@@ -22,7 +22,6 @@ import { canvasCountFor } from '@/webgl/sceneRegistry';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 
 const root = ref<HTMLElement | null>(null);
-const webgl = ref<HTMLElement | null>(null);
 const index = ref(0);
 
 const count = TESTIMONIALS.cardCount;
@@ -77,7 +76,6 @@ defineExpose({
 
           <div class="section-9__cards">
             <div
-              ref="webgl"
               class="landing-9-testimonials-webgl"
               data-evidence="pending-T00-webgl-scene"
               :data-webgl-index="index"

@@ -25,7 +25,6 @@ import { asset } from '@/content/assetRegistry';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 
 const root = ref<HTMLElement | null>(null);
-const webgl = ref<HTMLElement | null>(null);
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 const live = ref(false);
 const show = ref(false);
@@ -90,7 +89,6 @@ defineExpose({
                 <div class="section-2__media-wrapper" @click="openVideo">
                   <div class="section-2__video-preview-wrapper">
                     <div
-                      ref="webgl"
                       class="landing-2-get-seen-webgl"
                       :data-webgl="live ? 'live' : 'pending'"
                     >
