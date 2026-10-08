@@ -16,7 +16,7 @@ export default defineConfig({
   appType: "mpa",
   server: {
     host: "127.0.0.1",
-    port: 5179,
+    port: 5400,
     strictPort: true,
     proxy: {
       "/api": { target: "http://127.0.0.1:8080", changeOrigin: true },

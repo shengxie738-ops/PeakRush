@@ -8,9 +8,9 @@ import SiteFooter from '@/components/SiteFooter.vue';
 <template>
   <section class="ui-orange" data-section-id="not-found" data-page-header-theme="orange">
     <div class="section error-section">
-      <h1 class="display-heading">Page Not Found</h1>
-      <RouterLink class="button button--primary" to="/">Go to homepage</RouterLink>
-      <p data-evidence="pending-T00-subpage">Clone-local error page; reference 404 not yet captured.</p>
+      <h1 class="display-heading">页面未找到</h1>
+      <RouterLink class="button button--primary" to="/">返回首页</RouterLink>
+      <p>这个页面暂时找不到，回到首页发现心动好物。</p>
     </div>
   </section>
   <SiteFooter />

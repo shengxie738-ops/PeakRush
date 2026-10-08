@@ -1,0 +1,106 @@
+{
+  "created": "2026-10-09",
+  "mode": "built-in image_gen",
+  "purpose": "PeakRush desktop activity preview, 7 distinct products",
+  "export": "WebP quality 92, no crop or creative edits",
+  "assets": [
+    {
+      "key": "earbuds",
+      "file": "earbuds.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/earbuds.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-53b1-73a3-9643-500cd955d386\\exec-b285a76f-f1d4-45ec-888e-82c8ea24c03d.png",
+      "prompt": "Use case: ads-marketing\nAsset type: one standalone square product advertising artwork for a premium desktop ecommerce activity-preview gallery.\nPrimary request: Create an exquisite high-end creative-agency conceptual campaign photograph of warm ivory wireless earbuds and their open charging case, composed within a sculptural folded translucent amber acoustic membrane.\nScene/backdrop: warm pale parchment seamless studio, a simple carefully considered physical sculpture of thin translucent amber material curling like a single sculptural sound wave.\nSubject: one beautifully designed unbranded ivory charging case open, with two distinct small ivory earbuds naturally seated or gently floating immediately above it; realistic precise product engineering and readable recognizable silhouette.\nStyle/medium: museum-grade experimental editorial product photography, hyperreal premium materials, gallery art direction, physically credible refraction and tactile matte finish. Quiet luxury.\nComposition/framing: SQUARE 1:1 canvas, product centered within central 70%, generous breathing room, readable at small ecommerce card scale, amber sculpture elegantly wraps behind and below without obscuring product. Hero product complete within safe central 80%.\nLighting/mood: soft sunrise amber transmitted light, subtle warm refraction, precise long studio shadows, sophisticated calm.\nColor palette: ivory, pale parchment, honey amber, very restrained.\nConstraints: No text, no letters, no logos, no watermark, no branding, no UI. One concept, one scene, one product category. Product advertising image only.\nAvoid: neon, glowing sci-fi trails, purple, busy background, explosion, duplicate products, cropped product, human hands, collage, poster layout.",
+      "qa": "Pass: distinct ivory earbuds and case; amber sculptural membrane; complete central hero; no text/logos/watermarks.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 188944,
+      "sha256": "faacd859409e7168993071b4ec21cd48b80e965dac700c6a5491aa6c3c4bef5c"
+    },
+    {
+      "key": "camera",
+      "file": "camera.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/camera.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-53b1-73a3-9643-500cd955d386\\exec-ab7838f2-0b06-4a79-b5c2-77cfe00dd2de.png",
+      "prompt": "Use case: ads-marketing\nAsset type: one standalone SQUARE 1:1 product advertising artwork for a premium desktop ecommerce activity-preview gallery.\nPrimary request: an exquisite conceptual campaign photograph of one unbranded brushed titanium compact camera with a substantial black lens, floating inside a clean architectural frame made from a single bent mirror.\nScene/backdrop: oxblood burgundy seamless studio. Single thick polished silver mirror sheet bends into an elegant angular open architectural portal, with carefully controlled reflections of the camera and dark burgundy atmosphere.\nSubject: one premium compact camera, brushed silver titanium body, detailed black optical lens, minimal believable control dials, precise engineering, no lettering or logos. Camera occupies central 55 percent and is wholly readable, three-quarter frontal view.\nStyle/medium: top creative-agency gallery-grade surreal product photography, conceptual design studio campaign, ultra-real material fidelity, quiet sophisticated visual tension.\nComposition/framing: SQUARE canvas, entire camera fully inside central 80%, single sculptural mirror frame forms an angular cradle around the camera without obstructing lens or body, clean deliberate negative space. Strong graphic geometry and one hero product. One scene.\nLighting/mood: sharp museum lighting from above-left, cinematic sculptural shadows, silver highlights, deep rich burgundy background, credible controlled mirror reflections.\nColor palette: oxblood, burgundy, titanium silver, black; minimal restrained palette.\nConstraints: absolutely no text, no logos, no lettering, no watermark, no human figures, no UI, no typography. Camera and frame only. Reflections may show partial camera reflections naturally but only one actual camera.\nAvoid: rainy street, neon, glowing sci-fi lines, busy wireframe, liquid splash, explosion, repeated cameras, collages, image panels, cropped product.",
+      "qa": "Pass: one titanium camera; burgundy backdrop and bent mirror frame; reflected details physically coherent; complete central hero; no text/logos/watermarks.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 140218,
+      "sha256": "43f6f2e3924dfa8213411c07eaf75a79104aea69daa087c4b45846c4648af36b"
+    },
+    {
+      "key": "speaker",
+      "file": "speaker.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/speaker.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4b-6682-70f3-af18-2cea7fe9a1e4\\exec-d81e6e5a-2f88-4e0d-9c59-618e0a309d5a.png",
+      "prompt": "Use case: ads-marketing\nAsset type: standalone desktop ecommerce editorial hero advertising image, landscape 3:2 composition.\nPrimary request: A world-class independent creative agency / experimental concept design studio product campaign for a single premium portable wireless speaker. This is final art, not a mockup or collage.\nScene/backdrop: a charcoal-black sculptural studio with one enormous smooth burnt-orange curved acoustic wave wall sweeping diagonally behind the product, a dark polished basalt plinth, precise soft edge shadows and tactile surfaces. Restrained architectural surrealism, museum-grade art direction.\nSubject: ONE unbranded compact sculptural portable speaker, rounded rectangular vertical shape, deep graphite tightly woven speaker grille, beautifully milled warm orange aluminium outer frame and a discreet woven carry loop. Clearly recognisable as a speaker, plausible finely finished real product.\nStyle/medium: premium photorealistic studio advertising photograph, precise industrial design and microtexture, subtle analogue photographic grain. Sophisticated concept studio, editorial still life, rich warm orange contrast against charcoal.\nComposition/framing: landscape 3:2. Product full silhouette visible, prominent in upper central/right two thirds, not touching frame, bottom-left 35% is clean dark negative space for later webpage typography; no actual text in image. Curved orange sculpture creates dynamic visual rhythm, no repeated speaker and no busy collection.\nLighting/mood: large warm side light sculpting orange metal, razor-controlled rim and deep but detailed black shadows, confident and artful.\nConstraints: one standalone artwork, no readable text, no logos, no brand names, no watermark, no border, no price, no UI, no neon circuit lines, no particle explosion. Avoid generic catalog cutout. Speaker and fabric must be physically believable.",
+      "qa": "Pass: complete graphite-orange portable speaker; orange acoustic sculpture; dark lower-left typography space; no text/logo/watermark.",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "bytes": 174806,
+      "sha256": "92816fdabbcabefb202c41c6c4c2fadf040b468d7f9c261b3781237723cf8be5"
+    },
+    {
+      "key": "espresso",
+      "file": "espresso.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/espresso.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-828a-76e0-8cad-9d1a3879bd06\\exec-9dbcd3ae-3491-4966-9b9d-5ff1be4ed690.png",
+      "prompt": "Use case: ads-marketing.\nAsset type: final square product advertising photograph for a premium desktop ecommerce editorial gallery.\nPrimary request: a beautiful compact sculptural brushed stainless steel espresso machine with plausible unbranded simple controls. One ivory espresso cup directly beneath the grouphead. Entire machine and cup fully visible. The machine rests on a folded deep ultramarine-blue plinth resembling one wide sculptural ribbon, in a saturated cobalt seamless cyclorama. Gallery-grade product campaign from a world-class creative agency and conceptual design studio, sophisticated restrained surreal set design.\nComposition: 1:1 square image, front three-quarter viewpoint, readable large hero product entirely inside central 80 percent square. Deliberate elegant negative space, product dominates but no tight cropping. Professional high-end still life product photography with believable precise manufacturing details.\nLighting: warm strong directional sunlight, crisp geometric shadows, subtle metal highlights and exquisite brushed steel texture, rich blue studio atmosphere. Physical light and shadow, refined editorial color.\nConstraints: one espresso machine, one cup, one folded blue ribbon plinth. No people, text, brand names, logos, watermark, UI, typographic elements, collage, grids, borders, futuristic effects, neon, repeated pattern or repeated machines.",
+      "qa": "Viewed: plausible brushed steel machine and cup, cobalt folded-ribbon plinth, entire hero visible, no text/logo/UI.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 132054,
+      "sha256": "7e66ddd8c8ddccdca1662b294d209e2505ad67410de71bf03104295ffdefd317"
+    },
+    {
+      "key": "lamp",
+      "file": "lamp.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/lamp.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-828a-76e0-8cad-9d1a3879bd06\\exec-1f02113c-8d8c-4ef4-a993-2eaf9d03a14e.png",
+      "prompt": "Use case: ads-marketing.\nAsset type: final square product advertising photograph for a premium desktop ecommerce editorial gallery.\nPrimary request: sculptural orange-red mushroom shaped portable table lamp with a glowing cream underside, standing at the opening between two large chalk-white curved architectural surfaces. Muted sage-green seamless backdrop. Poetic circular pool of warm illumination around the lamp and a sculptural complementary shadow. Sparse elegant conceptual design photography created by a top global creative agency / avant-garde concept studio.\nComposition: 1:1 square frame, large singular hero lamp, fully visible and entirely inside central 80 percent square crop. A front three-quarter still life, the chalk-white curved forms frame but do not block lamp. Strong silhouette, plenty of deliberate negative space, simple extraordinary visual idea.\nStyle: photorealistic premium product photography, soft satin orange-red painted metal dome and pedestal, fine believable material texture, beautifully illuminated cream diffuser underneath. Quiet warm editorial atmosphere; disciplined color, crisp curved forms.\nConstraints: exactly one lamp, two large white curved architectural sculptural surfaces, sage background. No people, text, branding, logos, watermark, UI, typography, multiple products, grids, collage, repeated background, neon, space or sci-fi effects.",
+      "qa": "Viewed: one orange-red lamp, cream underside, sage backdrop and white curves, warm pool of light, full hero visible, no text/logo/UI.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 101762,
+      "sha256": "a64c4fbebbb3f4bb60921644b4a5df1f8d315ced4dc5ab0d17e3a438790d7dd3"
+    },
+    {
+      "key": "sneakers",
+      "file": "sneakers.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/sneakers.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-a976-7522-b840-999449a63438\\exec-391501a4-1850-4756-a44c-3f12db47e1ab.png",
+      "prompt": "Use case: ads-marketing. Asset type: final square 1:1 product campaign photograph for a desktop premium shopping editorial.\nCreate an exceptionally crafted premium photorealistic conceptual editorial advertisement, at the standard of a leading creative agency and concept design studio. ONE elegant cream/stone technical running shoe with a coral-orange outsole, shown in a three-quarter side view levitating in the center above a single broad spiraling sheet of orange-red flexible material resembling a frozen running track curve. The orange track sculpture is a substantial sculptural curved band, not a ribbon of light, sweeping with graceful geometry through the lower half. Very pale cool grey architectural studio backdrop and floor, crisp directional lighting, strong beautifully formed shadows, precise knitted textile, fine stitched details, technically believable outsole geometry. Quiet but arresting campaign art direction, expertly controlled sophisticated materials, photographic realism, tactile luxury, no clutter. Product reads clearly within central 80% square crop, complete shoe visible, generous balanced breathing room around silhouette. No duplicate shoe, no people, no powder explosion, no neon speed lines, no text, brand, logo, watermark or UI. Output one square image.",
+      "qa": "Inspected with view_image. Single distinct product, complete silhouette, no text/branding/watermark/UI. Premium photographic campaign; distinct pale grey/coral running shoe concept and terracotta/forest-green backpack/travertine composition.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 329242,
+      "sha256": "69856ec989baf7cea39d4bcbe065fdbf8cbe00151438b1af8290697dabd595fa"
+    },
+    {
+      "key": "backpack",
+      "file": "backpack.webp",
+      "original_file": "output/imagegen/activity-preview-20261009/backpack.png",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-a976-7522-b840-999449a63438\\exec-6bff1cc8-ae72-4343-a0f1-803274ae59fe.png",
+      "prompt": "Use case: ads-marketing. Asset type: final square 1:1 product campaign photograph for a desktop premium shopping editorial.\nCreate an exceptionally art-directed premium photorealistic concept advertisement at the standard of a top creative agency and concept design studio. ONE forest-green technical outdoor backpack with warm stone-colored webbing, carefully designed harness hardware, structured volume and discreet black zippers, centrally supported on top of a naturally weathered pale travertine arch with a simple architectural circular opening. The backpack is the unmistakable main hero, fully visible, facing front with a subtle three-quarter angle; high-end technically convincing construction and ripstop textile. Terracotta/clay seamless studio wall and floor, raking warm sun from upper left reveals the textile and travertine texture, striking deep warm ground shadows. Sculptural architectural fashion campaign, sophisticated restrained green, pale stone and clay palette, quiet luxurious editorial composition, realistic tactile material detail, minimal refined scene. Product reads clearly within central 80% square crop, balanced generous breathing room, complete backpack silhouette visible. No human model, no duplicates, no mountain panorama, no neon, no text, brand, logos, watermark or UI. Output one square image.",
+      "qa": "Inspected with view_image. Single distinct product, complete silhouette, no text/branding/watermark/UI. Premium photographic campaign; distinct pale grey/coral running shoe concept and terracotta/forest-green backpack/travertine composition.",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 244028,
+      "sha256": "04d34f0f63ab7cf0912805bb45bea1c7e9a1cce85c0fb4463e36634da0ba1720"
+    }
+  ]
+}

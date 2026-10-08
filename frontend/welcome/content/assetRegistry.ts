@@ -31,10 +31,19 @@ export interface AssetManifest {
   assets: AssetRecord[];
 }
 
-export const ASSET_MANIFEST = manifest as unknown as AssetManifest;
-
+/** Accept the captured v2 manifest and the original registry record shape. */
+type SourceAsset = AssetRecord & { referenceUrl?: string; servedAt?: string; status?: string };
+const records = (manifest.assets as unknown as SourceAsset[]).map((record): AssetRecord => ({
+  reference: record.reference ?? record.referenceUrl ?? '',
+  local: record.local ?? record.servedAt ?? null,
+  localExists: record.localExists ?? (record.status === 'MEASURED' && Boolean(record.servedAt)),
+  note: record.note,
+}));
+export const ASSET_MANIFEST: AssetManifest = {
+  generatedBy: manifest.generatedBy, provenance: 'Local asset manifest', note: '', assets: records,
+};
 const BY_REFERENCE: Map<string, AssetRecord> = new Map(
-  ASSET_MANIFEST.assets.map((record) => [record.reference, record]),
+  records.flatMap((record) => [[record.reference, record] as const, ...(record.local ? [[record.local, record] as const] : [])]),
 );
 
 export function assetRecord(reference: string): AssetRecord | undefined {
@@ -49,6 +58,7 @@ export function hasAsset(reference: string): boolean {
 
 /** The local path for a reference URL, or null when it was never captured. */
 export function asset(reference: string): string | null {
+  if (reference.startsWith('/peakrush/')) return reference;
   const record = BY_REFERENCE.get(reference);
   if (!record || !record.localExists) return null;
   return record.local;

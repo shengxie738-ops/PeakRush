@@ -46,3 +46,10 @@ test('a custom fallback is honoured', () => {
   assert.equal(safeRedirect('//evil.com', '/app/orders'), '/app/orders')
   assert.equal(safeRedirect('/app/admin', '/app/orders'), '/app/admin')
 })
+
+test('paths that normalize out of the business app are refused', () => {
+  for (const p of ['/app/../signin', '/app/../../outside', '/app/%2e%2e/signin',
+                   '/app/..\\signin', '/app/\n../signin']) {
+    assert.equal(safeRedirect(p), '/app/', p)
+  }
+})

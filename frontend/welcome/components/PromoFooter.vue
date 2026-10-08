@@ -76,7 +76,8 @@ const footerClass = computed(
               class="not-nuxt-link btn btn--link btn--block btn--accent btn--text-smaller"
               :href="item.href"
               tabindex="0"
-              target="_blank"
+              :target="item.external ? '_blank' : undefined"
+              :rel="item.external ? 'noopener noreferrer' : undefined"
               title=""
             ><span class="btn__content"><span class="btn__text"><svg
                   class="btn__hover-accent btn__hover-accent--text icon icon-hover"
@@ -126,7 +127,7 @@ const footerClass = computed(
                 preserveAspectRatio="none"
                 style="--icon-width: 173; --icon-height: 22;"
               ><use href="#hover" /></svg><span class="btn__text-text">{{ PROMO_FOOTER.email }}</span></span></span></a>
-          <div class="is-hidden:sm-down mt-auto">
+          <div v-if="PROMO_FOOTER.social.length" class="is-hidden:sm-down mt-auto">
             <div class="social-networks mt-auto social-networks--">
               <a
                 v-for="item in PROMO_FOOTER.social"
@@ -158,19 +159,10 @@ const footerClass = computed(
       </div>
 
       <div class="col col--12 col--3:md mt-1 mt-0:md text-right footer-author">
-        <svg
-          class="footer-author__icon is-hidden:md-up icon icon-videinfra"
-          role="presentation"
-          width="18px"
-          height="18px"
-          viewBox="0 0 18 18"
-          style="--icon-width: 18; --icon-height: 18;"
-        ><use href="#videinfra" /></svg>
         <a
           class="not-nuxt-link btn btn--link btn--block btn--accent btn--text-smaller"
           :href="PROMO_FOOTER.authorHref"
           tabindex="0"
-          target="_blank"
           :title="PROMO_FOOTER.authorTitle"
         ><span class="btn__content"><span class="btn__text"><svg
               class="btn__hover-accent btn__hover-accent--text icon icon-hover"
@@ -181,17 +173,9 @@ const footerClass = computed(
               preserveAspectRatio="none"
               style="--icon-width: 173; --icon-height: 22;"
             ><use href="#hover" /></svg>{{ ' ' + PROMO_FOOTER.author + ' ' }}</span></span></a>
-        <svg
-          class="footer-author__icon is-hidden:sm-down icon icon-videinfra"
-          role="presentation"
-          width="18px"
-          height="18px"
-          viewBox="0 0 18 18"
-          style="--icon-width: 18; --icon-height: 18;"
-        ><use href="#videinfra" /></svg>
       </div>
 
-      <div class="is-hidden:md-up mt-1.5">
+      <div v-if="PROMO_FOOTER.social.length" class="is-hidden:md-up mt-1.5">
         <div class="social-networks mt-auto social-networks--">
           <a
             v-for="item in PROMO_FOOTER.social"

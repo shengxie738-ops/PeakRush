@@ -17,19 +17,18 @@
  * Geometry measured at 1376x772: split 688 / 688, form column 427px wide starting
  * at x=819, no page scroll (containerScrollHeight = 772).
  *
- * Everything below this line is local-demo behaviour: no request, no storage, no
- * OAuth. The reference's Facebook / Google buttons and the Google-Places-backed
- * country picker are reproduced as inert, marked regions — their API keys belong
- * to the operator and are deliberately not copied.
+ * AuthPanel uses the PeakRush username/password API and shares its bearer session
+ * with the business entry. Reference-only profile and provider data below is
+ * retained for documentation; those unsupported controls are not rendered.
  */
 
 export const AUTH_SPLIT = {
   /** `.layout-split__bg` theme + the copy inside the sticky decoration. */
   theme: 'ui-green',
-  heading: 'FollowArt',
-  lines: ['Webby-awarded', 'digital infrastructure', 'for artists and curators'],
+  heading: 'PeakRush',
+  lines: ['好物准点开抢', '让热爱与好价相遇'],
   /** /signup paints a different promise on the same panel. */
-  signupLines: ['Create your profile to showcase your practice and receive direct financial support'],
+  signupLines: ['好物准点开抢', '让热爱与好价相遇'],
   /** The panel's word art is an inline SVG + a WebGL canvas: not reproduced. */
   wordmarkAvailable: false,
 } as const;
@@ -37,8 +36,8 @@ export const AUTH_SPLIT = {
 export const FORM_TABS = {
   /** `.btn-group` measured on both pages; the active item carries --active. */
   items: [
-    { label: 'Join', to: '/signup' },
-    { label: 'Login', to: '/signin' },
+    { label: '注册', to: '/signup' },
+    { label: '登录', to: '/signin' },
   ] as const,
   activeClass: 'btn-group__item--active',
 } as const;
@@ -48,39 +47,42 @@ export const OAUTH_PROVIDERS = [
   { id: 'google', label: 'Google', icon: 'login-google' },
 ] as const;
 
-/** Measured field rows of /signin. */
+/** Field rows of /signin. `type` and `label` depart from the measured reference on
+ *  purpose: Auth.java:30 requires `[A-Za-z0-9_]{3,40}`, which admits no '@' or '.',
+ *  so an email input would block a legitimate username like admin_01 before submit,
+ *  and an "Email" label would tell the user to type something the backend rejects. */
 export const SIGNIN_FIELDS = [
-  { name: 'username', type: 'email', label: 'Email', required: true, autocomplete: 'username' },
-  { name: 'password', type: 'password', label: 'Password', required: true, autocomplete: 'current-password' },
+  { name: 'username', type: 'text', label: '用户名', required: true, autocomplete: 'username' },
+  { name: 'password', type: 'password', label: '密码', required: true, autocomplete: 'current-password' },
 ] as const;
 
 export const SIGNIN_COPY = {
   path: '/signin',
-  heading: 'Login',
-  tab: 'Login',
-  orEmail: 'or login with e-mail',
-  remember: 'Remember me for 24 hours',
-  forgot: 'I forgot my password',
-  submit: 'Login',
-  footerHint: 'Not registered yet? Join',
+  heading: '登录',
+  tab: '登录',
+  orEmail: '使用 PeakRush 账号登录',
+  remember: '保持登录状态',
+  forgot: '忘记密码',
+  submit: '登录',
+  footerHint: '还没有账号？注册',
   /** The reference header on these two routes is `.header`, not `.promo-header`. */
-  notice: 'Local clone demo — nothing you type leaves the page, is sent anywhere or is stored.',
+  notice: '登录后，继续你的抢购之旅。',
 } as const;
 
 /** Measured step 1 of /signup. */
 export const SIGNUP_STEP1 = {
-  heading: 'Join',
-  orEmail: 'or join with e-mail',
+  heading: '注册',
+  orEmail: '创建你的 PeakRush 账号',
   fields: [
-    { name: 'username', type: 'email', label: 'Email', required: true, autocomplete: 'username' },
-    { name: 'password', type: 'password', label: 'Password (8 characters min)', required: true, autocomplete: 'new-password' },
+    { name: 'username', type: 'text', label: '用户名', required: true, autocomplete: 'username' },
+    { name: 'password', type: 'password', label: '密码（至少 8 位）', required: true, autocomplete: 'new-password' },
   ] as const,
   agreements: [
-    { name: 'agreeTerms', label: 'I agree to the', linkA: 'Terms and Conditions', hrefA: '/terms-and-conditions', linkB: 'Privacy Policy', hrefB: '/privacy-policy', required: true },
-    { name: 'newsletter', label: 'Subscribe to FOLLOW.ART’s newsletter', linkA: '', hrefA: '', linkB: '', hrefB: '', required: false },
+    { name: 'agreeTerms', label: '我已阅读', linkA: '平台使用规则', hrefA: '/terms-and-conditions', linkB: '隐私说明', hrefB: '/privacy-policy', required: true },
+    { name: 'newsletter', label: '关注 PeakRush 活动预告', linkA: '', hrefA: '', linkB: '', hrefB: '', required: false },
   ] as const,
-  submit: 'Continue',
-  stepLabel: (of: number): string => `Step 1 of ${of}`,
+  submit: '注册',
+  stepLabel: (of: number): string => `第 1 步，共 ${of} 步`,
 } as const;
 
 /**
@@ -91,21 +93,21 @@ export const SIGNUP_STEP1 = {
  * rather than a fabricated list.
  */
 export const SIGNUP_STEP2 = {
-  heading: 'Tell about yourself',
-  roles: ["I'm Artist", "I'm Curator"] as const,
+  heading: '完善账号信息',
+  roles: ['发现好物', '关注活动'] as const,
   roleGroupName: 'type',
   fields: [
-    { name: 'firstName', type: 'text', label: 'First name', required: true, maxlength: 50 },
-    { name: 'lastName', type: 'text', label: 'Last name', required: true, maxlength: 50 },
-    { name: 'phone', type: 'tel', label: 'Phone', required: false, maxlength: 20 },
+    { name: 'firstName', type: 'text', label: '名字', required: true, maxlength: 50 },
+    { name: 'lastName', type: 'text', label: '姓氏', required: true, maxlength: 50 },
+    { name: 'phone', type: 'tel', label: '联系电话', required: false, maxlength: 20 },
   ] as const,
-  countryHeading: 'Country',
-  countrySearchLabel: 'Country or Country code',
+  countryHeading: '国家或地区',
+  countrySearchLabel: '国家或地区名称',
   countryAvailable: false,
-  avatarLabel: 'Avatar',
-  submit: 'Create account',
-  stepLabel: (of: number): string => `Step 2 of ${of}`,
+  avatarLabel: '头像',
+  submit: '创建账号',
+  stepLabel: (of: number): string => `第 2 步，共 ${of} 步`,
 } as const;
 
-export const SIGNUP_NEWSLETTER_LABEL = 'Subscribe to FOLLOW.ART’s newsletter';
-export const SIGNUP_TERMS_LABEL = 'I agree to the Terms and Conditions and Privacy Policy';
+export const SIGNUP_NEWSLETTER_LABEL = '关注 PeakRush 活动预告';
+export const SIGNUP_TERMS_LABEL = '我已阅读平台使用规则和隐私说明';

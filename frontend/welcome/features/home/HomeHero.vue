@@ -107,7 +107,7 @@ defineExpose({
             <canvas ref="canvasA" aria-hidden="true" />
             <canvas v-if="canvasCount > 1" ref="canvasB" aria-hidden="true" />
             <span v-if="!poster" class="sr-only" data-evidence="pending-T01-assets">
-              FOLLOW.ART card ring
+              PeakRush 限时好物旋转展示
             </span>
           </div>
         </div>

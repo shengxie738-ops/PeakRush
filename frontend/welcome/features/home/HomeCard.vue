@@ -52,7 +52,7 @@ defineExpose({
               <img
                 class="section-5__title-decoration is-hidden:md-up img-full"
                 :src="asset(IMG.the) ?? ''"
-                alt="Card for artists — share your portfolio, bio, exhibitions, and awards with one professional."
+                alt="精选好物"
               />
             </DisplayHeading>
 

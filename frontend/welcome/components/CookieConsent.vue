@@ -12,8 +12,8 @@
  *       <div class="cookie-message__layout-buttons">Deny · Accept</div>
  *
  * The reference's `cookieConsentStatus` cookie is kept (it is a consent flag, not a
- * credential); its Google Analytics / Meta / Datadog side effects are NOT replayed —
- * this is a local clone and the brief forbids network calls.
+ * credential). The banner uses PeakRush's storage copy; no tracking services are
+ * attached to this preference.
  */
 import { onMounted, ref, watch } from 'vue';
 import BrushLink from './BrushLink.vue';

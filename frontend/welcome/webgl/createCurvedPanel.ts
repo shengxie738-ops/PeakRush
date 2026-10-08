@@ -52,7 +52,7 @@ const MESHES: readonly NexusMeshSpec[] = [
     offset: -0.48,
     progressScale: 1,
     alpha: 1,
-    textureUrl: '/assets/cards/nexus/card-1.png',
+    textureUrl: '/peakrush/nexus-product-1.png',
   },
   {
     position: [-0.3, 1.2, -3.5],
@@ -62,7 +62,7 @@ const MESHES: readonly NexusMeshSpec[] = [
     offset: -1.04,
     progressScale: 1,
     alpha: 1,
-    textureUrl: '/assets/cards/nexus/card-2.png',
+    textureUrl: '/peakrush/nexus-product-3.png',
   },
 ];
 

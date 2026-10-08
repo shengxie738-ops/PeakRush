@@ -22,9 +22,10 @@
  * whose absolute /src/… module path silently resolves to nothing once the tree lives
  * under welcome/) is gone.
  */
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, shallowRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import SiteHeader from '@/components/SiteHeader.vue';
+import EditorialHeader from '@/components/EditorialHeader.vue';
 import CookieConsent from '@/components/CookieConsent.vue';
 import FixedSignUpButton from '@/components/FixedSignUpButton.vue';
 import { ICON_SPRITE } from '@/content/assetRegistry';
@@ -32,6 +33,7 @@ import { WEBGL_SECTIONS, canvasCountFor, createWebGLScene } from '@/webgl/sceneR
 import type { MotionRuntime, SceneController, ScrollRange } from '@/motion/motion.types';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 import { SEO } from '@/content/home';
+import { EDITORIAL_SCROLL, type EditorialScroll } from './editorialScroll';
 
 const THEME_COLORS: Record<string, string> = {
   light: '#FFFFFF',
@@ -62,7 +64,9 @@ const root = shallowRef<MotionRuntime | null>(null);
 const scenes = new Map<string, SceneController>();
 
 const theme = computed<string>(() => (route.meta.theme as string) ?? 'light');
-const rootStyle = computed(() => ({ backgroundColor: THEME_COLORS[theme.value] ?? '#FFFFFF' }));
+const editorialNames = new Set(['about', 'our-product', 'community-board', 'pricing', 'faq']);
+const editorialRoute = computed(() => typeof route.name === 'string' && editorialNames.has(route.name));
+const rootStyle = computed(() => ({ backgroundColor: editorialRoute.value ? '#f7f7f2' : THEME_COLORS[theme.value] ?? '#FFFFFF' }));
 const documentTitle = computed<string>(() => (route.meta.title as string) ?? SEO.title);
 const reducedMotion =
   typeof window !== 'undefined' &&
@@ -76,6 +80,25 @@ watch(
   },
   { immediate: true },
 );
+
+const scrollTo: EditorialScroll = (target, offset = 0) => {
+  if (root.value) {
+    root.value.scrollTo(target, offset);
+    return;
+  }
+  const container = scrollArea.value;
+  if (!container) return;
+  const top = typeof target === 'number' ? target : target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+  container.scrollTo({ top: top + offset, behavior: 'instant' });
+};
+provide(EDITORIAL_SCROLL, scrollTo);
+
+watch(() => route.name, async (name, previous) => {
+  if (!editorialNames.has(String(name)) && !editorialNames.has(String(previous))) return;
+  await nextTick();
+  scrollTo(0);
+  syncScrollbar();
+});
 
 /**
  * Scroll range for one section.
@@ -180,7 +203,9 @@ function syncScrollbar(): void {
   <div class="scrollable scrollable--root" :style="rootStyle">
     <div ref="scrollArea" class="scrollable__area lenis">
       <div class="scrollable__area-inner">
+        <EditorialHeader v-if="editorialRoute" />
         <SiteHeader
+          v-else
           :theme="theme"
           :default-expanded="Boolean(route.meta.headerExpanded)"
           has-loading-state
@@ -208,7 +233,7 @@ function syncScrollbar(): void {
   <div class="clone-icon-sprite" aria-hidden="true" v-html="'<svg xmlns=&quot;http://www.w3.org/2000/svg&quot;>' + ICON_SPRITE + '</svg>'" />
 
   <CookieConsent />
-  <FixedSignUpButton />
+  <FixedSignUpButton v-if="!editorialRoute" />
 </template>
 
 <style>

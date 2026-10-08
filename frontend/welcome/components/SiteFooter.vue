@@ -18,24 +18,6 @@ import { computed, h, type Component, type VNode } from 'vue';
 import BrushLink from './BrushLink.vue';
 import { FOOTER, EXTERNAL, JOIN } from '@/content/home';
 
-/**
- * The reference footer credit carries the Vide Infra mark as an inline <svg> whose class
- * differs per breakpoint (CCJzzdh0.js). The mark path data was not part of the
- * captured chunks available to this clone, so the placeholder keeps the reference
- * class contract and the link target; the artwork itself is tracked as an asset gap.
- */
-function VideinfraIcon(className: string): Component {
-  return {
-    render(): VNode {
-      return h(
-        'svg',
-        { class: className, viewBox: '0 0 24 24', width: '24', height: '24', 'aria-hidden': 'true', focusable: 'false' },
-        [h('rect', { x: '2', y: '2', width: '20', height: '20', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.5' })],
-      );
-    },
-  };
-}
-
 const props = withDefaults(
   defineProps<{
     /** Wrap the footer in the reference .wrapper-section-10 shell. */
@@ -90,16 +72,14 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
   <component :is="wrapper">
     <footer class="section-10__footer text-smaller row row--gx row--stretch">
       <div class="section-10__footer-side col col--12 col--6:md col--last:md mb-1 mb-0:md">
-        <nav aria-label="Footer navigation">
+        <nav aria-label="页脚导航">
           <ul class="section-10__footer-nav">
             <li v-for="item in FOOTER.nav" :key="item.label" class="text-box-trim">
               <BrushLink
                 class="section-10__footer-link"
                 variant="link block text-smaller accent"
                 :title="item.label"
-                :to="'to' in item && item.to ? item.to : undefined"
-                :href="'href' in item && item.href ? item.href : undefined"
-                external
+                :to="item.to"
               />
             </li>
           </ul>
@@ -107,8 +87,7 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
 
         <div class="group group--smaller group--v-center is-hidden:sm-down">
           <BrushLink
-            :href="EXTERNAL.videinfra"
-            external
+            :to="EXTERNAL.videinfra"
             variant="link block accent"
             text-size="smaller"
             :attr-title="FOOTER.madeByTitle"
@@ -117,9 +96,6 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
 {{ FOOTER.madeBy }}
 </BrushLink
           >
-          <component
-            :is="VideinfraIcon('section-10__made-by-icon is-hidden:sm-down')"
-          />
         </div>
 
         <div class="text-right is-hidden:md-up">
@@ -127,7 +103,7 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
           <BrushLink
             variant="link accent"
             text-size="smaller"
-            :href="EXTERNAL.email"
+            :to="EXTERNAL.email"
             :title="FOOTER.email"
             class="mt-0.25"
           />
@@ -136,8 +112,8 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
 
       <div class="section-10__footer-side-left col col--12 col--6:md mt-2 mt-0:md is-hidden:sm-down">
         <p class="text-box-trim">{{ year }} {{ FOOTER.copyright }}</p>
-        <BrushLink variant="link accent" text-size="smaller" :href="EXTERNAL.email" :title="FOOTER.email" />
-        <div class="is-hidden:sm-down mt-auto">
+        <BrushLink variant="link accent" text-size="smaller" :to="EXTERNAL.email" :title="FOOTER.email" />
+        <div v-if="FOOTER.social.length" class="is-hidden:sm-down mt-auto">
           <div class="social-networks mt-auto social-networks--smaller">
             <BrushLink
               v-for="item in FOOTER.social"
@@ -155,10 +131,8 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
       </div>
 
       <div class="group group--smaller group--v-center mt-1 is-hidden:md-up">
-        <component :is="VideinfraIcon('section-10__made-by-icon is-hidden:md-up')" />
         <BrushLink
-          :href="EXTERNAL.videinfra"
-          external
+          :to="EXTERNAL.videinfra"
           variant="link block accent"
           text-size="smaller"
           :attr-title="FOOTER.madeByTitle"
@@ -167,10 +141,9 @@ const wrapper = computed<Component>(() => (props.shell ? (Shell as unknown as Co
 {{ FOOTER.madeBy }}
 </BrushLink
         >
-        <component :is="VideinfraIcon('section-10__made-by-icon is-hidden:sm-down')" />
       </div>
 
-      <div class="is-hidden:md-up mt-1.5">
+      <div v-if="FOOTER.social.length" class="is-hidden:md-up mt-1.5">
         <div class="social-networks mt-auto social-networks--smaller">
           <BrushLink
             v-for="item in FOOTER.social"

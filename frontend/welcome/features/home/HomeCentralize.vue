@@ -84,10 +84,26 @@ defineExpose({ sectionId: CENTRALIZE.sectionId, root });
                 <img :src="asset(IMG.cross) ?? ''" width="398" height="440" alt="" />
               </div>
               <ol class="section-4__cards ui-dark">
-                <li v-for="card in CENTRALIZE.cards" :key="card.index" class="section-4__card">
+                <li
+                  v-for="card in CENTRALIZE.cards"
+                  :key="card.index"
+                  class="section-4__card"
+                  :class="{ 'section-4__card--light': card.theme === 'light' }"
+                >
                   <div class="section-4__card-inner">
                     <div class="section-4__card-front">
                       <span class="text-smaller text-box-trim">{{ card.index }}</span>
+                      <img
+                        class="section-4__card-image"
+                        :src="card.image"
+                        width="1122"
+                        height="1402"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                        draggable="false"
+                      />
                       <p class="text-small text-box-trim">
                         {{ card.front[0] }}<br />
                         {{ card.front[1] }}
@@ -108,3 +124,53 @@ defineExpose({ sectionId: CENTRALIZE.sectionId, root });
     </div>
   </section>
 </template>
+
+<style scoped>
+@layer overrides {
+  .section-4__card-front {
+    overflow: hidden;
+    background: #000;
+  }
+
+  .section-4__card-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Wide desktop cards become squarer; keep the whole illustration visible. */
+    object-fit: contain;
+    object-position: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .section-4__card-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 62%, rgb(0 0 0 / 60%) 80%, #000 100%);
+    pointer-events: none;
+  }
+
+  .section-4__card-front > span,
+  .section-4__card-front > p {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-4__card--light {
+    --t-background: #fff;
+    --t-small: #666;
+  }
+
+  .section-4__card--light .section-4__card-front,
+  .section-4__card--light .section-4__card-back {
+    background: #fff;
+    color: #111;
+  }
+
+  .section-4__card--light .section-4__card-front::after {
+    background: linear-gradient(180deg, transparent 62%, rgb(255 255 255 / 60%) 80%, #fff 100%);
+  }
+}
+</style>

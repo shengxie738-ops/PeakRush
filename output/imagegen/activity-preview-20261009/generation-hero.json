@@ -1,0 +1,11 @@
+{
+  "mode": "built-in image_gen",
+  "assets": [
+    {
+      "file": "speaker.png",
+      "prompt": "Use case: ads-marketing\nAsset type: standalone desktop ecommerce editorial hero advertising image, landscape 3:2 composition.\nPrimary request: A world-class independent creative agency / experimental concept design studio product campaign for a single premium portable wireless speaker. This is final art, not a mockup or collage.\nScene/backdrop: a charcoal-black sculptural studio with one enormous smooth burnt-orange curved acoustic wave wall sweeping diagonally behind the product, a dark polished basalt plinth, precise soft edge shadows and tactile surfaces. Restrained architectural surrealism, museum-grade art direction.\nSubject: ONE unbranded compact sculptural portable speaker, rounded rectangular vertical shape, deep graphite tightly woven speaker grille, beautifully milled warm orange aluminium outer frame and a discreet woven carry loop. Clearly recognisable as a speaker, plausible finely finished real product.\nStyle/medium: premium photorealistic studio advertising photograph, precise industrial design and microtexture, subtle analogue photographic grain. Sophisticated concept studio, editorial still life, rich warm orange contrast against charcoal.\nComposition/framing: landscape 3:2. Product full silhouette visible, prominent in upper central/right two thirds, not touching frame, bottom-left 35% is clean dark negative space for later webpage typography; no actual text in image. Curved orange sculpture creates dynamic visual rhythm, no repeated speaker and no busy collection.\nLighting/mood: large warm side light sculpting orange metal, razor-controlled rim and deep but detailed black shadows, confident and artful.\nConstraints: one standalone artwork, no readable text, no logos, no brand names, no watermark, no border, no price, no UI, no neon circuit lines, no particle explosion. Avoid generic catalog cutout. Speaker and fabric must be physically believable.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4b-6682-70f3-af18-2cea7fe9a1e4\\exec-d81e6e5a-2f88-4e0d-9c59-618e0a309d5a.png",
+      "qa": "Pass: complete graphite-orange portable speaker; orange acoustic sculpture; dark lower-left typography space; no text/logo/watermark."
+    }
+  ]
+}

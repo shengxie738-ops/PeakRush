@@ -39,6 +39,7 @@
  *     what `scripts/check-hero-cards.mjs` now asserts against.
  */
 import * as THREE from 'three';
+import { productCard } from '@/content/productCatalog';
 import type { FrameInput, SceneController, SectionId } from '@/motion/motion.types';
 import {
   buildRingSpineFrames,
@@ -94,7 +95,7 @@ export interface CardRingOptions {
   id?: SectionId;
   cardCount?: number;
   calibration?: Partial<CardRingCalibration>;
-  /** Overrides the /assets/cards/Card-i.png URLs (1-based). */
+  /** Overrides the product catalog artwork URLs (1-based). */
   textureUrlFor?: (index: number) => string;
 }
 
@@ -154,7 +155,7 @@ export function createCardRing(options: CardRingOptions): CardRingController {
     ...options.calibration,
     spine: { ...DEFAULT_RING_SPINE, ...(options.calibration?.spine ?? {}) },
   };
-  const urlFor = options.textureUrlFor ?? ((i: number) => `/assets/cards/Card-${i}.png`);
+  const urlFor = options.textureUrlFor ?? productCard;
 
   // DOM order mirrors the reference: canvas 0 is pushed to the back (far layer),
   // canvas 1 sits on top and carries the near, textured cards.
@@ -200,7 +201,13 @@ export function createCardRing(options: CardRingOptions): CardRingController {
     };
     if (map) {
       u.map = { value: map };
-      u.mapTransform = { value: new THREE.Matrix3() };
+      // Square advertising art covers the portrait plane without stretching it.
+      const transform = new THREE.Matrix3();
+      if (!options.textureUrlFor) {
+        const visibleWidth = PLANE_W / PLANE_H;
+        transform.set(visibleWidth, 0, (1 - visibleWidth) / 2, 0, 1, 0, 0, 0, 1);
+      }
+      u.mapTransform = { value: transform };
     }
     return u;
   };

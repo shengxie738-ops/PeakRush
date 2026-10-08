@@ -7,15 +7,10 @@
  * `evidence/reference/raw/pricing-promo-footer.html`; the geometry of every node
  * is in `evidence/reference/raw/pricing-promo-footer-boxtree.json`.
  *
- * This list is NOT the home footer's list. `FOOTER` in ../home.ts is bound to the
- * measured `.section-10__footer` geometry on / and stays untouched; only the
- * shared, identical hrefs are reused from `EXTERNAL`.
- *
- * Note the copyright string: the promo footer reads "FOLLOW. ART" with a space
- * before ART, where the home footer renders "FOLLOW.ART". Both are measured, so
- * both are kept — the year is rendered at runtime by the component.
+ * PeakRush shares destinations and branding with the home footer while retaining
+ * this compact layout. The year is rendered at runtime by the component.
  */
-import { EXTERNAL } from '../home';
+import { EXTERNAL, FOOTER } from '../home';
 
 /** One promo nav link: either an internal route (`to`) or an absolute `href`. */
 export interface PromoFooterLink {
@@ -36,34 +31,22 @@ export interface PromoFooterSocial {
 }
 
 /** The five promo nav links, in captured DOM order. */
-export const PROMO_FOOTER_NAV: PromoFooterLink[] = [
-  { label: 'Brand Kit', href: EXTERNAL.brandKit, external: true },
-  { label: 'Buy Gift Card', to: '/gift-card' },
-  { label: 'Terms & Conditions', to: '/terms-and-conditions' },
-  { label: 'Privacy Policy', to: '/privacy-policy' },
-  { label: 'Cookie Policy', to: '/cookies-policy' },
-];
+export const PROMO_FOOTER_NAV: PromoFooterLink[] = [...FOOTER.nav];
 
-/** The five social buttons, in captured DOM order. */
-export const PROMO_FOOTER_SOCIAL: PromoFooterSocial[] = [
-  { icon: 'social-instagram', label: 'Follow us on Instagram', href: EXTERNAL.instagram },
-  { icon: 'social-linkedin', label: 'Follow us on Linkedin', href: EXTERNAL.linkedin },
-  { icon: 'social-youtube', label: 'Follow us on Youtube', href: EXTERNAL.youtube },
-  { icon: 'social-substack', label: 'Follow us on Substack', href: EXTERNAL.substack },
-  { icon: 'social-facebook', label: 'Follow us on Facebook', href: EXTERNAL.facebook },
-];
+/** Social buttons render only when destinations are supplied. */
+export const PROMO_FOOTER_SOCIAL: PromoFooterSocial[] = [...FOOTER.social];
 
 export const PROMO_FOOTER = {
-  /** Rendered as `{{ year }} © FOLLOW. ART`. */
-  copyright: '© FOLLOW. ART',
-  email: 'help@follow.art',
+  /** The year is added by the footer component. */
+  copyright: FOOTER.copyright,
+  email: FOOTER.email,
   emailHref: EXTERNAL.email,
-  author: 'Digital product development by Vide Infra',
+  author: FOOTER.madeBy,
   authorHref: EXTERNAL.videinfra,
   /** The `<a title>` of the author link, as captured. */
-  authorTitle: 'Award-winning digital product design agency',
+  authorTitle: FOOTER.madeByTitle,
   /** The sprite id behind `.footer-author__icon`. */
-  authorIcon: 'videinfra',
+  authorIcon: '',
   nav: PROMO_FOOTER_NAV,
   social: PROMO_FOOTER_SOCIAL,
 } as const;

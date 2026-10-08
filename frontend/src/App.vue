@@ -3,7 +3,6 @@ import { onMounted } from "vue";
 import { ArrowDown, User, SwitchButton } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { session, logout, requireLogin, restoreSession } from "./session";
-import AuthDialog from "./components/AuthDialog.vue";
 const router = useRouter();
 function command(value: string) {
   if (value === "logout") {
@@ -33,7 +32,7 @@ onMounted(restoreSession);
         to="/admin"
         active-class="active"
         >管理工作台</RouterLink
-      >
+      ><a href="/">返回首页</a>
     </nav>
     <div class="account">
       <el-dropdown v-if="session.user" trigger="click" @command="command"
@@ -66,5 +65,4 @@ onMounted(restoreSession);
     <p><strong>PeakRush</strong> 让好物与热爱，准点相遇。</p>
     <p>每一次开抢，都是生活的新起点。</p>
   </footer>
-  <AuthDialog />
 </template>

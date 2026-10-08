@@ -6,7 +6,7 @@ import "element-plus/dist/index.css";
 import "./style.css";
 import App from "./App.vue";
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory("/app/"),
   routes: [
     { path: "/", component: () => import("./pages/Storefront.vue") },
     {

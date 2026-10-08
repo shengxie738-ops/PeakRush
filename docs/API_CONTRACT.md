@@ -16,5 +16,5 @@ GET /api/admin/metrics/summary -> {requests,successes,failures,pending,orders,pa
 GET /api/admin/dead-letters -> {items:[{id,requestId,reason,status,attempts,createdAt}],total}; POST /{id}/retry or /abort -> record.
 GET /api/admin/experiments -> list; POST same {name,architectureVersion,concurrency,durationSeconds,stock,notes} -> record; GET /{id}/export -> JSON. May add POST /{id}/results for actual harness results.
 GET/POST /api/admin/faults labprofile only; backend documents fields. /actuator/health and /actuator/prometheus.
-Seed demo accounts documented by backend, local profile only. Ports: frontend5179 gateway8080 backend8081 MySQL13306 Redis16379 Kafka19092.
+Seed demo accounts documented by backend, local profile only. Ports: frontend5400 gateway8080 backend8081 MySQL13306 Redis16379 Kafka19092.
 Frontend uses relative /api via Vite proxy gateway. Preserve Idempotency-Key on network retry; never mock purchases.

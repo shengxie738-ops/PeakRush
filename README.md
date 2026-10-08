@@ -22,7 +22,9 @@
 powershell -ExecutionPolicy Bypass -File .\scripts\app-start.ps1
 ~~~
 
-打开 [本地页面](http://127.0.0.1:5179/)。
+打开 [本地页面](http://127.0.0.1:5400/)。
+
+首页导航中的「PeakRush」进入[抢购业务页面](http://127.0.0.1:5400/app/)，业务页的「返回首页」可回到首页。首页的 Login / Join 使用项目账号登录或注册，成功后进入业务页；从业务页发起登录会返回原业务页面。两个入口共用登录状态，项目面向桌面浏览器。
 
 本机（Windows + PowerShell 5.1，复用已装 MySQL、依赖放项目内 `依赖环境/`）的完整启动、停止、自检与已知坑见 [启动指导](docs/STARTUP_GUIDE.md)。
 
@@ -49,7 +51,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\app-start.ps1
 .\scripts\app-stop.ps1 -IncludeInfra
 ~~~
 
-所有服务面向本机开发，绑定回环地址。应用端口为 5179 / 8080 / 8081，独立依赖端口为 MySQL 13306、Redis 16379、Kafka 19092/19093。数据和日志位于被 Git 忽略的 .runtime/；不使用现有系统 MySQL 的 3306 或既有 Kafka 数据目录。前端本地启动使用 Vite，生产构建产物在 frontend/dist/。
+所有服务面向本机开发，绑定回环地址。应用端口为 5400 / 8080 / 8081，独立依赖端口为 MySQL 13306、Redis 16379、Kafka 19092/19093。数据和日志位于被 Git 忽略的 .runtime/；不使用现有系统 MySQL 的 3306 或既有 Kafka 数据目录。前端本地启动使用 Vite，生产构建产物在 frontend/dist/。
 
 ## 换一台机器运行
 

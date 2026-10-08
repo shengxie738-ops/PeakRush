@@ -1,0 +1,25 @@
+{
+  "mode": "built-in image_gen",
+  "useCase": "ads-marketing",
+  "generatedAt": "2026-10-09",
+  "assets": [
+    {
+      "name": "sneakers",
+      "sourcePath": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-a976-7522-b840-999449a63438\\exec-391501a4-1850-4756-a44c-3f12db47e1ab.png",
+      "prompt": "Use case: ads-marketing. Asset type: final square 1:1 product campaign photograph for a desktop premium shopping editorial.\nCreate an exceptionally crafted premium photorealistic conceptual editorial advertisement, at the standard of a leading creative agency and concept design studio. ONE elegant cream/stone technical running shoe with a coral-orange outsole, shown in a three-quarter side view levitating in the center above a single broad spiraling sheet of orange-red flexible material resembling a frozen running track curve. The orange track sculpture is a substantial sculptural curved band, not a ribbon of light, sweeping with graceful geometry through the lower half. Very pale cool grey architectural studio backdrop and floor, crisp directional lighting, strong beautifully formed shadows, precise knitted textile, fine stitched details, technically believable outsole geometry. Quiet but arresting campaign art direction, expertly controlled sophisticated materials, photographic realism, tactile luxury, no clutter. Product reads clearly within central 80% square crop, complete shoe visible, generous balanced breathing room around silhouette. No duplicate shoe, no people, no powder explosion, no neon speed lines, no text, brand, logo, watermark or UI. Output one square image.",
+      "path": "G:\\高并发大作业项目\\PeakRush\\frontend\\public\\peakrush\\drops-20261009\\sneakers.png",
+      "width": 1254,
+      "height": 1254,
+      "qa": "Inspected with view_image. Single distinct product, complete silhouette, no text/branding/watermark/UI. Premium photographic campaign; distinct pale grey/coral running shoe concept and terracotta/forest-green backpack/travertine composition."
+    },
+    {
+      "name": "backpack",
+      "sourcePath": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-a976-7522-b840-999449a63438\\exec-6bff1cc8-ae72-4343-a0f1-803274ae59fe.png",
+      "prompt": "Use case: ads-marketing. Asset type: final square 1:1 product campaign photograph for a desktop premium shopping editorial.\nCreate an exceptionally art-directed premium photorealistic concept advertisement at the standard of a top creative agency and concept design studio. ONE forest-green technical outdoor backpack with warm stone-colored webbing, carefully designed harness hardware, structured volume and discreet black zippers, centrally supported on top of a naturally weathered pale travertine arch with a simple architectural circular opening. The backpack is the unmistakable main hero, fully visible, facing front with a subtle three-quarter angle; high-end technically convincing construction and ripstop textile. Terracotta/clay seamless studio wall and floor, raking warm sun from upper left reveals the textile and travertine texture, striking deep warm ground shadows. Sculptural architectural fashion campaign, sophisticated restrained green, pale stone and clay palette, quiet luxurious editorial composition, realistic tactile material detail, minimal refined scene. Product reads clearly within central 80% square crop, balanced generous breathing room, complete backpack silhouette visible. No human model, no duplicates, no mountain panorama, no neon, no text, brand, logos, watermark or UI. Output one square image.",
+      "path": "G:\\高并发大作业项目\\PeakRush\\frontend\\public\\peakrush\\drops-20261009\\backpack.png",
+      "width": 1254,
+      "height": 1254,
+      "qa": "Inspected with view_image. Single distinct product, complete silhouette, no text/branding/watermark/UI. Premium photographic campaign; distinct pale grey/coral running shoe concept and terracotta/forest-green backpack/travertine composition."
+    }
+  ]
+}

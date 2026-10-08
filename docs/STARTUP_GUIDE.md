@@ -7,7 +7,7 @@
 
 | 角色 | 地址 | 由谁启动 | 说明 |
 | --- | --- | --- | --- |
-| 前端（Vite 开发服务器） | `http://127.0.0.1:5179` | `scripts/app-start.ps1` | **端口为 5179，不是 5173**；`--strictPort`，端口被占直接失败，不会自动漂到 5180 |
+| 前端（Vite 开发服务器） | `http://127.0.0.1:5400` | `scripts/app-start.ps1` | **端口为 5400**；本机 Windows 保留 5112–5211 端口段，原端口 5179 无法绑定；`--strictPort`，端口被占直接失败 |
 | 网关 Gateway | `127.0.0.1:8080` | `scripts/app-start.ps1` | 前端 `/api`、`/actuator` 经 Vite 代理转发到这里 |
 | 后端 Spring Boot | `127.0.0.1:8081` | `scripts/app-start.ps1` | 只由网关对外暴露，前端不直连 |
 | MySQL | `127.0.0.1:3306` | 本机已有 `MySQL81` 服务 | 复用现有实例，库名 `peakrush` |
@@ -75,7 +75,7 @@ cd G:\高并发大作业项目\PeakRush
 .\scripts\app-start.ps1 -SkipBuild -SkipInfra
 ```
 
-期望最后一行：`PeakRush ready: http://127.0.0.1:5179`。
+期望最后一行：`PeakRush ready: http://127.0.0.1:5400`。
 
 - 首次或改过后端/前端代码后，去掉 `-SkipBuild`（会执行 `mvn package` 与 `npm ci && npm run build`，约 3–6 分钟）。
 - 只想构建不启动：`.\依赖环境\build-local.ps1`。
@@ -104,10 +104,10 @@ cd G:\高并发大作业项目\PeakRush
 .\scripts\app-status.ps1                                  # 三个应用端口 listening=True
 curl.exe http://127.0.0.1:8081/actuator/health            # {"status":"UP"}
 curl.exe http://127.0.0.1:8080/actuator/health            # {"status":"UP"}
-curl.exe -X POST -H "Content-Type: application/json" -d "{\"username\":\"demo\",\"password\":\"demo12345\"}" http://127.0.0.1:5179/api/auth/login
+curl.exe -X POST -H "Content-Type: application/json" -d "{\"username\":\"demo\",\"password\":\"demo12345\"}" http://127.0.0.1:5400/api/auth/login
 ```
 
-最后一条同时验证了 5179 → Vite 代理 → 网关 → 后端 → MySQL 的完整链路，应返回 `{"token":"...","user":{"username":"demo",...}}`。
+最后一条同时验证了 5400 → Vite 代理 → 网关 → 后端 → MySQL 的完整链路，应返回 `{"token":"...","user":{"username":"demo",...}}`。
 
 管理员登录后访问 `GET /api/admin/metrics/summary`，`kafkaLag` 有数值即说明 Kafka 消费者组已连上。
 
@@ -117,7 +117,7 @@ curl.exe -X POST -H "Content-Type: application/json" -d "{\"username\":\"demo\",
 2. **`ConvertFrom-Json` 外面套 `@()` 会造出嵌套数组**：PS 5.1 把 JSON 数组作为一个 `Object[]` 单次送入管道，`@( … )` 得到的是"1 个元素、其内是数组"，于是按 `.name` 过滤命中 0 条。`scripts/app-start.ps1:31-37` 原本因此无法识别"服务已在运行"，重复执行会误报 `Port 8081 is occupied by a process not verified as this project's backend`；现已改为逐条累加。
 3. **脚本内不要用 `*>>` 重定向原生命令的 stderr**：配合 `$ErrorActionPreference='Stop'` 会把第一行 stderr 变成终止错误（`java -version` 就中招）。把重定向放到调用层，例如 `powershell -File x.ps1 > log.txt 2>&1`。
 4. **自己新写的 `.ps1` 必须存成带 BOM 的 UTF-8**，否则里面的中文注释和路径字面量在 PS 5.1 下会坏掉。
-5. **换前端端口等于换 origin**：浏览器 `localStorage` 里的登录 token 不跨端口，5173 上的登录态在 5179 上不存在，需要重新登录，属正常现象。
+5. **换前端端口等于换 origin**：浏览器 `localStorage` 里的登录 token 不跨端口，从旧端口 5179 切到 5400 后需要重新登录，属正常现象。
 6. `scripts/verification_invariants.py:20` 把 MySQL 写死成 `127.0.0.1:13306 --user=peakrush`，没有命令行开关。本机用 3306/root，所以该脚本当前跑不了；`verification_api.py` 与 `verification_gateway.py` 支持 `--base`（默认 `http://127.0.0.1:8080`），不受前端端口影响。
 
 ## 8. 与 README.md 的偏离
@@ -127,7 +127,7 @@ curl.exe -X POST -H "Content-Type: application/json" -d "{\"username\":\"demo\",
 | MySQL | 独立实例 8.0.30 @13306，`scripts/runtime-start.ps1` 自建数据目录 | 复用本机 `MySQL81` 服务 3306 / root，只新建 `peakrush` 库 |
 | 依赖启动 | `scripts/runtime-start.ps1` 一次拉起 MySQL+Redis+Kafka | 只用 `依赖环境/start-runtime.ps1` 拉起 Redis+Kafka；`env.ps1` 故意不设 `PEAKRUSH_MYSQL_BIN`，误调用 `runtime-start.ps1` 会立即报错，不会另起一套数据目录 |
 | 环境变量 | 需要 3 个 16 位以上口令 | 走 `DB_URL/DB_USER/DB_PASSWORD` 覆盖后端连接，Redis 无口令、仅绑回环 |
-| 前端端口 | 5173 | 5179 |
+| 前端端口 | 5173 | 5400 |
 
 ## 9. 数据与日志位置
 

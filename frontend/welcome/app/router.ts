@@ -9,7 +9,7 @@
  * so the router itself never touches window.scroll.
  */
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
-import { ROUTE_MANIFEST } from './routeManifest';
+import { NOT_FOUND_TITLE, ROUTE_MANIFEST } from './routeManifest';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -52,19 +52,19 @@ const routes: RouteRecordRaw[] = [
     path: '/signin',
     name: 'signin',
     component: () => import('@/pages/SignInPage.vue'),
-    meta: { theme: 'light', localDemo: true, title: ROUTE_MANIFEST[6].title },
+    meta: { theme: 'light', title: ROUTE_MANIFEST[6].title },
   },
   {
     path: '/signup',
     name: 'signup',
     component: () => import('@/pages/SignUpPage.vue'),
-    meta: { theme: 'orange', localDemo: true, title: ROUTE_MANIFEST[7].title },
+    meta: { theme: 'orange', title: ROUTE_MANIFEST[7].title },
   },
   {
     path: '/gift-card',
     name: 'gift-card',
     component: () => import('@/pages/GiftCardPage.vue'),
-    meta: { theme: 'orange', localDemo: true, title: ROUTE_MANIFEST[8].title },
+    meta: { theme: 'orange', title: ROUTE_MANIFEST[8].title },
   },
   {
     path: '/terms-and-conditions',
@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
     path: '/:catchAll(.*)',
     name: 'not-found',
     component: () => import('@/pages/NotFoundPage.vue'),
-    meta: { theme: 'orange', notFound: true },
+    meta: { theme: 'orange', notFound: true, title: NOT_FOUND_TITLE },
   },
 ];
 

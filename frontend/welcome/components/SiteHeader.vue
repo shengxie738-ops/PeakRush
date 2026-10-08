@@ -1,10 +1,8 @@
 <script setup lang="ts">
 /**
  * SiteHeader.vue — the reference `PagePromoHeader` + `PagePromoMobileMenu`
- * (evidence/reference/raw/_nuxt/Bi84onXO.js). The DOM, class list and text order
- * are the measured ones from docs/DOM_CONTRACT.md ("Header (measured text order)"):
- *   FOLLOW. ART / One Practice. One Card · About Our Product Community Board
- *   Pricing FAQ · Login Join · plus the #menu anchor.
+ * (evidence/reference/raw/_nuxt/Bi84onXO.js). The measured DOM and class list
+ * retain the animated header geometry while content comes from PeakRush.
  *
  * The theme (and with it the colour of the fixed bar) is read from the
  * `data-page-header-theme` attribute each `<section>` carries, exactly as the
@@ -13,6 +11,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { safeRedirect } from '@shared/safe-redirect';
 import BrushLink from './BrushLink.vue';
 import AccessibleDialog from './AccessibleDialog.vue';
 import { HEADER, EXTERNAL } from '@/content/home';
@@ -82,6 +81,7 @@ function isActive(to: string): boolean {
  */
 const authRoute = computed(() => route.name === 'signin' || route.name === 'signup');
 const otherAuthMode = computed(() => (route.name === 'signin' ? HEADER.join : HEADER.login));
+const otherAuthTarget = computed(() => `${otherAuthMode.value.to}?redirect=${encodeURIComponent(safeRedirect(route.query.redirect))}`);
 
 let frame = 0;
 let sections: HTMLElement[] = [];
@@ -154,6 +154,7 @@ watch(
     previousTheme.value = value;
     measure();
   },
+  { flush: 'post' },
 );
 
 /* Same first-render race for `defaultExpanded`: the home route sets it, and it
@@ -171,7 +172,7 @@ watch(
   <header :class="rootClass">
     <div :class="previousClass" :style="previousBackgroundStyle" />
     <div class="row row--gx row--middle promo-header__row">
-      <div class="col col--8 col--5:md col--6:xl promo-header__logo">
+      <div class="col col--8 promo-header__logo" :class="authRoute ? 'col--5:md col--6:xl' : 'col--3:md col--4:xl'">
         <BrushLink
           variant="link block accent"
           :text-size="textSize"
@@ -183,7 +184,7 @@ watch(
         </p>
       </div>
 
-      <div v-if="!authRoute" class="promo-header__desktop-links col col--5 col--4:xl is-hidden:sm-down">
+      <div v-if="!authRoute" class="promo-header__desktop-links promo-header__desktop-links--sections col col--7:md col--6:xl is-hidden:sm-down">
         <BrushLink
           v-for="item in HEADER.nav"
           :key="item.to"
@@ -194,6 +195,14 @@ watch(
           :to="item.to"
           :active="isActive(item.to)"
         />
+        <BrushLink
+          class="promo-header__animated-button"
+          variant="link block accent"
+          :text-size="textSize"
+          title="进入商城"
+          aria-label="进入 PeakRush 商城"
+          href="/app/"
+        />
       </div>
 
       <div
@@ -201,12 +210,13 @@ watch(
         class="col col--7:md col--6:xl is-hidden:sm-down text-right promo-header__content-right promo-header__content-right--auth"
       >
         <div class="promo-header__desktop-links">
+          <BrushLink variant="link block accent" :text-size="textSize" title="进入商城" aria-label="进入 PeakRush 商城" href="/app/" />
           <BrushLink
             class="promo-header__animated-button"
             variant="link block accent"
             :text-size="textSize"
             :title="otherAuthMode.label"
-            :to="otherAuthMode.to"
+            :to="otherAuthTarget"
             :active="isActive(otherAuthMode.to)"
           />
         </div>
@@ -249,6 +259,7 @@ watch(
         <div class="mobile-menu__stub" />
         <div class="mobile-menu__list">
           <ul class="px-1">
+            <li><BrushLink variant="link" text-size="h5" title="进入商城" aria-label="进入 PeakRush 商城" href="/app/" /></li>
             <li v-for="item in HEADER.nav" :key="item.to">
               <BrushLink variant="link" text-size="h5" :title="item.label" :to="item.to" />
             </li>
@@ -263,12 +274,12 @@ watch(
               alt=""
               data-evidence="pending-T01-assets"
             />
-            <BrushLink variant="link" text-size="h5" :title="HEADER.login.label" :to="HEADER.login.to" />
-            <BrushLink variant="link" text-size="h5" :title="HEADER.join.label" :to="HEADER.join.to" />
+            <BrushLink variant="link" text-size="h5" :title="HEADER.login.label" :to="authRoute ? '/signin?redirect=' + encodeURIComponent(safeRedirect(route.query.redirect)) : HEADER.login.to" />
+            <BrushLink variant="link" text-size="h5" :title="HEADER.join.label" :to="authRoute ? '/signup?redirect=' + encodeURIComponent(safeRedirect(route.query.redirect)) : HEADER.join.to" />
           </div>
         </div>
         <div class="mobile-menu__sub-links mt-auto px-1 py-1">
-          <BrushLink variant="link" :title="'Brand Kit'" :href="EXTERNAL.brandKit" external />
+          <BrushLink variant="link" title="抢购指南" :to="EXTERNAL.brandKit" />
         </div>
       </div>
     </AccessibleDialog>
@@ -279,3 +290,7 @@ watch(
     </Teleport>
   </header>
 </template>
+
+<style scoped>
+.promo-header__desktop-links--sections { gap: clamp(10px, 1.3vw, 24px); justify-content: flex-end; }
+</style>

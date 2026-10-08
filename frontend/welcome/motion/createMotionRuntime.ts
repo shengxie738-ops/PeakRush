@@ -186,6 +186,18 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
       registrations.delete(id);
       reg.scene.dispose();
     },
+    scrollTo(target, offset = 0) {
+      if (disposed) return;
+      const wasStopped = lenis.isStopped;
+      // Cancel wheel inertia even when the target already equals the position.
+      lenis.stop();
+      // The stopped class clips overflow, so restore scrolling before positioning.
+      lenis.start();
+      // Routes can change the content height before ResizeObserver has fired.
+      lenis.resize();
+      lenis.scrollTo(target, { offset, immediate: true, force: true });
+      if (wasStopped) lenis.stop();
+    },
     setTestInput(input) {
       if (typeof input.scrollYPx === 'number') {
         testScroll = input.scrollYPx;

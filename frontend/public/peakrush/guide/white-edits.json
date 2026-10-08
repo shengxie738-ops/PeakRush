@@ -1,0 +1,25 @@
+{
+  "tool": "Built-in image_gen",
+  "editedOn": "2026-10-08",
+  "purpose": "White backgrounds for login and order desktop guide cards",
+  "assets": [
+    {
+      "key": "step-login-white",
+      "file": "step-login-white.webp",
+      "editOf": "step-login.webp",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached existing PeakRush card illustration. Change ONLY the black background to a pure solid WHITE #FFFFFF seamless studio background. Preserve the identity tile, profile silhouette, orange glass ring and orange key exactly: same silhouette, individual details, original warm orange and ivory object colors, graphite colors, arrangement, position, proportions, camera angle and scale. Preserve the portrait canvas and original extensive empty space at the bottom for HTML heading overlays. Cleanly remove the black backdrop and black floor/halo, replacing them with solid white; add only a small soft natural neutral contact shadow directly under the object group to ground it on white. Keep the white background outside the tiny contact-shadow region EXACTLY #FFFFFF, particularly entire top and bottom 25% and edges. No gray background, no cream background, no tint, no gradient or border. Do not reinterpret, redesign, enlarge or move the subjects. No lettering, no text, no digits, no watermark. Output one edited image with the same composition as the input.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 54740
+    },
+    {
+      "key": "step-order-white",
+      "file": "step-order-white.webp",
+      "editOf": "step-order.webp",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached existing PeakRush card illustration. Change ONLY the black background to a pure solid WHITE #FFFFFF seamless studio background. Preserve the curled ivory receipt, dark graphite parcel box with orange ribbon, and orange circle with ivory check mark exactly: same silhouette, individual details, original warm orange and ivory object colors, graphite colors, arrangement, position, proportions, camera angle and scale. Preserve the portrait canvas and original extensive empty space at the bottom for HTML heading overlays. Cleanly remove the black backdrop and black floor/halo, replacing them with solid white; add only a small soft natural neutral contact shadow directly under the object group to ground it on white. Keep the white background outside the tiny contact-shadow region EXACTLY #FFFFFF, particularly entire top and bottom 25% and edges. No gray background, no cream background, no tint, no gradient or border. Do not reinterpret, redesign, enlarge or move the subjects. No lettering, no text, no digits, no watermark. Output one edited image with the same composition as the input.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 41566
+    }
+  ]
+}

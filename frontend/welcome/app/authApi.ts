@@ -9,9 +9,7 @@
  *
  * Error text: the backend already answers in Chinese (ApiException.bad("用户名须为
  * 3–40位字母数字下划线…"), "用户名或密码不正确", "用户名已存在"), so its message is
- * passed through verbatim rather than re-worded. Chinese copy on an otherwise English
- * page is expected in sub-project 1 and gets fixed wholesale by sub-project 2. Only
- * the locally-generated fallbacks are English.
+ * passed through verbatim. Locally generated fallbacks use the same Chinese UI.
  */
 export interface AuthUser {
   id: number;
@@ -38,13 +36,13 @@ export class AuthRequestError extends Error {
 const TIMEOUT_MS = 18000;
 
 const STATUS_FALLBACK: Record<number, string> = {
-  400: 'The form was rejected. Check the fields and try again.',
-  401: 'Incorrect username or password.',
-  403: 'You are not allowed to do that.',
-  404: 'That endpoint does not exist.',
-  409: 'That username is already taken.',
-  429: 'Too many attempts. Wait a moment and try again.',
-  503: 'The service is busy. Try again shortly.',
+  400: '请检查填写的信息后重试。',
+  401: '用户名或密码不正确。',
+  403: '当前账号暂时无法完成此操作。',
+  404: '服务暂时不可用，请稍后重试。',
+  409: '该用户名已被使用，请换一个。',
+  429: '操作过于频繁，请稍后重试。',
+  503: '服务繁忙，请稍后重试。',
 };
 
 function isAbort(error: unknown): boolean {
@@ -74,7 +72,7 @@ export async function submitAuth(
       } catch {
         if (response.ok) {
           throw new AuthRequestError(
-            'The server sent something unreadable. Try again.',
+            '暂时无法读取服务响应，请重试。',
             response.status,
             'INVALID_RESPONSE',
           );
@@ -84,7 +82,7 @@ export async function submitAuth(
     if (!response.ok) {
       const body = data as { message?: string; code?: string } | null;
       throw new AuthRequestError(
-        body?.message || STATUS_FALLBACK[response.status] || 'That did not work. Try again.',
+        body?.message || STATUS_FALLBACK[response.status] || '操作未完成，请重试。',
         response.status,
         body?.code || String(response.status),
       );
@@ -100,7 +98,7 @@ export async function submitAuth(
       // `return data as AuthResult` alone would resolve a 200 carrying `{}` and let the
       // caller persist an undefined token, i.e. a login that is visibly broken.
       throw new AuthRequestError(
-        'The server did not return a session. Try again.',
+        '暂时无法获取登录状态，请重试。',
         response.status,
         'INVALID_RESPONSE',
       );
@@ -111,8 +109,8 @@ export async function submitAuth(
     const timedOut = isAbort(error);
     throw new AuthRequestError(
       timedOut
-        ? 'The request timed out. It is safe to try again.'
-        : 'Cannot reach the service. Check the connection and try again.',
+        ? '请求超时，请重试。'
+        : '无法连接服务，请检查网络后重试。',
       0,
       timedOut ? 'TIMEOUT' : 'NETWORK_ERROR',
     );

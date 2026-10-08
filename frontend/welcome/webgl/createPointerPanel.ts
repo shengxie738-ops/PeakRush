@@ -74,7 +74,7 @@ export interface PointerPanelController extends SceneController {
 
 export function createPointerPanel(options: PointerPanelOptions): PointerPanelController {
   const id = options.id ?? 'home.get-seen';
-  const url = options.textureUrl ?? '/assets/product/video-preview.png';
+  const url = options.textureUrl ?? '/peakrush/shopping-scene.png';
 
   const host = new WebGLHost(options.canvas);
   const scene = new THREE.Scene();

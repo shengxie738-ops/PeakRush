@@ -64,7 +64,7 @@ const chunks = computed<Chunk[]>(() => {
 });
 
 function isInternal(href: string): boolean {
-  return href.startsWith('/');
+  return href.startsWith('/') && !href.startsWith('/app/');
 }
 </script>
 

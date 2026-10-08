@@ -1,392 +1,133 @@
 <script setup lang="ts">
-/**
- * AuthPanel.vue — the measured /signin and /signup panel.
- * evidence/reference/signin-measured.md + evidence/reference/signup-measured.md,
- * both captured 2026-10-01 in the in-app Browser at 1376x772 @ dpr 1.5. Every
- * number below is one of those files' rects, or a value derived from them and
- * labelled as such.
- *
- * WHY ONE COMPONENT FOR BOTH ROUTES (the brief asked me to justify this):
- * the two pages are the same nine blocks in the same DOM order inside the same
- * 426.82px column at x=819, and they differ only in *data* — which tab is active
- * (and therefore whether the active slot holds the `h2` or the `a`), the
- * "or … with e-mail" string, the password label, the checkbox set, the submit
- * label, and the left panel's theme + tagline. There is no structural fork.
- * Splitting them would duplicate every derived margin in this file twice, which
- * is exactly the drift that made the old stubs unreviewable.
- *
- * WHAT IS DELIBERATELY NOT HERE (unobserved -> not invented, plan §13.4):
- *  - focus, hover, invalid/error and post-submit states. The `.error-list` is
- *    rendered EMPTY, as measured, because it reserves 10.7067px of the layout;
- *    nothing is ever written into it.
- *  - the artist/curator radio PRESENTATION. The two `<input type=radio>` are
- *    emitted (they are real — signup-measured.md finding 6 read values "artist"
- *    and "curator" off the form element) but no control is drawn around them, so
- *    a single <p data-evidence="pending-T00-subpage"> below the submit states
- *    that gap on both routes.
- *  - "Step 1 of 2". It is legible in the frozen V22 frame but it is NOT in
- *    signup-measured.md's copy list, so there is no measurement behind it and it
- *    is left out. "Remember me for 24 hours" and "I forgot my password" are kept
- *    for the opposite reason: signin-measured.md gives both a rect ([819,473,
- *    426.82,15.28] and [819,526,163.33,17.2]) and both are visible in V21, so
- *    they are measured content, not leftover placeholder copy.
- *
- * NO NETWORK, NO STORAGE: the form is `@submit.prevent` and the handler is a
- * no-op; the OAuth buttons are `type="button"` and go nowhere. Nothing is read
- * from or written to localStorage / sessionStorage / cookies.
- */
-import { computed } from 'vue';
-import { RouterLink } from 'vue-router';
+// Keep the existing split layout while using the PeakRush account API.
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 import DisplayHeading from '@/components/DisplayHeading.vue';
-import { iconAttrs, iconId } from '@/content/assetRegistry';
-import {
-  AUTH_SPLIT,
-  FORM_TABS,
-  OAUTH_PROVIDERS,
-  SIGNIN_COPY,
-  SIGNIN_FIELDS,
-  SIGNUP_STEP1,
-} from '@/content/subpages/auth';
+import { safeRedirect } from '@shared/safe-redirect';
+import { submitAuth, AuthRequestError } from '@/app/authApi';
+import { validateCredentials, type FieldErrors, type FieldName } from '@/app/auth-validation';
+import { AUTH_SPLIT, FORM_TABS, SIGNIN_COPY, SIGNIN_FIELDS, SIGNUP_STEP1 } from '@/content/subpages/auth';
 
 interface AuthField {
-  name: string;
+  name: FieldName;
   type: string;
   label: string;
   required: boolean;
   autocomplete: string;
-  /** /signup's password field carries the measured reveal toggle; /signin's does not. */
   reveal: boolean;
 }
 
-const props = withDefaults(
-  defineProps<{ mode: 'signin' | 'signup'; notice?: string }>(),
-  { notice: '' },
-);
-
+const props = defineProps<{ mode: 'signin' | 'signup' }>();
+const route = useRoute();
 const isSignIn = computed(() => props.mode === 'signin');
-
-/**
- * Left panel: `ui-green` is measured on /signin (AUTH_SPLIT.theme). On /signup
- * the same slot is orange — the V22 frame cannot distinguish it from the ground,
- * and the ground is orange, so ui-orange is the honest reading.
- */
 const panelTheme = computed(() => (isSignIn.value ? 'ui-green' : 'ui-orange'));
 const headerTheme = computed(() => (isSignIn.value ? 'light' : 'orange'));
-const tagline = computed(() =>
-  isSignIn.value ? AUTH_SPLIT.lines.join('\n') : AUTH_SPLIT.signupLines.join(' '),
-);
+const tagline = computed(() => (isSignIn.value ? AUTH_SPLIT.lines : AUTH_SPLIT.signupLines).join('\n'));
+const redirectTarget = computed(() => safeRedirect(route.query.redirect));
+const tabs = computed(() => FORM_TABS.items.map(tab => ({
+  label: tab.label,
+  to: { path: tab.to, query: { redirect: redirectTarget.value } },
+  active: (tab.to === '/signin') === isSignIn.value,
+})));
+const fields = computed<AuthField[]>(() => {
+  const base: AuthField[] = (isSignIn.value ? SIGNIN_FIELDS : SIGNUP_STEP1.fields)
+    .map(field => ({ ...field, reveal: field.type === 'password' }));
+  if (!isSignIn.value) base.push({ name: 'confirm', type: 'password', label: '确认密码', required: true, autocomplete: 'new-password', reveal: true });
+  return base;
+});
+const form = reactive<Record<FieldName, string>>({ username: '', password: '', confirm: '' });
+const revealed = reactive<Record<FieldName, boolean>>({ username: false, password: false, confirm: false });
+const errors = ref<FieldErrors>({});
+const busy = ref(false);
+const serverError = ref('');
+const guidance = ref('');
+let disposed = false;
+onBeforeUnmount(() => { disposed = true; });
+onMounted(() => {
+  try {
+    guidance.value = sessionStorage.getItem('peakrush.authMessage') || '';
+    sessionStorage.removeItem('peakrush.authMessage');
+  } catch { /* The form is usable even when session storage is disabled. */ }
+  if (!guidance.value && route.query.reason === 'expired') guidance.value = '登录已过期，请重新登录后继续。';
+});
+const submitLabel = computed(() => busy.value
+  ? (isSignIn.value ? '登录中…' : '注册中…')
+  : (isSignIn.value ? SIGNIN_COPY.submit : SIGNUP_STEP1.submit));
+const submitClass = ['btn', 'btn--space-between', 'btn--primary', 'btn--accent', 'btn--full', 'btn--block', 'btn--smallish'];
 
-/**
- * Tab pair, in DOM order Join then Login (FORM_TABS.items as measured). The pair
- * is MIRRORED between the routes and active/inactive are different ELEMENT TYPES:
- * the active tab is a bare `h2.text-card-h1` (28.91px, black), the inactive one
- * an `a.btn--link…` (48.01px, rgb(156,156,156)).
- */
-const tabs = computed(() =>
-  FORM_TABS.items.map((tab) => ({
-    label: tab.label,
-    to: tab.to,
-    active: (tab.to === '/signin') === isSignIn.value,
-  })),
-);
-
-const fields = computed<AuthField[]>(() =>
-  isSignIn.value
-    ? SIGNIN_FIELDS.map((f) => ({ ...f, reveal: false }))
-    : SIGNUP_STEP1.fields.map((f) => ({ ...f, reveal: f.type === 'password' })),
-);
-
-const agreements = computed(() => (isSignIn.value ? [] : SIGNUP_STEP1.agreements));
-const orEmail = computed(() => (isSignIn.value ? SIGNIN_COPY.orEmail : SIGNUP_STEP1.orEmail));
-const submitLabel = computed(() => (isSignIn.value ? SIGNIN_COPY.submit : SIGNUP_STEP1.submit));
-
-/**
- * Measured, full list — `btn--primary` is what brings `--btn-background:#000`,
- * and all button paint in this system lives on `.btn:after{inset:0}`, so a bare
- * `.btn` would render transparent. `btn--smallish` is what makes it 28.66 tall.
- */
-const submitClass = [
-  'btn',
-  'btn--space-between',
-  'btn--primary',
-  'btn--accent',
-  'btn--full',
-  'btn--block',
-  'btn--smallish',
-];
-
-/** Measured: `btn btn--space-between btn--outline btn--accent btn--full btn--smallish`. */
-const oauthClass = [
-  'btn',
-  'btn--space-between',
-  'btn--outline',
-  'btn--accent',
-  'btn--full',
-  'btn--smallish',
-];
-
-function keepLocal(): void {
-  /* CLONE-LOCAL: the deliberate no-op that replaces the reference's POST. */
+async function submit(): Promise<void> {
+  if (busy.value) return;
+  serverError.value = '';
+  errors.value = validateCredentials(form, props.mode);
+  if (Object.keys(errors.value).length) return;
+  const target = redirectTarget.value;
+  busy.value = true;
+  try {
+    const result = await submitAuth(props.mode, form.username, form.password);
+    if (disposed) return;
+    localStorage.setItem('peakrush.user', JSON.stringify(result.user));
+    localStorage.setItem('peakrush.token', result.token);
+    window.location.assign(target);
+  } catch (error) {
+    if (!disposed) serverError.value = error instanceof AuthRequestError
+      ? error.message : '暂时无法完成操作，请重试。';
+  } finally {
+    if (!disposed) busy.value = false;
+  }
 }
 </script>
 
 <template>
-  <section
-    class="auth-page layout-split-page"
-    :data-section-id="props.mode"
-    :data-page-header-theme="headerTheme"
-  >
+  <section class="auth-page layout-split-page" :data-section-id="props.mode" :data-page-header-theme="headerTheme">
     <div class="layout-split row layout-split--mobile-background">
-      <!-- --------------------------------------------------- sticky decoration side -->
       <div class="layout-split__bg col col--6:md" :class="[panelTheme, 'ui-background']">
-        <DisplayHeading
-          is="h1"
-          :title="AUTH_SPLIT.heading"
-          :svg-key="props.mode === 'signin' ? 'signin-wordmark' : 'signup-wordmark'"
-          visual-class="layout-split__word"
-        />
+        <DisplayHeading is="h1" :title="AUTH_SPLIT.heading" :svg-key="props.mode === 'signin' ? 'signin-wordmark' : 'signup-wordmark'" visual-class="layout-split__word" />
         <p class="layout-split__tagline text-card-h1 text-box-trim">{{ tagline }}</p>
       </div>
-
-      <!-- -------------------------------------------------------------- the form -->
-      <div
-        class="layout-split__overlay-container col col--6:md ui-light ui-light-background"
-      >
+      <div class="layout-split__overlay-container col col--6:md ui-light ui-light-background">
         <div class="layout-split__content">
           <div class="section">
             <div class="section__layer">
               <div class="row row--gx px-1">
-                <div
-                  class="col col--12 mx-auto:md layout-split__side layout-split-stretch pt-header:md"
-                >
+                <div class="col col--12 mx-auto:md layout-split__side layout-split-stretch pt-header:md">
                   <div class="pb-2 pt-0.75 py-4.5:md layout-split-stretch auth-column">
-                    <!-- tabs: y=134, two 213.07px slots, underline at y=182 -->
                     <div class="auth-tabs">
-                      <div
-                        v-for="tab in tabs"
-                        :key="tab.to"
-                        class="auth-tabs__item"
-                        :class="{ 'is-active': tab.active }"
-                      >
-                        <h2
-                          v-if="tab.active"
-                          class="text-card-h1 text-box-trim text-nowrap auth-tabs__active"
-                        >
-                          {{ tab.label }}
-                        </h2>
-                        <RouterLink
-                          v-else
-                          class="btn btn--link btn--link--small btn--full btn--text-card-h1 auth-tabs__inactive"
-                          :class="tab.to === '/signin' ? 'btn--text-right' : 'btn--text-left'"
-                          :to="tab.to"
-                        >
-                          <span class="btn__content">
-                            <span class="btn__text">
-                              <span class="btn__text-text">{{ tab.label }}</span>
-                            </span>
-                          </span>
+                      <div v-for="tab in tabs" :key="tab.to.path" class="auth-tabs__item" :class="{ 'is-active': tab.active }">
+                        <h2 v-if="tab.active" class="text-card-h1 text-box-trim text-nowrap auth-tabs__active">{{ tab.label }}</h2>
+                        <RouterLink v-else class="btn btn--link btn--link--small btn--full btn--text-card-h1 auth-tabs__inactive" :class="tab.to.path === '/signin' ? 'btn--text-right' : 'btn--text-left'" :to="tab.to">
+                          <span class="btn__content"><span class="btn__text"><span class="btn__text-text">{{ tab.label }}</span></span></span>
                         </RouterLink>
                       </div>
                     </div>
-
-                    <!-- OAuth row: y=240, two 208.64 x 28.66 buttons. Inert — the
-                         provider keys belong to the operator and were not copied. -->
-                    <div class="auth-oauth">
-                      <button
-                        v-for="provider in OAUTH_PROVIDERS"
-                        :key="provider.id"
-                        :class="oauthClass"
-                        type="button"
-                      >
-                        <span class="btn__content">
-                          <span class="btn__text">
-                            <span class="btn__text-text">{{ provider.label }}</span>
-                          </span>
-                          <svg v-bind="iconAttrs(provider.icon)" class="btn__icon" aria-hidden="true">
-                            <use :href="'#' + iconId(provider.icon)" />
-                          </svg>
-                        </span>
-                      </button>
-                    </div>
-
-                    <p class="auth-or">{{ orEmail }}</p>
-
-                    <form class="auth-form" novalidate @submit.prevent="keepLocal">
-                      <!-- Real, measured on the /signup form element. Their
-                           presentation is unobserved, so they stay sr-only. -->
-                      <template v-if="!isSignIn">
-                        <input class="sr-only" type="radio" name="role" value="artist" />
-                        <input class="sr-only" type="radio" name="role" value="curator" />
-                      </template>
-
+                    <div class="auth-oauth" aria-hidden="true" />
+                    <p class="auth-or">{{ isSignIn ? SIGNIN_COPY.orEmail : SIGNUP_STEP1.orEmail }}</p>
+                    <p v-if="guidance" class="auth-demo-notice" role="status">{{ guidance }}</p>
+                    <form class="auth-form" novalidate :aria-busy="busy" @submit.prevent="submit">
                       <template v-for="field in fields" :key="field.name">
-                        <div class="input-text is-empty is-with-label input--base">
-                          <label
-                            :for="'auth-' + mode + '-' + field.name"
-                            class="form-label form-label--floating input-text__label"
-                          >
-                            {{ field.label }}
-                            <span v-if="field.required" class="text-color-error">*</span>
+                        <div class="input-text is-with-label input--base" :class="{ 'is-empty': !form[field.name], 'has-error': errors[field.name] }">
+                          <label :for="'auth-' + mode + '-' + field.name" class="form-label form-label--floating input-text__label">
+                            {{ field.label }} <span v-if="field.required" class="text-color-error">*</span>
                           </label>
                           <div class="input-text__group">
-                            <input
-                              :id="'auth-' + mode + '-' + field.name"
-                              class="input-text__group-input"
-                              :class="{ 'input-text__group-input--password': field.reveal }"
-                              :type="field.type"
-                              :name="field.name"
-                              :autocomplete="field.autocomplete"
-                            />
-                            <!-- Measured on /signup: [1208,418,17.2,17.2], class list
-                                 `btn btn--start btn--link btn--link--heading`. The two
-                                 visual states were never captured, so it is inert and
-                                 marked; the artwork is traced from the frozen V22 frame. -->
-                            <span
-                              v-if="field.reveal"
-                              class="btn btn--start btn--link btn--link--heading auth-reveal"
-                              data-evidence="pending-T01-assets"
-                            >
-                              <span class="btn__content">
-                                <svg class="btn__icon" viewBox="0 0 18 18" aria-hidden="true">
-                                  <circle
-                                    cx="9"
-                                    cy="9"
-                                    r="8.1"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.6"
-                                  />
-                                  <path
-                                    d="M3.5 9c1.6-2.3 3.4-3.4 5.5-3.4S12.9 6.7 14.5 9c-1.6 2.3-3.4 3.4-5.5 3.4S5.1 11.3 3.5 9Z"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.3"
-                                  />
-                                  <circle cx="9" cy="9" r="1.9" fill="currentColor" />
-                                </svg>
-                              </span>
-                            </span>
+                            <input :id="'auth-' + mode + '-' + field.name" v-model="form[field.name]" class="input-text__group-input" :class="{ 'input-text__group-input--password': field.reveal }" :type="field.reveal && revealed[field.name] ? 'text' : field.type" :name="field.name" :autocomplete="field.autocomplete" :required="field.required" :disabled="busy" :aria-invalid="Boolean(errors[field.name])" :aria-describedby="errors[field.name] ? 'auth-error-' + field.name : undefined" @input="errors[field.name] = undefined">
+                            <button v-if="field.reveal" class="btn btn--start btn--link btn--link--heading auth-reveal" type="button" :aria-label="(revealed[field.name] ? '隐藏' : '显示') + field.label" :aria-pressed="revealed[field.name]" :disabled="busy" @click="revealed[field.name] = !revealed[field.name]">
+                              <span class="btn__content"><svg class="btn__icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8.1" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M3.5 9c1.6-2.3 3.4-3.4 5.5-3.4S12.9 6.7 14.5 9c-1.6 2.3-3.4 3.4-5.5 3.4S5.1 11.3 3.5 9Z" fill="none" stroke="currentColor" stroke-width="1.3" /><circle cx="9" cy="9" r="1.9" fill="currentColor" /></svg></span>
+                            </button>
                           </div>
                         </div>
-                        <!-- Measured empty: height 10.7067px, padding-top 9.55494px.
-                             A real <ul>, because that is what the reference uses. It
-                             is a SIBLING of the field block: the block is 55.2px tall
-                             and its .input-text__group is 56.75px, so the list cannot
-                             live inside a box the group already overflows. -->
-                        <ul class="error-list transition-height"></ul>
+                        <ul :id="'auth-error-' + field.name" class="error-list transition-height" :class="{ 'auth-field-error': errors[field.name] }" aria-live="polite"><li v-if="errors[field.name]">{{ errors[field.name] }}</li></ul>
                       </template>
-
-                      <!-- /signin: remember-me + "I forgot my password" -->
-                      <label
-                        v-if="isSignIn"
-                        class="form-label form-label--with-input input-checkbox auth-remember"
-                        for="auth-signin-remember"
-                      >
-                        <input
-                          id="auth-signin-remember"
-                          class="input-checkbox__input sr-only"
-                          type="checkbox"
-                          name="rememberMe"
-                        />
-                        <span class="input-checkbox__box" aria-hidden="true" />
-                        <span class="input-checkbox__text">{{ SIGNIN_COPY.remember }}</span>
-                      </label>
-                      <span
-                        v-if="isSignIn"
-                        class="not-nuxt-link btn btn--space-between btn--link btn--link--sm auth-forgot"
-                        data-evidence="pending-T01-assets"
-                      >
-                        <span class="btn__content">
-                          <!-- 17.2px circle-and-bar glyph, left of the label. It is
-                               not in the captured sprite; traced from V21. -->
-                          <svg class="btn__icon" viewBox="0 0 18 18" aria-hidden="true">
-                            <circle
-                              cx="9"
-                              cy="9"
-                              r="8.1"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="1.4"
-                            />
-                            <path d="M9 4.4v6.2" stroke="currentColor" stroke-width="1.6" />
-                            <path d="M9 12.6v1.2" stroke="currentColor" stroke-width="1.6" />
-                          </svg>
-                          <span class="btn__text">
-                            <span class="btn__text-text">{{ SIGNIN_COPY.forgot }}</span>
-                          </span>
-                        </span>
-                      </span>
-
-                      <!-- /signup: consent (with its two inline links) + newsletter -->
-                      <label
-                        v-for="(row, index) in agreements"
-                        :key="row.name"
-                        class="form-label form-label--with-input input-checkbox input--checkbox auth-consent"
-                        :class="index === 0 ? 'auth-consent--terms' : 'auth-consent--news'"
-                        :for="'auth-signup-' + row.name"
-                      >
-                        <input
-                          :id="'auth-signup-' + row.name"
-                          class="input-checkbox__input sr-only"
-                          type="checkbox"
-                          :name="row.name"
-                        />
-                        <span class="input-checkbox__box" aria-hidden="true" />
-                        <span class="input-checkbox__text">
-                          {{ row.label }}
-                          <RouterLink
-                            v-if="row.linkA"
-                            class="btn btn--link btn--link--underline auth-consent__link"
-                            :to="row.hrefA"
-                            ><span class="btn__content"
-                              ><span class="btn__text">{{ row.linkA }}</span></span
-                            ></RouterLink
-                          >
-                          {{ row.linkB ? 'and' : '' }}
-                          <RouterLink
-                            v-if="row.linkB"
-                            class="btn btn--link btn--link--underline auth-consent__link"
-                            :to="row.hrefB"
-                            ><span class="btn__content"
-                              ><span class="btn__text">{{ row.linkB }}</span></span
-                            ></RouterLink
-                          >
-                        </span>
-                      </label>
-
+                      <p v-if="serverError" class="auth-server-error" role="alert">{{ serverError }}</p>
                       <div class="row row--gx auth-submit">
                         <div class="col col--6">
-                          <button :class="submitClass" type="submit">
-                            <span class="btn__content">
-                              <span class="btn__text">
-                                <span class="btn__text-text">{{ submitLabel }}</span>
-                              </span>
-                              <svg
-                                class="btn__icon auth-submit__icon"
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                              >
-                                <circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" />
-                                <path d="M8 12h8M13 8l4 4-4 4" fill="none" stroke="currentColor" />
-                              </svg>
-                            </span>
+                          <button :class="submitClass" type="submit" :disabled="busy">
+                            <span class="btn__content"><span class="btn__text"><span class="btn__text-text">{{ submitLabel }}</span></span><svg class="btn__icon auth-submit__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" /><path d="M8 12h8M13 8l4 4-4 4" fill="none" stroke="currentColor" /></svg></span>
                           </button>
                         </div>
-                        <!-- The reference's second 6-column slot. On /signup the frozen
-                             frame shows an unmeasured step label in it; it is not in
-                             signup-measured.md's copy list, so it is not rendered. -->
                         <div class="col col--6" />
                       </div>
-
-                      <!-- CLONE-LOCAL: plan §13.4 — the local-demo boundary has to
-                           stay visible on these two routes. Both lines sit in the
-                           empty gutter below the submit, where both frames are
-                           blank, and are one line each so the column stays inside
-                           the measured 724px (containerScrollHeight is 772). -->
-                      <p v-if="notice" class="auth-demo-notice" role="note">{{ notice }}</p>
-                      <p class="auth-demo-notice" data-evidence="pending-T00-subpage">
-                        Artist / curator radio pair: presentation unmeasured.
-                      </p>
+                      <p class="auth-demo-notice">{{ isSignIn ? '登录后，继续你的抢购之旅。' : '创建账号，让心动好物准点相遇。' }}</p>
+                      <a href="/app/" class="auth-business-link">进入商城 →</a>
                     </form>
                   </div>
                 </div>
@@ -399,7 +140,6 @@ function keepLocal(): void {
     </div>
   </section>
 </template>
-
 <style>
 /* ==========================================================================
    Auth panel CSS. Either (a) a reference class the measurement names but that
@@ -653,6 +393,19 @@ body:has(.layout-split-page) .promo-header__previous-bg {
   pointer-events: none;
   position: absolute;
   top: 0;
+  z-index: 1;
+}
+.auth-form .input-text:not(.is-empty) .input-text__label,
+.auth-form .input-text:focus-within .input-text__label {
+  height: auto;
+  padding-top: calc(var(--spacing) * .3);
+  font-size: calc(var(--scale-text-rem) * 1);
+}
+.auth-form .input-text__group-input--password {
+  padding-right: calc(var(--spacing) * 3);
+}
+.auth-form .has-error .input-text__group {
+  border-color: var(--c-error);
 }
 /* Measured 10.7067px total with 9.55494px of padding-top. Empty on both routes;
    kept because it reserves the gap before the next field. */
@@ -661,6 +414,29 @@ body:has(.layout-split-page) .promo-header__previous-bg {
   list-style: none;
   margin: 0;
   padding: calc(var(--scale-px) * 10) 0 0;
+}
+.auth-form .auth-field-error {
+  height: auto;
+  min-height: calc(var(--scale-text-rem) * 1.1);
+  padding: calc(var(--scale-px) * 10) 0;
+  color: var(--c-error);
+  font-size: calc(var(--scale-text-rem) * 1.3);
+  line-height: 1.4;
+}
+.auth-server-error {
+  color: var(--c-error);
+  font-size: calc(var(--scale-text-rem) * 1.3);
+  line-height: 1.4;
+  margin-top: var(--spacing);
+}
+.auth-form button:disabled { cursor: wait; opacity: .6; }
+.auth-business-link {
+  color: var(--t-text);
+  display: inline-block;
+  font-size: calc(var(--scale-text-rem) * 1.3);
+  line-height: 1.4;
+  margin-top: var(--spacing);
+  text-decoration: underline;
 }
 
 /* ---- password reveal ---------------------------------------------------- */

@@ -39,14 +39,9 @@ import { JOIN } from '@/content/home';
 
 <template>
   <div class="fixed-sign-up-button fixed-sign-up-button--transition-header">
-    <!--
-      The reference also carries `not-nuxt-link`, which is Nuxt's marker for "navigate with a
-      full document load". /signup is a local route here, so a RouterLink is the faithful
-      behaviour rather than the faithful class name.
-    -->
-    <RouterLink
+    <a
       class="btn btn--start btn--primary btn--full btn--accent btn--large fixed-sign-up-button__btn"
-      to="/signup"
+      :href="JOIN.to"
     >
       <span class="btn__content">
         <span class="btn__text">{{ JOIN.button }}</span>
@@ -56,7 +51,7 @@ import { JOIN } from '@/content/home';
         </svg>
         <span class="sr-only">{{ JOIN.srLabel }}</span>
       </span>
-    </RouterLink>
+    </a>
   </div>
 </template>
 

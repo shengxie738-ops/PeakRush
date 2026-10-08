@@ -55,7 +55,7 @@ const MESH = {
 };
 /** `L.position.y = e * 16 + y` with desktop y = -3.6. */
 const Y_TRAVEL = 16;
-const TEXTURE_URL = '/assets/decor/image.png';
+const TEXTURE_URL = '/peakrush/collection-wide.png';
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 

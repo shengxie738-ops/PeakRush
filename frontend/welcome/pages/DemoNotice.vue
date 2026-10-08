@@ -1,15 +1,10 @@
 <script setup lang="ts">
 /**
- * DemoNotice.vue — CLONE-LOCAL (src/pages/ lane).
- *
- * Plan §13.4 marks /signin, /signup and /gift-card as local-demo-only pages: the
- * boundary has to stay visible while the page is on screen, so this is a
- * position:fixed notice rather than a banner that scrolls away. It reserves the
- * reference's own bottom gutter (`--spacing`) and steps above the cookie bar with
- * `--cookie-message-height`, both declared in src/styles/tokens.css.
+ * An optional compact storefront notice. It reserves the existing bottom gutter
+ * and steps above the storage banner using the shared layout tokens.
  */
 withDefaults(defineProps<{ text?: string }>(), {
-  text: 'Local clone demo — no request leaves this page, nothing is stored.',
+  text: '进入商城，查看商品与抢购场次。',
 });
 </script>
 

@@ -176,14 +176,14 @@ defineExpose({
               <hr class="mt-3.5 is-hidden:md-up hr-thin" />
             </template>
             <div class="section-2__video-player-wrapper">
-              <div class="section-2__video-player px-1 px-0:md" data-evidence="pending-T00-external-embed">
-                <p class="section-2__video-preview-title text-card-base">
-                  {{ GET_SEEN.modalTitle }}
-                </p>
-                <p class="text-smaller text-color-small">
-                  The reference plays this panel from an external video host; external
-                  embeds are entry-only and are not cloned.
-                </p>
+              <div class="section-2__video-player peakrush-guide px-1">
+                <ol class="peakrush-guide__steps">
+                  <li><span>01</span><strong>登录账号</strong><p>登录或注册 PeakRush，开启抢购之旅。</p></li>
+                  <li><span>02</span><strong>选择场次</strong><p>查看开抢时间、商品价格和限购规则。</p></li>
+                  <li><span>03</span><strong>准点开抢</strong><p>提交抢购后等待处理结果，避免重复创建请求。</p></li>
+                  <li><span>04</span><strong>查看订单</strong><p>抢购成功后，在订单有效时间内完成模拟支付。</p></li>
+                </ol>
+                <BrushLink href="/app/" variant="primary accent" title="进入商城" icon="step-next" />
               </div>
             </div>
           </AccessibleDialog>
@@ -200,4 +200,10 @@ defineExpose({
 .section-2__title-icon-wrap {
   display: contents;
 }
+.peakrush-guide { display: flex; flex-direction: column; justify-content: center; gap: 2rem; padding: 4rem; }
+.peakrush-guide__steps { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.peakrush-guide__steps span { display: block; color: #f4793a; font-size: 3rem; }
+.peakrush-guide__steps strong { display: block; margin: 1rem 0; }
+.peakrush-guide__steps p { font-size: 1.5rem; line-height: 1.7; color: #c5c5c5; }
+@media (max-width: 600px) { .peakrush-guide__steps { grid-template-columns: 1fr; } }
 </style>

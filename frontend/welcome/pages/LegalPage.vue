@@ -1,37 +1,17 @@
 <script setup lang="ts">
-/**
- * LegalPage — one template for /terms-and-conditions, /privacy-policy and
- * /cookies-policy, selected by the route prop.
- *
- * The wording is the reference's own text, lifted from the server-rendered HTML
- * (see evidence/reference/raw and LEGAL_DOCS). Displaying it does not make this
- * local clone a party to it — LEGAL_DISCLAIMER says so on the page itself.
- *
- * Layout is bound to evidence/reference/subpages-measured.md (2026-10-01): the page is
- * a 12-column row whose RIGHT half is the heading column
- * `col col:12 col--6:md col--last:md text-page-title pb-1` at [698, 76, 659, 696], and
- * the heading is a *visible* `h1.text-box-trim.text-right:md.mb-4.mb-0:md` at the h1
- * scale (250.148px measured) — not an sr-only heading paired with a glyph SVG, which is
- * the model the home page uses. Prose occupies the left 6 columns.
- *
- * Two earlier defects lived here: the wrapper carried a hardcoded `ui-light`, which
- * forced a white ground on routes the reference tints pink/green/pink, and the heading
- * was a full-width banner stacked above the prose.
- */
+/** 三类使用说明共用双栏模板与路由配色。 */
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import SiteFooter from '@/components/SiteFooter.vue';
-import { LEGAL_DOCS, LEGAL_DISCLAIMER, type LegalBlock } from '@/content/subpages/legal';
+import { LEGAL_DOCS, LEGAL_NOTICE, type LegalBlock } from '@/content/subpages/legal';
 
 const props = defineProps<{ document: 'terms-and-conditions' | 'privacy-policy' | 'cookies-policy' }>();
 const doc = computed(() => LEGAL_DOCS[props.document]);
 
-/** The page ground is a route property, so take it from the route instead of fixing it. */
 const route = useRoute();
 const theme = computed(() => (route.meta.theme as string) ?? 'light');
 
-/** Consecutive `li` blocks become one real list so the reading order is semantic,
- *  not a run of paragraphs styled as bullets. */
+/** 相邻的条目合为一个语义化列表。 */
 type Run = { kind: 'block'; block: LegalBlock } | { kind: 'list'; blocks: LegalBlock[] };
 const runs = computed<Run[]>(() => {
   const out: Run[] = [];
@@ -67,11 +47,11 @@ const runs = computed<Run[]>(() => {
           <p v-else>{{ run.block.x }}</p>
         </template>
         <aside class="legal-disclaimer">
-          <p v-for="(line, i) in LEGAL_DISCLAIMER" :key="i">{{ line }}</p>
+          <p v-for="(line, i) in LEGAL_NOTICE" :key="i">{{ line }}</p>
         </aside>
       </div>
       <div class="col col:12 col--6:md col--last:md text-page-title pb-1">
-        <h1 class="text-box-trim text-right:md mb-4 mb-0:md">{{ doc?.title ?? props.document }}</h1>
+        <h1 class="text-box-trim text-right:md mb-4 mb-0:md">{{ doc?.title ?? '使用说明' }}</h1>
         <p class="text-page-updated">{{ doc?.lastUpdated }}</p>
         <hr />
       </div>
@@ -81,9 +61,7 @@ const runs = computed<Run[]>(() => {
 </template>
 
 <style>
-/* CLONE-LOCAL: the reference heading column is the right half of the grid and the
-   prose the left half; `col--last:md` supplies the order. Nothing here overrides a
-   measured value — it only stops the 250px heading from forcing the row wider. */
+/* 保留右侧标题栏，长标题在栏内换行。 */
 .text-page-title h1 {
   overflow-wrap: break-word;
 }

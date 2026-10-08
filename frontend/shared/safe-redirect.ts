@@ -11,11 +11,14 @@
  * else — including same-origin '/' and '/signin' — falls back.
  */
 export function safeRedirect(value: unknown, fallback = '/app/'): string {
-  if (typeof value !== 'string') return fallback;
-  const isAppPath =
-    value === '/app' ||
-    value.startsWith('/app/') ||
-    value.startsWith('/app?') ||
-    value.startsWith('/app#');
-  return isAppPath ? value : fallback;
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) return fallback;
+  if (/[\\\u0000-\u0020]/.test(value)) return fallback;
+  try {
+    // Check the browser-normalized path as well: /app/../signin escapes /app.
+    const url = new URL(value, 'https://peakrush.invalid');
+    const isAppPath = url.pathname === '/app' || url.pathname.startsWith('/app/');
+    return url.origin === 'https://peakrush.invalid' && isAppPath ? value : fallback;
+  } catch {
+    return fallback;
+  }
 }

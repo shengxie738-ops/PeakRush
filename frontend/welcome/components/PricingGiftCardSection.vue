@@ -92,6 +92,7 @@ const playButtonStyle = {
                       aria-hidden="true"
                       v-html="wordmark"
                     />
+                    <span v-if="wordmark" class="page-title__visual text-h2 is-hidden:md-up" aria-hidden="true">{{ GIFT_CARD.titleText }}</span>
                     <span
                       v-else
                       class="page-title__visual text-h2"
@@ -121,9 +122,9 @@ const playButtonStyle = {
                    Rendered as a <span> because the reference is a span too — its click
                    destination was never captured, so no href is invented here.
                    This closes the 314px of column content previously left empty. -->
-              <span class="gift-card-section__cta not-nuxt-link btn btn--space-between btn--accent btn--large">
+              <a href="/app/" class="gift-card-section__cta not-nuxt-link btn btn--space-between btn--accent btn--large">
                 <span class="btn__content">{{ GIFT_CARD.ctaText }}</span>
-              </span>
+              </a>
             </div>
 
             <div class="gift-card-section__form-wrapper col col-12 col--6:md">
@@ -136,14 +137,14 @@ const playButtonStyle = {
                 <!-- The video source was never captured (`GIFT_CARD.video.playable` is false), so
                      this is the measured 56x56 black square with the 9x15 white triangle in it —
                      not a control, because no observed behaviour belongs to it. -->
-                <span
+                <a
                   class="gift-card-section__video-preview-play-btn"
                   :style="playButtonStyle"
-                  data-evidence="pending-T00-subpage"
-                  aria-hidden="true"
+                  href="/app/"
+                  aria-label="进入商城发现好物"
                 >
                   <img class="gift-card-section__video-preview-play-icon" :src="GIFT_CARD.video.playIcon" alt="" />
-                </span>
+                </a>
                 <p class="gift-card-section__video-preview-text text-bit-small">
                   <template v-for="(line, i) in GIFT_CARD.video.lines" :key="line"
                     >
@@ -168,14 +169,15 @@ const playButtonStyle = {
                 <p class="gift-card-section__closing text-small">{{ GIFT_CARD.closing }}</p>
                 <p class="gift-card-section__after-purchase text-small">{{ GIFT_CARD.afterPurchase }}</p>
 
-                <div class="buying-gift-card-form" data-evidence="pending-T00-subpage"></div>
+                <div class="buying-gift-card-form">
+                  <a class="btn btn--primary" href="/app/">查看商品与场次</a>
+                </div>
                 <hr class="gift-card-section__divider" />
-                <div class="gift-card-section__trustpilot" data-evidence="pending-T00-subpage"></div>
 
                 <p class="gift-card-section__partners-title text-bit-small">{{ GIFT_CARD.mediaTitle }}</p>
                 <ul class="gift-card-section__partners">
-                  <li v-for="partner in partners" :key="partner">
-                    <img :src="GIFT_CARD.partnersDirectory + partner" :alt="partner.replace(/\.[a-z]+$/, '')" />
+                  <li v-for="(partner, index) in partners" :key="partner">
+                    <a href="/app/"><img :src="GIFT_CARD.partnersDirectory + partner" :alt="GIFT_CARD.partnerLabels[index]" /></a>
                   </li>
                 </ul>
               </div>
@@ -279,6 +281,7 @@ const playButtonStyle = {
     bottom: var(--spacing);
     left: var(--spacing);
     position: absolute;
+    color: var(--c-white);
   }
   /* The reference panel carries `pt-1.25 pt-4.25:md ui-light`; the horizontal
      gutter is DERIVED (it matches the --spacing inset the left column gets from
@@ -333,12 +336,18 @@ const playButtonStyle = {
   .gift-card-section__partners li {
     align-items: center;
     display: flex;
-    height: calc(var(--scale-px) * 42);
+    height: auto;
     justify-content: center;
   }
   .gift-card-section__partners img {
-    height: 100%;
-    width: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+  }
+  .gift-card-section__partners a {
+    display: block;
+    width: 100%;
   }
   /* The reference's `.title` measures 630.688px inside a 640.229px
      `.gift-card-section__title`: the difference is exactly half of

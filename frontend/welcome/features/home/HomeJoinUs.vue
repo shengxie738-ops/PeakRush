@@ -6,7 +6,7 @@
  *
  * The measured footer text order lives in <SiteFooter>, rendered here inside the
  * .section-10 flow exactly where the reference puts it (after <hr class="my-1">).
- * The 18-photo .image-trail keeps the reference DOM; photos 4-18 carry the
+ * The 10-photo .image-trail keeps the reference DOM; photos 4-10 carry the
  * reference's own `is-hidden` class because the pointer trail that reveals them is
  * motion the ImageTrail component drives with a pointer tracker — dropped under
  * prefers-reduced-motion, and out of scope for a static DOM clone.
@@ -119,9 +119,9 @@ defineExpose({ sectionId: JOIN.sectionId, root });
                         :aria-label="JOIN.ariaLabel"
                         size="large"
                         icon="step-next"
-                        to="/signup"
+                        :href="JOIN.to"
                         >
-Join<span class="sr-only">{{ JOIN.ariaLabel }}</span>
+{{ JOIN.button }}<span class="sr-only">{{ JOIN.ariaLabel }}</span>
 </BrushLink
                       >
                     </div>

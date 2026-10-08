@@ -59,17 +59,20 @@ foreach($module in @('backend','gateway')){
 }
 $vite=Join-Path $projectRoot 'frontend\node_modules\vite\bin\vite.js'
 if(!(Test-Path $vite)){throw 'Vite not installed; run without -SkipBuild'}
-$started+=Start-App 'frontend' $node "`"$vite`" --host 127.0.0.1 --port 5179 --strictPort" (Join-Path $projectRoot 'frontend') 5179 $vite
+$started+=Start-App 'frontend' $node "`"$vite`" --host 127.0.0.1 --port 5400 --strictPort" (Join-Path $projectRoot 'frontend') 5400 $vite
 $started|ConvertTo-Json|Set-Content -LiteralPath $manifest -Encoding utf8
-foreach($url in @('http://127.0.0.1:8081/actuator/health','http://127.0.0.1:8080/actuator/health','http://127.0.0.1:5179')){
+foreach($url in @('http://127.0.0.1:8081/actuator/health','http://127.0.0.1:8080/actuator/health','http://127.0.0.1:5400/app/')){
  $ready=$false
  for($attempt=0;$attempt -lt 60;$attempt++){
-  try {$r=Invoke-WebRequest -Uri $url -TimeoutSec 2 -UseBasicParsing;if($r.StatusCode -eq 200){$ready=$true;break}}catch{}
+  try {
+   if($url -eq 'http://127.0.0.1:5400/app/'){$r=Invoke-WebRequest -Uri $url -Headers @{Accept='text/html'} -TimeoutSec 2 -UseBasicParsing}else{$r=Invoke-WebRequest -Uri $url -TimeoutSec 2 -UseBasicParsing}
+   if($r.StatusCode -eq 200){$ready=$true;break}
+  }catch{}
   Start-Sleep -Seconds 1
  }
  if(!$ready){throw "Not ready: $url. Inspect logs in $runRoot"}
 }
-Write-Host 'PeakRush ready: http://127.0.0.1:5179'
+Write-Host 'PeakRush ready: http://127.0.0.1:5400'
 Write-Host 'Local demo users: demo / demo12345, admin / admin12345'
 Write-Host "Lab faults enabled: $Lab"
 

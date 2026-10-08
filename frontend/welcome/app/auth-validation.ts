@@ -39,15 +39,15 @@ export function validateCredentials(
   const username = input.username.trim();
 
   if (!USERNAME_PATTERN.test(username)) {
-    errors.username = 'Username must be 3-40 letters, digits or underscores.';
+    errors.username = '用户名须为 3–40 位字母、数字或下划线。';
   }
   if (input.password.length < PASSWORD_MIN_CHARS) {
-    errors.password = `Password must be at least ${PASSWORD_MIN_CHARS} characters.`;
+    errors.password = `密码至少需要 ${PASSWORD_MIN_CHARS} 个字符。`;
   } else if (passwordByteLength(input.password) > PASSWORD_MAX_BYTES) {
-    errors.password = `Password must be at most ${PASSWORD_MAX_BYTES} bytes.`;
+    errors.password = `密码长度不能超过 ${PASSWORD_MAX_BYTES} 字节。`;
   }
   if (mode === 'signup' && input.confirm !== input.password) {
-    errors.confirm = 'The two passwords do not match.';
+    errors.confirm = '两次输入的密码不一致。';
   }
   return errors;
 }

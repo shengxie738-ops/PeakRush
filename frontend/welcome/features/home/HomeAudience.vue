@@ -112,7 +112,7 @@ defineExpose({ sectionId: AUDIENCE.sectionId, root });
 
             <div class="section-3__loop-carousel mt-1 mt-0:md">
               <ul v-for="group in groups" :key="group" class="section-3__loop-group">
-                <li v-for="member in members" :key="member.name + group" class="section-3__card">
+                <li v-for="(member, memberIndex) in members" :key="group + '-' + memberIndex" class="section-3__card">
                   <div class="section-3__card-content">
                     <div class="section-3__card-content-item section-3__card-content-name text-smaller">
                       <p class="section-3__card-content-item-text">{{ member.name }}</p>
@@ -142,7 +142,7 @@ defineExpose({ sectionId: AUDIENCE.sectionId, root });
                     :src="member.photo ?? ''"
                     :width="160"
                     :height="160"
-                    alt=""
+                    :alt="member.name"
                     :data-evidence="member.photo ? undefined : 'pending-T01-assets'"
                     loading="lazy"
                     draggable="false"

@@ -38,6 +38,7 @@
  * implemented here as an ease-in-out and marked DERIVED.
  */
 import * as THREE from 'three';
+import { productPhoto } from '@/content/productCatalog';
 import type { FrameInput, SceneController, SectionId } from '@/motion/motion.types';
 import { WebGLHost } from './createWebGLHost';
 import { textureRegistry } from './textureRegistry';
@@ -110,7 +111,7 @@ export function cardLayout(index: number, pointerX: number, u: number): CardLayo
   };
 }
 
-const reviewUrl = (i: number): string => `/assets/decor/Review-${i + 1}.png`;
+const reviewUrl = (i: number): string => productPhoto(i + 1);
 
 export interface TestimonialCarouselOptions {
   canvas: HTMLCanvasElement;

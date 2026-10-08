@@ -1,0 +1,39 @@
+{
+  "tool": "Built-in image_gen",
+  "generatedOn": "2026-10-08",
+  "purpose": "Desktop homepage, four flash-sale guide card fronts. Artwork only; numbers and labels remain real HTML.",
+  "assets": [
+    {
+      "key": "step-login",
+      "file": "step-login.webp",
+      "prompt": "Use case: stylized-concept. Asset type: one portrait 4:5 illustration for a desktop PeakRush flash-sale guide flip card. Generate a polished premium 3D editorial object illustration, not a screenshot or an interface mockup. Unified art direction: pure black #000000 seamless background; warm vivid orange #f4793a glossy resin and softly lit ivory ceramic, a few dark graphite metallic details; precise tactile materials and soft refined studio rim lighting. Straight-on three-quarter still-life view, crisp sculptural forms, restrained intentional composition. One compact coherent focal group fits within middle 65% of canvas width, placed in upper-middle area: its center at 43% canvas height; all important objects entirely inside 12%-73% canvas height. Leave the top 10% and entire bottom 25% pure black and empty for real HTML number and heading overlays. Absolutely NO text, NO digits, NO typography, NO letters, NO watermark, NO third-party logos, NO border, NO full UI panels, NO extra decorative confetti, NO people. Full bleed pure black portrait canvas, strong silhouette legible at a 280px card width.\nPrimary request: visualize signing in to your account. Subject: an ivory sculptural profile identity tile with a simple embossed circular head and rounded shoulders, a vivid orange translucent rounded ring framing the profile, and a small orange sculptural key resting diagonally in front. Identity tile is tilted very slightly in perspective. Beautiful tangible shapes, profile symbol easy to recognize. Key and ring are supporting accents, compact composition.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 57890
+    },
+    {
+      "key": "step-session",
+      "file": "step-session.webp",
+      "prompt": "Use case: stylized-concept. Asset type: one portrait 4:5 illustration for a desktop PeakRush flash-sale guide flip card. Generate a polished premium 3D editorial object illustration, not a screenshot or an interface mockup. Unified art direction: pure black #000000 seamless background; warm vivid orange #f4793a glossy resin and softly lit ivory ceramic, a few dark graphite metallic details; precise tactile materials and soft refined studio rim lighting. Straight-on three-quarter still-life view, crisp sculptural forms, restrained intentional composition. One compact coherent focal group fits within middle 65% of canvas width, placed in upper-middle area: its center at 43% canvas height; all important objects entirely inside 12%-73% canvas height. Leave the top 10% and entire bottom 25% pure black and empty for real HTML number and heading overlays. Absolutely NO text, NO digits, NO typography, NO letters, NO watermark, NO third-party logos, NO border, NO full UI panels, NO extra decorative confetti, NO people. Full bleed pure black portrait canvas, strong silhouette legible at a 280px card width.\nPrimary request: visualize choosing a flash-sale session and checking its start time. Subject: one small ivory desk-calendar slab, slightly tilted, with two orange binding loops and a clean regular grid of shallow embossed square date cells, exactly one cell orange and selected. No numerals or lettering. A small orange analog clock with ivory face and simple hands, no numbers, rests at lower right of the calendar. Compact unified calendar-and-clock still life.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 49156
+    },
+    {
+      "key": "step-rush",
+      "file": "step-rush.webp",
+      "prompt": "Use case: stylized-concept. Asset type: one portrait 4:5 illustration for a desktop PeakRush flash-sale guide flip card. Generate a polished premium 3D editorial object illustration, not a screenshot or an interface mockup. Unified art direction: pure black #000000 seamless background; warm vivid orange #f4793a glossy resin and softly lit ivory ceramic, a few dark graphite metallic details; precise tactile materials and soft refined studio rim lighting. Straight-on three-quarter still-life view, crisp sculptural forms, restrained intentional composition. One compact coherent focal group fits within middle 65% of canvas width, placed in upper-middle area: its center at 43% canvas height; all important objects entirely inside 12%-73% canvas height. Leave the top 10% and entire bottom 25% pure black and empty for real HTML number and heading overlays. Absolutely NO text, NO digits, NO typography, NO letters, NO watermark, NO third-party logos, NO border, NO full UI panels, NO extra decorative confetti, NO people. Full bleed pure black portrait canvas, strong silhouette legible at a 280px card width.\nPrimary request: visualize taking part in a timed flash sale. Subject: a sculptural vivid orange shopping bag with a thick rounded handle, a beautiful simple ivory over-ear headphone product partially emerging from the bag, and a small glossy orange lightning bolt in front on the lower right. The headphone is a physical consumer product with rounded earpads, no brand marks. Energetic but carefully composed compact bag-product-lightning group. No receipt, no price, no text.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 54030
+    },
+    {
+      "key": "step-order",
+      "file": "step-order.webp",
+      "prompt": "Use case: stylized-concept. Asset type: one portrait 4:5 illustration for a desktop PeakRush flash-sale guide flip card. Generate a polished premium 3D editorial object illustration, not a screenshot or an interface mockup. Unified art direction: pure black #000000 seamless background; warm vivid orange #f4793a glossy resin and softly lit ivory ceramic, a few dark graphite metallic details; precise tactile materials and soft refined studio rim lighting. Straight-on three-quarter still-life view, crisp sculptural forms, restrained intentional composition. One compact coherent focal group fits within middle 65% of canvas width, placed in upper-middle area: its center at 43% canvas height; all important objects entirely inside 12%-73% canvas height. Leave the top 10% and entire bottom 25% pure black and empty for real HTML number and heading overlays. Absolutely NO text, NO digits, NO typography, NO letters, NO watermark, NO third-party logos, NO border, NO full UI panels, NO extra decorative confetti, NO people. Full bleed pure black portrait canvas, strong silhouette legible at a 280px card width.\nPrimary request: visualize checking your order after a flash sale. Subject: an ivory sculptural order receipt sheet with a gently curling lower edge, several shallow abstract horizontal embossed rows (no actual writing), two small outlined square item marks, and a vivid orange circular badge with a bold ivory raised check mark overlapping the receipt at the lower right. A small neatly closed graphite parcel box behind the receipt supports the shopping context. Compact unified receipt-and-confirmation still life. No numerals or lettering.",
+      "width": 1122,
+      "height": 1402,
+      "bytes": 51086
+    }
+  ]
+}

@@ -20,6 +20,7 @@ export interface SceneController {
 export interface MotionRuntime {
   register(scene: SceneController, range?: ScrollRange): void;
   unregister(id: SectionId): void;
+  scrollTo(target: number | HTMLElement, offset?: number): void;
   setTestInput(input: { scrollYPx?: number; elapsedSec?: number; pointerNdc?: { x: number; y: number }; reducedMotion?: boolean }): void;
   dispose(): void;
 }

@@ -1,347 +1,150 @@
-/**
- * pricing.ts — the ONE source of price truth for every sub-page in this clone.
- *
- * Provenance (captured 2026-09-30 in the in-app browser, same-origin fetch of
- * https://follow.art/pricing, viewport 1376x772 @ dpr 1.5):
- *   the page's own Nuxt payload carries, in `pinia.subscriptionPrices.pricesData`,
- *   `subscribeWeeklyPrice: 5.99`, `subscribeMonthlyPrice: 11.99`,
- *   `subscribeAnnuallyPrice: 59.88`, `subscribeCurrency: "usd"`.
- *   Nothing else on the page is a price: every displayed amount, period label and
- *   unit in this clone is derived from SUBSCRIPTION_PRICES below.
- *
- * Measured render (verified by clicking each radio and reading the DOM):
- *   annually -> primary "US$4.99 / mo." (sr-only "US$4.99 per month"),
- *               secondary "US$59.88 / year" (sr-only "US$59.88 per year"),
- *               promo "US$4.99/mo."
- *   monthly  -> primary "US$11.99 / mo.", secondary "US$143.88 / year",
- *               promo "US$11.99/mo."
- *   weekly   -> primary "US$5.99 / wk.",  secondary "US$311.48 / year",
- *               promo "US$5.99/w."
- * i.e. the secondary figure is always the annualised cost of the selected cycle
- * (annually x1, monthly x12, weekly x52) and the annual cycle is shown as its
- * monthly equivalent. Those are computed here, never written out.
- */
-
+/** 活动规则。保留既有选项 id 和双栏结构，呈现真实购物流程。 */
 export type BillingCycle = 'annually' | 'monthly' | 'weekly';
 
-/** The frozen figures, exactly as the reference payload states them. */
-export const SUBSCRIPTION_PRICES = Object.freeze({
-  currency: 'usd' as const,
-  /** Displayed prefix measured on the rendered page ("US$", not "$"). */
-  displayPrefix: 'US$',
-  weekly: 5.99,
-  monthly: 11.99,
-  annually: 59.88,
-  /** Number of each cycle inside one year — drives the annualised figure. */
-  perYear: { weekly: 52, monthly: 12, annually: 1 } as const,
-  /** Reference capture stamp, kept so the figures can be re-verified. */
-  capturedAt: '2026-09-30',
-  capturedFrom: '/pricing Nuxt payload `subscriptionPrices.pricesData`',
-});
-
-export function round2(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-/** The only money formatter in the clone. */
-export function moneyWithPrefix(value: number, prefix: string): string {
-  return `${prefix}${round2(value).toFixed(2)}`;
-}
-
-export function money(value: number): string {
-  return moneyWithPrefix(value, SUBSCRIPTION_PRICES.displayPrefix);
-}
-
-/** /our-product paints "$5.99", /pricing paints "US$5.99" (both measured). */
-export const SHORT_DISPLAY_PREFIX = '$';
-
 export interface PriceFigure {
-  /** Visible amount, e.g. "US$59.88". */
   amount: string;
-  /** Visible unit suffix as measured, e.g. "/ year". */
   unit: string;
-  /** Screen-reader sentence: "<amount> per <period>". */
   srOnly: string;
   period: string;
 }
-
 export interface CycleSpec {
   id: BillingCycle;
-  /** Radio label, measured order: Annual, Monthly, Weekly. */
   label: string;
-  /** Price block the reference paints first (text-color-heading). */
   primary: PriceFigure;
-  /** Annualised price block. */
   annualised: PriceFigure;
-  /** Inline figure of the promo sentence, e.g. "US$4.99/mo.". */
   promoFigure: string;
 }
 
-/** `input[value]` order measured in `.radio-group__options`. */
 export const BILLING_CYCLES: readonly CycleSpec[] = [
   {
-    id: 'annually',
-    label: 'Annual',
-    primary: {
-      amount: money(SUBSCRIPTION_PRICES.annually / SUBSCRIPTION_PRICES.perYear.monthly),
-      unit: '/ mo.',
-      period: 'month',
-      srOnly: `${money(SUBSCRIPTION_PRICES.annually / SUBSCRIPTION_PRICES.perYear.monthly)} per month`,
-    },
-    annualised: {
-      amount: money(SUBSCRIPTION_PRICES.annually),
-      unit: '/ year',
-      period: 'year',
-      srOnly: `${money(SUBSCRIPTION_PRICES.annually)} per year`,
-    },
-    promoFigure: `${money(SUBSCRIPTION_PRICES.annually / SUBSCRIPTION_PRICES.perYear.monthly)}/mo.`,
+    id: 'weekly', label: '准备',
+    primary: { amount: '01', unit: '准备', srOnly: '第一步，提前准备', period: '准备' },
+    annualised: { amount: '先登录', unit: '', srOnly: '参与前注册或登录账户', period: '账户' },
+    promoFigure: '提前准备',
   },
   {
-    id: 'monthly',
-    label: 'Monthly',
-    primary: {
-      amount: money(SUBSCRIPTION_PRICES.monthly),
-      unit: '/ mo.',
-      period: 'month',
-      srOnly: `${money(SUBSCRIPTION_PRICES.monthly)} per month`,
-    },
-    annualised: {
-      amount: money(SUBSCRIPTION_PRICES.monthly * SUBSCRIPTION_PRICES.perYear.monthly),
-      unit: '/ year',
-      period: 'year',
-      srOnly: `${money(SUBSCRIPTION_PRICES.monthly * SUBSCRIPTION_PRICES.perYear.monthly)} per year`,
-    },
-    promoFigure: `${money(SUBSCRIPTION_PRICES.monthly)}/mo.`,
+    id: 'annually', label: '开抢',
+    primary: { amount: '02', unit: '开抢', srOnly: '第二步，场次开始后提交抢购', period: '开抢' },
+    annualised: { amount: '选场次', unit: '', srOnly: '确认时间与商品，选择活动场次', period: '场次' },
+    promoFigure: '提交抢购',
   },
   {
-    id: 'weekly',
-    label: 'Weekly',
-    primary: {
-      amount: money(SUBSCRIPTION_PRICES.weekly),
-      unit: '/ wk.',
-      period: 'week',
-      srOnly: `${money(SUBSCRIPTION_PRICES.weekly)} per week`,
-    },
-    annualised: {
-      amount: money(SUBSCRIPTION_PRICES.weekly * SUBSCRIPTION_PRICES.perYear.weekly),
-      unit: '/ year',
-      period: 'year',
-      srOnly: `${money(SUBSCRIPTION_PRICES.weekly * SUBSCRIPTION_PRICES.perYear.weekly)} per year`,
-    },
-    promoFigure: `${money(SUBSCRIPTION_PRICES.weekly)}/w.`,
+    id: 'monthly', label: '下单',
+    primary: { amount: '03', unit: '下单', srOnly: '第三步，查看订单并体验模拟支付', period: '订单' },
+    annualised: { amount: '查订单', unit: '', srOnly: '在订单页确认抢购结果', period: '结果' },
+    promoFigure: '确认订单',
   },
 ] as const;
 
-export const DEFAULT_BILLING_CYCLE: BillingCycle = 'annually';
-
+export const DEFAULT_BILLING_CYCLE: BillingCycle = 'weekly';
 export function cycleById(id: BillingCycle): CycleSpec {
-  const found = BILLING_CYCLES.find((cycle) => cycle.id === id);
-  if (!found) throw new Error(`unknown billing cycle ${id}`);
+  const found = BILLING_CYCLES.find((option) => option.id === id);
+  if (!found) throw new Error('unknown shopping step ' + id);
   return found;
 }
 
-/* --------------------------------------------------------------------- plans
- * The two comparison frames are NOT one table with per-plan flags: measured row-by-row
- * (evidence/reference/pricing-plans-difference-measured.md) they differ in labels, in row
- * order, in how rows are grouped into `ul.plans-difference__sub-list`, and in whether a row
- * paints a tooltip at all. So each column is its own measured list.
- *
- *   Pro frame     one sub-list per group; rows Starter already has carry
- *                 `plans-difference__list-item_free`.
- *   Starter frame one sub-list PER ROW; rows Pro has that Starter lacks are painted
- *                 disabled (`_list-item_disabled is-hidden:sm-down`, promo-more-close,
- *                 label only — no tooltip wrapper).
- */
-
 export interface PlanFeatureRow {
   label: string;
-  /**
-   * `.tooltip .plans-difference__tooltip-content`, verbatim. `null` is measured, not missing:
-   * a disabled row renders no tooltip wrapper, so its label is the whole item.
-   */
   tooltip: string | null;
-  /** Pro paints this row `plans-difference__list-item_free`. Starter never uses it. */
   freeForPro?: boolean;
-  /** Starter paints this row disabled. Pro never uses it. */
   disabled?: boolean;
 }
-
 export interface PlanFeatureGroup {
   title: string;
-  /** In the Starter frame the `Support` and `Insights` group `<li>` carry `is-hidden:sm-down`. */
   hiddenOnSmall?: boolean;
   rows: readonly PlanFeatureRow[];
 }
 
 export const PRO_FEATURE_GROUPS: readonly PlanFeatureGroup[] = [
   {
-    title: 'Presentation',
+    title: '参与准备',
     rows: [
-      { label: 'Profile', tooltip: 'The essential identity section of your Card', freeForPro: true },
-      { label: 'Full portfolio', tooltip: 'Up to 50 artworks or projects with descriptions' },
-      { label: 'Extended links', tooltip: 'Links to your website, CV, socials, e-commerce, and publications' },
+      { label: '先登录', tooltip: '参加抢购前，先注册或登录 PeakRush 账户。', freeForPro: true },
+      { label: '看商品', tooltip: '了解商品介绍与活动展示信息，根据自己的需求选择。' },
+      { label: '选场次', tooltip: '确认场次开始时间、结束时间和活动状态。' },
     ],
   },
   {
-    title: 'Sharing',
+    title: '活动时间',
     rows: [
-      { label: 'Link sharing', tooltip: 'Share your Card through a direct link', freeForPro: true },
-      { label: 'QR sharing', tooltip: 'Download printable QR code templates to use at events' },
-      { label: 'Add to Wallet', tooltip: 'Keep your Card ready in your phone Wallet for exhibitions, meetings, and events' },
+      { label: '限时参与', tooltip: '活动只在对应场次的有效时间内开放。', freeForPro: true },
+      { label: '准时开抢', tooltip: '场次开始后，进入商品或活动页面提交抢购请求。' },
+      { label: '关注状态', tooltip: '未开始、进行中和已结束等状态，以商城实时展示为准。' },
     ],
   },
   {
-    title: 'Connections',
+    title: '活动库存',
     rows: [
-      { label: 'Connectory', tooltip: 'Discover and be discovered by curators and artists globally', freeForPro: true },
-      { label: 'Community Board', tooltip: 'Access opportunities, updates, and collaboration invites', freeForPro: true },
-      { label: 'Book a studio visit / meeting', tooltip: 'Let others request a studio visit or professional meeting directly through your Card' },
+      { label: '限量库存', tooltip: '每场活动的库存有限，库存不足时可能无法成功下单。', freeForPro: true },
+      { label: '等待结果', tooltip: '提交后等待系统返回结果，避免连续重复操作。', freeForPro: true },
+      { label: '结果为准', tooltip: '是否抢购成功，以系统返回与订单页面的信息为准。' },
     ],
   },
-  {
-    title: 'Support',
-    rows: [
-      { label: 'Support My Practice', tooltip: 'Let people financially support your artistic or curatorial practice' },
-    ],
-  },
-  {
-    title: 'Insights',
-    rows: [
-      { label: 'Card statistics', tooltip: 'See views, scans, search appearances, and mentions to understand how people engage with your Card' },
-    ],
-  },
+  { title: '活动价格', rows: [{ label: '确认金额', tooltip: '活动价格与订单成交金额，以商城对应页面显示为准。' }] },
+  { title: '下一步', rows: [{ label: '查看订单', tooltip: '成功生成订单后，进入订单页核对商品、金额与状态。' }] },
 ] as const;
 
-/**
- * The Starter column. Note `Sharing` puts Add to Wallet before QR sharing, which is the reverse of
- * the Pro column — the disabled rows are pushed to the end of their group, so the two frames share
- * one row grid and `row--stretch` has something to align.
- */
 export const STARTER_FEATURE_GROUPS: readonly PlanFeatureGroup[] = [
   {
-    title: 'Presentation',
+    title: '订单确认',
     rows: [
-      { label: 'Profile', tooltip: 'The essential identity section of your Card' },
-      { label: 'Basic portfolio', tooltip: 'Two images to introduce your practice' },
-      { label: 'Basic links', tooltip: 'Two links' },
+      { label: '核对商品', tooltip: '进入订单详情，确认购买的商品信息。' },
+      { label: '核对金额', tooltip: '查看订单展示的实际成交金额。' },
+      { label: '确认状态', tooltip: '以订单页显示的当前状态判断后续操作。' },
     ],
   },
   {
-    title: 'Sharing',
+    title: '支付体验',
     rows: [
-      { label: 'Link sharing', tooltip: 'Share your Card through a direct link' },
-      { label: 'Add to Wallet', tooltip: 'Keep your Card ready in your phone Wallet for exhibitions, meetings, and events' },
-      { label: 'QR sharing', tooltip: null, disabled: true },
+      { label: '模拟支付', tooltip: '当前项目使用模拟支付流程，按订单页面提示体验。' },
+      { label: '等待返回', tooltip: '操作后等待系统反馈，再查看订单结果。' },
+      { label: '再次确认', tooltip: '完成操作后，重新查看订单当前状态。' },
     ],
   },
   {
-    title: 'Connections',
+    title: '参与提醒',
     rows: [
-      { label: 'Connectory', tooltip: 'Discover and be discovered by curators and artists globally' },
-      { label: 'Community Board', tooltip: 'Access opportunities, updates, and collaboration invites' },
-      { label: 'Book a studio visit / meeting', tooltip: null, disabled: true },
+      { label: '按需选择', tooltip: '根据商品信息和自己的需求决定是否参与。' },
+      { label: '留意场次', tooltip: '活动时间与可参与状态，请以当前商城展示为准。' },
+      { label: '查看规则', tooltip: '不同场次的具体说明，请在参与前认真查看。' },
     ],
   },
-  {
-    title: 'Support',
-    hiddenOnSmall: true,
-    rows: [{ label: 'Support My Practice', tooltip: null, disabled: true }],
-  },
-  {
-    title: 'Insights',
-    hiddenOnSmall: true,
-    rows: [{ label: 'Card statistics', tooltip: null, disabled: true }],
-  },
+  { title: '查看记录', rows: [{ label: '订单列表', tooltip: '在商城订单入口查看账户下的订单。' }] },
+  { title: '继续发现', rows: [{ label: '浏览好物', tooltip: '返回商城，查看其他商品与当前活动。' }] },
 ] as const;
 
 export interface PlanCard {
   id: 'pro' | 'starter';
-  /** `<p class="text-lead …">` inside the frame. */
   title: string;
-  /** `<p class="text-small … text-color-small">`. */
   tagline: string;
-  /** Frame class list measured on the rendered page. */
   frameClass: string;
-  /** Icon shown in the Pro frame (`images/card/edit/subscribe.svg`). */
   icon: string | null;
-  /** CTA target. */
   ctaTo: string;
 }
-
 export const PLAN_CARDS: readonly PlanCard[] = [
   {
-    id: 'pro',
-    title: 'Pro Card',
-    tagline: 'Show more. Share better. Earn directly',
+    id: 'pro', title: '抢购须知', tagline: '把时间、库存与结果看清楚',
     frameClass: 'ui-dark plans-difference__frame plans-difference__frame_upgraded px-1 py-1 pt-1.25 pt-1:md',
-    icon: '/assets/decor/subscribe.svg',
-    ctaTo: '/signup',
+    icon: '/assets/decor/subscribe.svg', ctaTo: '/app/',
   },
   {
-    id: 'starter',
-    title: 'Starter Card',
-    tagline: 'A first impression',
+    id: 'starter', title: '订单须知', tagline: '成功之后，继续确认每一步',
     frameClass: 'plans-difference__frame plans-difference__frame_free px-1 py-1 pt-1.25 pt-1:md',
-    icon: null,
-    ctaTo: '/signup',
+    icon: null, ctaTo: '/app/',
   },
 ] as const;
-
-/** Starter Card price: measured as the literal word "Free" under a "Pricing" key. */
-export const STARTER_PRICE_LABEL = 'Free';
-
-/** Rotating tail of the promo sentence, measured in this order. */
-export const PROMO_COMPARISONS: readonly string[] = [
-  'one coffee',
-  'a slice of pizza',
-  'a taxi ride',
-  'a glass of wine',
-] as const;
-
-export const PROMO_SENTENCE = {
-  lead: 'Get your PRO Card for just',
-  middle: 'That’s less than',
-} as const;
-
+export const STARTER_PRICE_LABEL = '以订单页面为准';
+export const PROMO_COMPARISONS: readonly string[] = ['确认活动时间', '查看商品信息', '留意库存状态', '核对订单金额'] as const;
+export const PROMO_SENTENCE = { lead: '当前步骤：', middle: '每次参与，请先' } as const;
 export const PRICING_PAGE = {
-  path: '/pricing',
-  theme: 'pink',
-  /** `<h1 class="sr-only">` measured on /pricing. */
-  heading: 'Subscription & Pricing',
-  /** Second sr-only heading inside `.title.subscription-and-pricing__title`. */
-  subheading: 'Subscription',
-  /** `img.subscription-and-pricing__title-decoration` — not captured locally. */
-  titleDecoration: null,
-  radioName: 'type',
+  path: '/pricing', theme: 'pink', heading: '活动规则', subheading: '参与抢购须知',
+  titleDecoration: null, radioName: 'type',
 } as const;
 
-/* --------------------------------------------------------------------- FAQ
- * The FAQ copy on follow.art quotes euro figures that contradict the pricing
- * payload above (its copy is regional/stale). They are kept here — in this one
- * module, so no other file repeats an amount — and are labelled as observed
- * copy rather than the plan price.
- */
-export const FAQ_OBSERVED_EURO_PRICES = Object.freeze({
-  weekly: '€4.99',
-  monthly: '€9.99',
-  annually: '€47.88',
-  monthlyEquivalent: '€3.99',
-  note: 'verbatim from /faq answers "Is the FOLLOW.ART Card free?", "…for curators?", "How much does FOLLOW.ART PRO cost?" — euro strings, not the USD payload.',
-});
-
-/** Rendered form of the euro sentence reused by three FAQ answers. */
+/** 兼容常见问题内容导入，所有说明均对应当前项目流程。 */
 export const FAQ_PRICE_LINES: readonly string[] = [
-  `- **Weekly**: ${FAQ_OBSERVED_EURO_PRICES.weekly} per week`,
-  `- **Monthly**: ${FAQ_OBSERVED_EURO_PRICES.monthly} per month`,
-  `- **Annual**: ${FAQ_OBSERVED_EURO_PRICES.annually} per year or ${FAQ_OBSERVED_EURO_PRICES.monthlyEquivalent} per month`,
+  '- **提前准备**：注册或登录账户，查看商品与活动场次。',
+  '- **准时开抢**：活动开始后提交抢购，以系统返回结果为准。',
+  '- **订单跟进**：查看订单，并按提示体验模拟支付。',
 ] as const;
-
-/* --------------------------------------------------------------- gift card
- * The gift card is one year of PRO, so its amount is the annual figure.
- */
-export const GIFT_CARD_PRICE = Object.freeze({
-  label: '1-year subscription',
-  amount: money(SUBSCRIPTION_PRICES.annually),
-  /** Measured on /gift-card: the price cell reads "US$59.88". */
-  derivedFrom: 'SUBSCRIPTION_PRICES.annually',
-});
+export const GIFT_CARD_PRICE = Object.freeze({ label: '活动商品', amount: '以商城为准', derivedFrom: '商城当前商品信息' });

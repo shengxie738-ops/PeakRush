@@ -1034,3 +1034,85 @@
    class - that is a cookie-bar defect, not a number to fold into this rule.
    ------------------------------------------------------------------------ */
 @layer components{.promo-footer{padding-bottom:var(--cookie-message-height,0)}.footer-links{display:flex;flex-direction:column;gap:var(--md,calc(var(--scale-px)*6)) var(--n-md,calc(var(--scale-px)*11))}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.footer-links--text-right{align-items:flex-end}}.footer-copyright{position:relative}.footer-author{align-items:center;display:flex;gap:calc(var(--scale-px)*9)}@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px){.footer-author{align-self:flex-start;justify-content:flex-end}}.footer-author--no-justify-content{justify-content:flex-start}.footer-author__icon{position:relative;z-index:1}.footer-padding{padding-bottom:calc(var(--spacing) + env(safe-area-inset-bottom) + var(--cookie-message-height, 0px))}.footer-side-left{display:flex;flex-direction:column;gap:calc(var(--scale-px)*8);height:100%}.footer-social{display:flex;flex-direction:row;gap:calc(var(--scale-px)*10)}}
+
+/* Chinese copy retains the existing motion/layout and uses readable native glyphs. */
+@layer overrides {
+  @font-face {
+    font-family: 'PeakRush Display';
+    src: url('/fonts/PeakRushDisplay-Regular.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    unicode-range: U+51C6, U+597D, U+5F00, U+62A2, U+65F6, U+70B9, U+7269, U+9650;
+  }
+
+  body, button, input, select, textarea { font-family: HeadingNow, 'Microsoft YaHei', 'PingFang SC', sans-serif; }
+  [data-section-id] .text-h2 { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; font-weight: 900; line-height: 1.08; --lh: 1.08em; }
+  .section-2__title .text-h2 { font-size: clamp(64px, 9.4vw, 220px); }
+  .section-3__title .text-h2 { font-size: clamp(64px, 9.4vw, 220px); }
+  .section-4__title { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; line-height: 1.08; }
+  .section-4__card { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; }
+  .section-3__card img { object-fit: cover; }
+  .section-10__description { line-height: 1.25; }
+  .title svg text { text-transform: none; }
+
+  /* Real display type, natural slant, and flat black/white poster lettering. */
+  [data-section-id="home.get-seen"] .section-2__title .text-h2,
+  [data-section-id="home.centralize"] .section-4__title,
+  [data-section-id="home.card"] .section-5__title--desktop text {
+    font-family: 'PeakRush Display', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: -.015em;
+    color: #111;
+  }
+
+  [data-section-id="home.get-seen"] .section-2__title .text-h2 {
+    font-size: clamp(88px, 11.8vw, 270px);
+    line-height: 1;
+    --lh: 1em;
+    padding-right: .12em;
+  }
+
+  [data-section-id="home.get-seen"] .section-2__title-seen-word > span:first-child,
+  [data-section-id="home.centralize"] .section-4__title-word > .section-4__title-word--inline-block {
+    color: #fff;
+    -webkit-text-stroke: clamp(1.5px, .14vw, 3.5px) #111;
+    paint-order: stroke fill;
+  }
+
+  [data-section-id="home.centralize"] .section-4__title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .03em;
+    font-size: clamp(110px, min(19vw, 31svh), 430px);
+    line-height: .94;
+    --lh: .94em;
+  }
+
+  [data-section-id="home.centralize"] .section-4__title-word:after {
+    display: none;
+  }
+
+  [data-section-id="home.centralize"] .section-4__content-texts {
+    margin-top: clamp(24px, 5vh, 72px);
+  }
+
+  [data-section-id="home.card"] .section-5__title--desktop text {
+    fill: currentColor;
+  }
+
+  [data-section-id="home.card"] .peakrush-title__outline {
+    fill: #fff;
+    stroke: #111;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
+  }
+
+  [data-section-id="home.connectory"] .section-7__title--desktop {
+    z-index: 1;
+    pointer-events: none;
+  }
+}
