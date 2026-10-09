@@ -19,8 +19,8 @@ export default defineConfig({
     port: 5400,
     strictPort: true,
     proxy: {
-      "/api": { target: "http://127.0.0.1:8080", changeOrigin: true },
-      "/actuator": { target: "http://127.0.0.1:8080", changeOrigin: true },
+      "/api": { target: process.env.PEAKRUSH_GATEWAY_URI ?? "http://127.0.0.1:8080", changeOrigin: true },
+      "/actuator": { target: process.env.PEAKRUSH_GATEWAY_URI ?? "http://127.0.0.1:8080", changeOrigin: true },
     },
   },
   build: {

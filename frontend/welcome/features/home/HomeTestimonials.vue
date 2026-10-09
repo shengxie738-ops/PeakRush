@@ -4,16 +4,10 @@
  * row 5), reference `Landing9Testimonials` + `Landing9TestimonialsWebGl`
  * (Cc-BjTZB.js, BsSV4kAi.js). ui-blue, 1544px, 1 canvas.
  *
- * sceneRegistry marks this section built:false — webgl-scenes.json records
- * "landing-9-testimonials … 未取到场景（渲染门控/离屏）", and its 8 review textures
- * (/images/landing/9.testimonials/Review-1..8.png) were never downloaded
- * (see src/content/assets.manifest.json). The DOM therefore keeps the measured
- * .landing-9-testimonials-webgl box, the measured canvas count and the measured
- * Prev / Next navigation, and the card region carries
- * data-evidence="pending-T00-webgl-scene" instead of invented artwork. Prev / Next
- * still move the measured index (0 … count-1) with the reference's edge disabling.
+ * Prev/Next and the WebGL drag controller share an index through the host's event.
+ * A selected product poster remains usable when WebGL or motion is unavailable.
  */
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import BrushLink from '@/components/BrushLink.vue';
 import DisplayHeading from '@/components/DisplayHeading.vue';
 import { TESTIMONIALS, IMG } from '@/content/home';
@@ -22,6 +16,7 @@ import { canvasCountFor } from '@/webgl/sceneRegistry';
 import type { WebGLMount } from '@/webgl/sceneRegistry';
 
 const root = ref<HTMLElement | null>(null);
+const carouselHost = ref<HTMLElement | null>(null);
 const index = ref(0);
 
 const count = TESTIMONIALS.cardCount;
@@ -37,6 +32,13 @@ function previous(): void {
 function next(): void {
   if (!nextDisabled.value) index.value += 1;
 }
+
+const syncIndex = (event: Event): void => {
+  const selected = (event as CustomEvent<{ index: number }>).detail.index;
+  if (Number.isInteger(selected) && selected >= 0 && selected < count) index.value = selected;
+};
+onMounted(() => carouselHost.value?.addEventListener('peakrush:carousel-index', syncIndex));
+onBeforeUnmount(() => carouselHost.value?.removeEventListener('peakrush:carousel-index', syncIndex));
 
 defineExpose({
   sectionId: TESTIMONIALS.sectionId,
@@ -76,6 +78,7 @@ defineExpose({
 
           <div class="section-9__cards">
             <div
+              ref="carouselHost"
               class="landing-9-testimonials-webgl"
               data-evidence="pending-T00-webgl-scene"
               :data-webgl-index="index"
@@ -86,6 +89,9 @@ defineExpose({
                 ref="canvasEl"
                 aria-hidden="true"
               />
+              <span class="webgl-fallback">
+                <img :src="IMG.review(index + 1)" alt="精选好物" />
+              </span>
               <div class="landing-9-testimonials-webgl__navigation">
                 <BrushLink
                   variant="block link accent"
@@ -95,6 +101,7 @@ defineExpose({
                   text-size="smaller"
                   :disabled="prevDisabled"
                   as-button
+                  data-carousel-step="prev"
                   @click="previous"
                 />
                 <BrushLink
@@ -105,6 +112,7 @@ defineExpose({
                   text-size="smaller"
                   :disabled="nextDisabled"
                   as-button
+                  data-carousel-step="next"
                   @click="next"
                 />
               </div>

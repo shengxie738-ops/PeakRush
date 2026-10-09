@@ -4,8 +4,7 @@
  * The motion runtime owns scroll → progress and calls `register(scene)`. This module
  * is the only place that knows which sections have a captured scene and how to build
  * one from its canvas element(s). It never queries the DOM itself — that lives in
- * `mountScenes.ts`, which is armed from here (module scope) so discovery starts before
- * the lazily-imported route components exist.
+ * `mountScenes.ts`, explicitly mounted by App after the homepage route renders.
  *
  * Reference facts (docs/DOM_CONTRACT.md):
  *   home.hero        → landing-1-intro   (2 canvases, depth-split ring)
@@ -52,10 +51,8 @@ export const WEBGL_SECTIONS: readonly WebGLSectionMeta[] = [
 
 /**
  * sceneName → the element that hosts the canvas + which mount shape it takes. The class
- * names come from the captured WebGL chunks (Landing1IntroWebGl.DZK6hbZ4.css,
- * Landing5NexusWebGl.DUcfhe4o.css, wH0WNvJv.js) and are the same ones App.vue's
- * `MOUNT_BY_SCENE` uses; keeping the map here means the WebGL layer can discover its
- * own mounts without the app being online at the right moment.
+ * names come from the captured WebGL chunks. The mount registry uses this map to
+ * discover canvas DOM that arrives after the route's first render.
  */
 export const MOUNT_SPEC_BY_SCENE: Record<string, { selector: string; kind: WebGLMount['kind'] }> = {
   'landing-1-intro': { selector: '.landing-1-intro-webgl__canvas-wrapper', kind: 'card-ring' },
@@ -108,14 +105,5 @@ export function createWebGLScene(
 export function canvasCountFor(sectionId: SectionId): number {
   return WEBGL_SECTIONS.find((s) => s.sectionId === sectionId)?.canvasCount ?? 0;
 }
-
-/* Importing this module is what arms the mount watcher: App.vue and every section
-   component import it, so it runs before any canvas exists in the DOM. The import is
-   dynamic on purpose — `mountScenes` statically imports this module for its section
-   table, so a static edge back would leave one of the two half-initialised. Idempotent,
-   and opt-out with `window.__FOLLOW_WEBGL_NO_AUTOMOUNT__ = true` (unit tests). */
-void import('./mountScenes')
-  .then((m) => m.ensureWebGLAutoMount())
-  .catch(() => undefined);
 
 export type { DiscoveredMount, MountedScene, MountOptions } from './mountScenes';

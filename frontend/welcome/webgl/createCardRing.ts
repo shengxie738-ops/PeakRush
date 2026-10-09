@@ -294,6 +294,7 @@ export function createCardRing(options: CardRingOptions): CardRingController {
 
   return {
     id,
+    get ready(): boolean { return !disposed && hostFar.isReady && hostNear.isReady; },
 
     update(frame: FrameInput, progress: number): void {
       if (disposed) return;
@@ -301,9 +302,10 @@ export function createCardRing(options: CardRingOptions): CardRingController {
       // pure function of (timeSec, progress, pointerNdc) regardless of the renderer.
       applyState(frame, progress);
       hostFar.setViewport();
-      hostFar.render(sceneFar, camFar);
+      const assetsReady = textureUrls.every((url) => textureRegistry.ready(url, { colorSpace: 'srgb' }));
+      hostFar.render(sceneFar, camFar, assetsReady);
       hostNear.setViewport();
-      hostNear.render(sceneNear, camNear);
+      hostNear.render(sceneNear, camNear, assetsReady);
     },
 
     resize(width: number, height: number, dpr: number): void {
@@ -330,7 +332,7 @@ export function createCardRing(options: CardRingOptions): CardRingController {
       geometryNear.dispose();
       spineTexture.dispose();
       for (const m of materials) m.dispose();
-      for (const url of textureUrls) textureRegistry.release(url);
+      for (const url of textureUrls) textureRegistry.release(url, { colorSpace: 'srgb' });
       sceneFar.clear();
       sceneNear.clear();
       hostFar.dispose();

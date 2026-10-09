@@ -21,6 +21,9 @@ const storage = values => ({
   removeItem: key => values.delete(key),
 })
 const loadSession = () => import(moduleUrl(source) + '#' + imports++)
+const persistedPageShow = () => Object.assign(new Event('pageshow'), { persisted: true })
+const nextTurn = () => new Promise(resolve => setImmediate(resolve))
+const BOB = { id: 8, username: 'bob', role: 'USER' }
 
 beforeEach(() => {
   saved = new Map([
@@ -118,5 +121,70 @@ test('a temporary identity-service failure keeps the existing bearer session', a
   await restoreSession()
   assert.equal(session.user?.id, USER.id)
   assert.equal(saved.get('peakrush.token'), 'saved-token')
+  assert.deepEqual(navigations, [])
+})
+
+test('restoring a cached document clears the previous account before validating the new token', async () => {
+  const { session } = await loadSession()
+  saved.set('peakrush.token', 'bob-token')
+  saved.set('peakrush.user', JSON.stringify(BOB))
+  let respond
+  globalThis.fetch = async (_path, options) => {
+    assert.equal(options.headers.get('Authorization'), 'Bearer bob-token')
+    return new Promise(resolve => { respond = resolve })
+  }
+
+  window.dispatchEvent(persistedPageShow())
+  assert.equal(session.user, null, 'the previous account must disappear during validation')
+  respond(new Response(JSON.stringify(BOB), { status: 200 }))
+  await nextTurn()
+
+  assert.equal(session.user?.id, 8)
+  assert.equal(saved.get('peakrush.user'), JSON.stringify(BOB))
+  assert.deepEqual(navigations, [])
+})
+
+test('restoring a cached document after another document logged out clears its account', async () => {
+  const { session } = await loadSession()
+  saved.delete('peakrush.token')
+  saved.delete('peakrush.user')
+
+  window.dispatchEvent(persistedPageShow())
+  await nextTurn()
+
+  assert.equal(session.user, null)
+  assert.equal(saved.has('peakrush.user'), false)
+  assert.deepEqual(navigations, [])
+})
+
+test('an earlier identity response cannot replace a newer login', async () => {
+  const { session, restoreSession, setSession } = await loadSession()
+  let respond
+  globalThis.fetch = async () => new Promise(resolve => { respond = resolve })
+  const restoring = restoreSession()
+  setSession('bob-token', BOB)
+
+  respond(new Response(JSON.stringify(USER), { status: 200 }))
+  await restoring
+
+  assert.equal(session.user?.id, 8)
+  assert.equal(saved.get('peakrush.token'), 'bob-token')
+  assert.equal(saved.get('peakrush.user'), JSON.stringify(BOB))
+})
+
+test('restoring the same cached bearer account preserves its identity when validation temporarily fails', async () => {
+  const { session } = await loadSession()
+  let fail
+  globalThis.fetch = async () => new Promise(resolve => { fail = resolve })
+
+  window.dispatchEvent(persistedPageShow())
+  assert.equal(typeof fail, 'function', 'cached documents must revalidate their current bearer token')
+  assert.equal(session.user?.id, 7)
+  fail(new Response('{}', { status: 503 }))
+  await nextTurn()
+
+  assert.equal(session.user?.id, 7)
+  assert.equal(saved.get('peakrush.token'), 'saved-token')
+  assert.equal(saved.get('peakrush.user'), JSON.stringify(USER))
   assert.deepEqual(navigations, [])
 })

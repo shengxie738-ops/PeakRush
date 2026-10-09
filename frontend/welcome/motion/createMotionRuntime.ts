@@ -59,6 +59,7 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     wheelMultiplier: 1,
     touchMultiplier: 2,
+    smoothWheel: !reducedMotion,
   });
 
   const registrations = new Map<string, Registration>();
@@ -105,22 +106,28 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
     const w = container!.clientWidth;
     const h = container!.clientHeight;
     const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
-    for (const reg of registrations.values()) reg.scene.resize(w, h, dpr);
+    for (const reg of registrations.values()) {
+      if (reg.scene.resizeToHost) reg.scene.resizeToHost(dpr);
+      else reg.scene.resize(w, h, dpr);
+    }
   }
   window.addEventListener('resize', onResize);
   ownedListeners++;
 
-  const onMotionChange = (): void => {
-    reducedMotion = reduceQuery.matches;
+  function setReducedMotion(value: boolean): void {
+    reducedMotion = value;
     frame.reducedMotion = reducedMotion;
-    if (reducedMotion) lenis.stop();
-    else lenis.start();
-  };
+    // stop() cancels current inertia; start() immediately unlocks native scrolling.
+    lenis.stop();
+    lenis.options.smoothWheel = !reducedMotion;
+    lenis.start();
+  }
+  const onMotionChange = (): void => setReducedMotion(reduceQuery.matches);
   if (typeof reduceQuery.addEventListener === 'function') {
     reduceQuery.addEventListener('change', onMotionChange);
     ownedListeners++;
   }
-  if (reducedMotion) lenis.stop();
+  setReducedMotion(reducedMotion);
 
   let previousScroll = 0;
 
@@ -177,8 +184,9 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
     register(scene, range) {
       if (disposed) return;
       registrations.set(scene.id, { scene, range: range ?? null, lastProgress: 0 });
-      const rect = container!.clientWidth;
-      scene.resize(rect, container!.clientHeight, Math.min(window.devicePixelRatio || 1, dprCap));
+      const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
+      if (scene.resizeToHost) scene.resizeToHost(dpr);
+      else scene.resize(container!.clientWidth, container!.clientHeight, dpr);
     },
     unregister(id) {
       const reg = registrations.get(id);
@@ -188,7 +196,6 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
     },
     scrollTo(target, offset = 0) {
       if (disposed) return;
-      const wasStopped = lenis.isStopped;
       // Cancel wheel inertia even when the target already equals the position.
       lenis.stop();
       // The stopped class clips overflow, so restore scrolling before positioning.
@@ -196,7 +203,6 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
       // Routes can change the content height before ResizeObserver has fired.
       lenis.resize();
       lenis.scrollTo(target, { offset, immediate: true, force: true });
-      if (wasStopped) lenis.stop();
     },
     setTestInput(input) {
       if (typeof input.scrollYPx === 'number') {
@@ -209,9 +215,7 @@ export function createMotionRuntime(options: MotionRuntimeOptions = {}): MotionR
       }
       if (input.pointerNdc) testPointer = { x: input.pointerNdc.x, y: input.pointerNdc.y };
       if (typeof input.reducedMotion === 'boolean') {
-        reducedMotion = input.reducedMotion;
-        if (reducedMotion) lenis.stop();
-        else lenis.start();
+        setReducedMotion(input.reducedMotion);
       }
     },
     diagnostics() {

@@ -12,6 +12,10 @@ export interface FrameInput {
 
 export interface SceneController {
   id: SectionId;
+  /** True after a successful draw with loaded assets; false again on context loss. */
+  readonly ready?: boolean;
+  /** Optional mount-owned resize; decorative scenes use their own host dimensions. */
+  resizeToHost?(dpr: number): void;
   update(frame: FrameInput, progress: number): void;
   resize(width: number, height: number, dpr: number): void;
   dispose(): void;

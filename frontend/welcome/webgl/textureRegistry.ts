@@ -1,8 +1,8 @@
 /**
  * textureRegistry.ts — ref-counted, colour-managed image loading.
  *
- * Scenes acquire textures by URL (`/assets/...`); the registry loads each URL once,
- * hands out the shared THREE.Texture, and only disposes it when the last owner
+ * Scenes acquire textures by URL and color mode; the registry loads each pair once,
+ * hands out the shared THREE.Texture for that pair, and only disposes it when the last owner
  * releases it (route changes / dispose).
  *
  * COLOUR MANAGEMENT — the two modes are both taken from the reference, and mixing
@@ -35,6 +35,7 @@ interface TextureEntry {
   texture: THREE.Texture;
   refs: number;
   failed: boolean;
+  loaded: boolean;
   colorSpace: TextureColorSpace;
 }
 
@@ -54,10 +55,15 @@ export class TextureRegistry {
   private readonly entries = new Map<string, TextureEntry>();
   private readonly loader = new THREE.TextureLoader();
 
+  private key(url: string, options: AcquireOptions): string {
+    return JSON.stringify([url, options.colorSpace ?? 'srgb']);
+  }
+
   /** Acquire a shared texture for `url`, incrementing its ref count. */
   acquire(url: string, options: AcquireOptions = {}): THREE.Texture {
     const colorSpace: TextureColorSpace = options.colorSpace ?? 'srgb';
-    const existing = this.entries.get(url);
+    const key = this.key(url, options);
+    const existing = this.entries.get(key);
     if (existing) {
       existing.refs += 1;
       return existing.texture;
@@ -67,17 +73,21 @@ export class TextureRegistry {
     const entry: TextureEntry = {
       refs: 1,
       failed: false,
+      loaded: false,
       colorSpace,
       texture: undefined as unknown as THREE.Texture,
     };
     const texture = this.loader.load(
       url,
       (t) => {
+        if (this.entries.get(key) !== entry) return;
+        entry.loaded = true;
         t.colorSpace = threeSpace;
         t.needsUpdate = true;
       },
       undefined,
       () => {
+        if (this.entries.get(key) !== entry) return;
         entry.failed = true;
         texture.image = fallbackPixel();
         texture.needsUpdate = true;
@@ -87,28 +97,34 @@ export class TextureRegistry {
     );
     texture.colorSpace = threeSpace;
     entry.texture = texture;
-    this.entries.set(url, entry);
+    this.entries.set(key, entry);
     return texture;
   }
 
   /** Release one reference; dispose the GPU texture at zero refs. */
-  release(url: string): void {
-    const entry = this.entries.get(url);
+  release(url: string, options: AcquireOptions = {}): void {
+    const key = this.key(url, options);
+    const entry = this.entries.get(key);
     if (!entry) return;
     entry.refs -= 1;
     if (entry.refs <= 0) {
       entry.texture.dispose();
-      this.entries.delete(url);
+      this.entries.delete(key);
     }
   }
 
-  has(url: string): boolean {
-    return this.entries.has(url);
+  has(url: string, options: AcquireOptions = {}): boolean {
+    return this.entries.has(this.key(url, options));
+  }
+
+  ready(url: string, options: AcquireOptions = {}): boolean {
+    const entry = this.entries.get(this.key(url, options));
+    return !!entry?.loaded && !entry.failed;
   }
 
   /** Held URLs (empty once every scene has been disposed). */
   held(): string[] {
-    return [...this.entries.keys()];
+    return [...new Set([...this.entries.keys()].map((key) => JSON.parse(key)[0] as string))];
   }
 
   /** Total live references across every held texture. */

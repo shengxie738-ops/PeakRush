@@ -140,6 +140,7 @@ export function createConnectoryPanel(options: ConnectoryOptions): ConnectoryCon
 
   return {
     id,
+    get ready(): boolean { return !disposed && host.isReady; },
 
     update(frame: FrameInput, progress: number): void {
       if (disposed) return;
@@ -149,7 +150,7 @@ export function createConnectoryPanel(options: ConnectoryOptions): ConnectoryCon
       camera.position.set(...s.cameraPosition);
       camera.lookAt(s.target[0], s.target[1], s.target[2]);
       host.setViewport();
-      host.render(scene, camera);
+      host.render(scene, camera, textureRegistry.ready(TEXTURE_URL, { colorSpace: 'none' }));
     },
 
     /** Exposed for tests: the measured values must survive construction untouched. */
@@ -182,7 +183,7 @@ export function createConnectoryPanel(options: ConnectoryOptions): ConnectoryCon
       disposed = true;
       geometry.dispose();
       material.dispose();
-      textureRegistry.release(TEXTURE_URL);
+      textureRegistry.release(TEXTURE_URL, { colorSpace: 'none' });
       scene.clear();
       host.dispose();
     },

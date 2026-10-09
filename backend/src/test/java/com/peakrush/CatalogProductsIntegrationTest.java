@@ -48,4 +48,13 @@ class CatalogProductsIntegrationTest {
   new CatalogSchema(db.jdbc).afterPropertiesSet();
   assertEquals(count,db.jdbc.queryForObject("SELECT COUNT(*) FROM product",Long.class));
  }
+ @Test void explicitNullResetsCategoryAndInvalidUpdatesLeaveStoredCategoryIntact() {
+  var created=create("居家生活");
+  long id=Json.number(created.get("id"));
+  var update=Json.map("name",created.get("name"),"description","updated","imageUrl",created.get("imageUrl"),"originalPrice",199,"category",null);
+  assertEquals("其他好物",db.saveProduct(id,update).get("category"));
+  update.put("category","invalid-category");
+  assertThrows(ApiException.class,()->db.saveProduct(id,update));
+  assertEquals("其他好物",db.jdbc.queryForObject("SELECT category FROM product WHERE id=?",String.class,id));
+ }
 }

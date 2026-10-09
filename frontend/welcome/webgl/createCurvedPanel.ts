@@ -177,12 +177,13 @@ export function createCurvedPanel(options: CurvedPanelOptions): CurvedPanelContr
 
   return {
     id,
+    get ready(): boolean { return !disposed && host.isReady; },
 
     update(frame: FrameInput, progress: number): void {
       if (disposed) return;
       applyState(frame, progress);
       host.setViewport();
-      host.render(scene, camera);
+      host.render(scene, camera, textureUrls.every((url) => textureRegistry.ready(url, { colorSpace: 'none' })));
     },
 
     snapshot(): CurvedPanelSnapshot {
@@ -206,7 +207,7 @@ export function createCurvedPanel(options: CurvedPanelOptions): CurvedPanelContr
       disposed = true;
       geometry.dispose();
       for (const { mesh } of meshRefs) (mesh.material as THREE.Material).dispose();
-      for (const url of textureUrls) textureRegistry.release(url);
+      for (const url of textureUrls) textureRegistry.release(url, { colorSpace: 'none' });
       scene.clear();
       host.dispose();
     },

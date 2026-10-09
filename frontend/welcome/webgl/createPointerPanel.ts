@@ -122,12 +122,13 @@ export function createPointerPanel(options: PointerPanelOptions): PointerPanelCo
 
   return {
     id,
+    get ready(): boolean { return !disposed && host.isReady; },
 
     update(frame: FrameInput, progress: number): void {
       if (disposed) return;
       applyState(frame, progress);
       host.setViewport();
-      host.render(scene, camera);
+      host.render(scene, camera, textureRegistry.ready(url, { colorSpace: 'none' }));
     },
 
     snapshot(): PointerPanelSnapshot {
@@ -152,7 +153,7 @@ export function createPointerPanel(options: PointerPanelOptions): PointerPanelCo
       disposed = true;
       geometry.dispose();
       material.dispose();
-      textureRegistry.release(url);
+      textureRegistry.release(url, { colorSpace: 'none' });
       scene.clear();
       host.dispose();
     },

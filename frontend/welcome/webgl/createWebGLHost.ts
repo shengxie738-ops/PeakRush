@@ -44,12 +44,24 @@ export class WebGLHost {
 
   private disposed = false;
   private dead = false;
+  private contextLost = false;
+  private rendered = false;
   private onScreen = true;
   private docVisible = typeof document !== 'undefined' ? document.visibilityState !== 'hidden' : true;
 
   private readonly io: IntersectionObserver | null = null;
   private readonly onVisibility = (): void => {
     this.docVisible = document.visibilityState !== 'hidden';
+  };
+  private readonly onContextLost = (event: Event): void => {
+    event.preventDefault();
+    this.contextLost = true;
+    this.rendered = false;
+  };
+  private readonly onContextRestored = (): void => {
+    this.contextLost = false;
+    this.dead = this.renderer === null;
+    this.rendered = false;
   };
 
   constructor(canvas: HTMLCanvasElement, opts: HostOptions = {}) {
@@ -90,15 +102,21 @@ export class WebGLHost {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.onVisibility, { passive: true });
     }
+    canvas.addEventListener('webglcontextlost', this.onContextLost);
+    canvas.addEventListener('webglcontextrestored', this.onContextRestored);
   }
 
   get isDead(): boolean {
-    return this.dead || this.disposed;
+    return this.dead || this.disposed || this.contextLost;
+  }
+
+  get isReady(): boolean {
+    return !this.isDead && this.rendered;
   }
 
   /** Live, on-screen and not disposed — the gate the controller checks before drawing. */
   get shouldDraw(): boolean {
-    return !this.dead && !this.disposed && this.renderer !== null && this.onScreen && this.docVisible;
+    return !this.isDead && this.renderer !== null && this.onScreen && this.docVisible;
   }
 
   setSize(cssWidth: number, cssHeight: number, dpr: number): void {
@@ -159,20 +177,39 @@ export class WebGLHost {
     };
   }
 
-  render(scene: THREE.Scene, camera: THREE.Camera): void {
+  render(scene: THREE.Scene, camera: THREE.Camera, assetsReady = true): void {
     if (!this.shouldDraw || !this.renderer) return;
-    this.renderer.render(scene, camera);
+    this.draw(scene, camera, assetsReady);
   }
 
   /** Force a single frame even when off-screen (used for reduced-motion stills). */
-  renderOnce(scene: THREE.Scene, camera: THREE.Camera): void {
+  renderOnce(scene: THREE.Scene, camera: THREE.Camera, assetsReady = true): void {
     if (this.isDead || !this.renderer) return;
-    this.renderer.render(scene, camera);
+    this.draw(scene, camera, assetsReady);
+  }
+
+  private draw(scene: THREE.Scene, camera: THREE.Camera, assetsReady: boolean): void {
+    try {
+      if (this.renderer!.getContext().isContextLost()) {
+        this.contextLost = true;
+        this.rendered = false;
+        return;
+      }
+      this.renderer!.render(scene, camera);
+      this.rendered = assetsReady;
+    } catch (error) {
+      this.rendered = false;
+      this.dead = true;
+      console.warn('[webgl] render failed; keeping static fallback', error);
+    }
   }
 
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.rendered = false;
+    this.canvas.removeEventListener('webglcontextlost', this.onContextLost);
+    this.canvas.removeEventListener('webglcontextrestored', this.onContextRestored);
     if (this.io) this.io.disconnect();
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.onVisibility);

@@ -37,9 +37,9 @@ public class Store {
  public Map<String,Object> saveProduct(Long id,Map<String,Object>b){
   String n=name(b),image=Json.string(b,"imageUrl");
   if(image.length()>500||!(image.isBlank()||image.startsWith("/")||image.startsWith("https://")))throw ApiException.bad("图片须为站内路径或HTTPS地址");
-  String c=category(b.containsKey("category")?b.get("category"):id==null?null:one("SELECT category FROM product WHERE id=?",id).get("category"));
+  String c=b.containsKey("category")||id==null?category(b.get("category")):null;
   if(id==null)id=insert("INSERT INTO product(name,description,image_url,original_price,category) VALUES(?,?,?,?,?)",n,Json.string(b,"description"),image,money(b.get("originalPrice")),c);
-  else{one("SELECT id FROM product WHERE id=?",id);jdbc.update("UPDATE product SET name=?,description=?,image_url=?,original_price=?,category=? WHERE id=?",n,Json.string(b,"description"),image,money(b.get("originalPrice")),c,id);}
+  else{one("SELECT id FROM product WHERE id=?",id);jdbc.update("UPDATE product SET name=?,description=?,image_url=?,original_price=?,category=COALESCE(?,category) WHERE id=?",n,Json.string(b,"description"),image,money(b.get("originalPrice")),c,id);}
   invalidateItems();
   return product(one("SELECT * FROM product WHERE id=?",id));
  }

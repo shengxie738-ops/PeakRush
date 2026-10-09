@@ -1,31 +1,4 @@
-/**
- * mountScenes.ts — owns "get a captured scene onto its canvas, reliably".
- *
- * WHY THIS FILE EXISTS (the `live=0` bug, measured):
- * `src/app/App.vue` registers scenes exactly once, inside its own `onMounted`, after
- * `await import('@/motion/createMotionRuntime')`. Every route in `src/app/router.ts` is
- * a lazy `() => import('@/pages/HomePage.vue')`, so at that moment the section
- * components have not been created yet: `document.querySelector('[data-section-id=…]')`
- * returns null for all three built scenes, `mountFor()` returns null, the loop
- * `continue`s and nothing throws. Probe evidence: the WEBGL_SECTIONS iteration runs at
- * +135ms while the hero section only reaches the DOM later, and `canvasCountFor()` is
- * never called from `mountFor()` (only from the section setups). Result: canvases=6,
- * live=0.
- *
- * The fix lives on the WebGL side so it cannot regress: mounts are discovered with a
- * MutationObserver plus a bounded retry, so it does not matter whether the canvas
- * exists at App-onMounted time, one frame later, or after a route change.
- *
- * CLOCK CONTRACT (see INTEGRATION_REQUESTS.md):
- *   • `mountWebGLScenes(runtime)` / `attachMotionRuntime(runtime)` — preferred. The
- *     single-clock motion runtime drives and resizes the scenes.
- *   • `ensureWebGLAutoMount()` — the safety net App.vue does not have to know about. It
- *     renders with a *presentation-only* loop: it never creates a second Lenis and never
- *     writes scroll, it only READS `container.scrollTop` (which the app's Lenis owns)
- *     plus a pointer listener. One scroll authority, one render tick.
- *   Both paths share one registry, so adopting the helper in App.vue just hands the
- *   scenes over; nothing ever renders twice.
- */
+/** App owns activation; this registry owns each host/canvas and its fallback. */
 import type { FrameInput, MotionRuntime, SceneController, ScrollRange, SectionId } from '@/motion/motion.types';
 import { MOUNT_SPEC_BY_SCENE, WEBGL_SECTIONS, createWebGLScene, type WebGLMount } from './sceneRegistry';
 
@@ -36,457 +9,211 @@ export interface DiscoveredMount {
   host: HTMLElement;
   canvases: HTMLCanvasElement[];
 }
-
-export interface MountedScene {
-  sectionId: SectionId;
+export interface MountedScene extends Omit<DiscoveredMount, 'sceneName'> {
   scene: SceneController;
-  host: HTMLElement;
-  section: HTMLElement;
-  canvases: HTMLCanvasElement[];
   range: ScrollRange;
-  /** True once the scene has taken over its placeholder DOM. */
   live: boolean;
 }
-
 export interface MountOptions {
-  /** Scroll container; defaults to `.scrollable__area`. */
   container?: HTMLElement | null;
-  /** Called instead of the built-in live signal (so a component can own it). */
   onLive?: (sectionId: SectionId, host: HTMLElement) => void;
-  /** Stop retrying after this many ms (default 10s — slow route chunks included). */
   timeoutMs?: number;
-  /** Set false for runtime-only mode (never start the presentation-only loop). */
   allowFallbackDriver?: boolean;
 }
-
 interface Entry {
   mounted: MountedScene;
-  /** True when a MotionRuntime drives this scene. */
+  driven: SceneController;
   claimed: boolean;
+  onContextLost: () => void;
 }
-
-const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 const entries = new Map<SectionId, Entry>();
 const pending = new Set<SectionId>();
 let opts: MountOptions = {};
 let runtime: MotionRuntime | null = null;
 let observer: MutationObserver | null = null;
 let retryTimer: ReturnType<typeof setInterval> | null = null;
-let deadline = 0;
 let driver: PresentationDriver | null = null;
-let autoStarted = false;
+let active = false;
+const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
-/** Scroll container of the clone (reference: `DIV.scrollable__area.lenis`). */
 export function scrollContainer(): HTMLElement | null {
-  if (typeof document === 'undefined') return null;
-  return document.querySelector<HTMLElement>('.scrollable__area') ?? document.documentElement;
+  return typeof document === 'undefined' ? null : document.querySelector<HTMLElement>('.scrollable__area') ?? document.documentElement;
 }
-
-/**
- * Scroll range for one section — the same derivation App.vue uses: progress 0 when the
- * section top sits one viewport below the fold, 1 when it has travelled one viewport
- * past the top.
- */
 export function scrollRangeFor(element: HTMLElement, container: HTMLElement): ScrollRange {
-  const top = element.getBoundingClientRect().top + container.scrollTop;
-  const span = container.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 1) || 1;
+  const top = element.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+  const span = container.clientHeight || window.innerHeight || 1;
   return { startPx: Math.max(0, top - span), endPx: top + span };
 }
-
-/** Every captured section whose host element and canvases are currently in the DOM. */
 export function discoverMounts(): DiscoveredMount[] {
   if (typeof document === 'undefined') return [];
   const found: DiscoveredMount[] = [];
   for (const meta of WEBGL_SECTIONS) {
     if (!meta.built) continue;
     const spec = MOUNT_SPEC_BY_SCENE[meta.sceneName];
-    if (!spec) continue;
     const section = document.querySelector<HTMLElement>('[data-section-id="' + meta.sectionId + '"]');
-    if (!section) continue;
-    const host = section.querySelector<HTMLElement>(spec.selector);
-    if (!host) continue;
-    const canvases = Array.from(host.querySelectorAll('canvas')) as HTMLCanvasElement[];
-    if (canvases.length === 0 || canvases.length < meta.canvasCount) continue;
+    const host = section?.querySelector<HTMLElement>(spec.selector);
+    if (!section || !host) continue;
+    const canvases = Array.from(host.querySelectorAll('canvas'));
+    if (canvases.length < meta.canvasCount) continue;
     found.push({ sectionId: meta.sectionId, sceneName: meta.sceneName, section, host, canvases });
   }
   return found;
 }
-
-function hostSize(el: HTMLElement): { w: number; h: number } {
-  const rect = typeof el.getBoundingClientRect === 'function' ? el.getBoundingClientRect() : null;
-  return {
-    w: Math.round((rect?.width || el.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 1)) || 1),
-    h: Math.round((rect?.height || el.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 1)) || 1),
-  };
-}
-
-/**
- * The mount must be a box the canvas can fill.
- *
- * The reference CSS for the hero (`Landing1IntroWebGl.DZK6hbZ4.css`) is
- *   .landing-1-intro-webgl canvas, .landing-1-intro-webgl__canvas-wrapper {
- *     top:0;right:0;bottom:0;left:0;position:absolute }
- *   .landing-1-intro-webgl canvas:first-child { z-index:-1 }
- * i.e. the wrapper is taken out of flow and stretched over the section layer, and the
- * first canvas (the far depth layer) is pushed behind the section content. App.vue's
- * CLONE-LOCAL style currently pins the wrapper to `position: relative` instead, which
- * collapses it to 0px because its only children are absolutely positioned canvases —
- * the hero then renders into a full-size buffer that is displayed at 1440×0.
- *
- * Restoring the measured placement inline on the mount element (never on a component
- * this layer does not own) keeps the canvas visible; see INTEGRATION_REQUESTS.md §2 for
- * the one-line style-block change that makes this redundant.
- */
-function ensureHostBox(host: HTMLElement, canvases: readonly HTMLCanvasElement[]): void {
-  if (typeof host.getBoundingClientRect !== 'function' || typeof getComputedStyle !== 'function') return;
+function hostSize(host: HTMLElement): { width: number; height: number } {
   const rect = host.getBoundingClientRect();
-  if (rect.width < 1 || rect.height < 1) {
-    host.style.position = 'absolute';
-    host.style.inset = '0';
-  }
-  // Far layer behind the section content, near layer on top (reference rule above).
-  const first = canvases[0];
-  if (first && getComputedStyle(first).zIndex === 'auto') first.style.zIndex = '-1';
+  return { width: Math.max(1, Math.round(rect.width || host.clientWidth)), height: Math.max(1, Math.round(rect.height || host.clientHeight)) };
 }
-
-function devicePixelRatio(): number {
-  return typeof window === 'undefined' ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+function dpr(): number { return Math.min(window.devicePixelRatio || 1, 2); }
+function ensureHostBox(host: HTMLElement, canvases: HTMLCanvasElement[]): void {
+  const rect = host.getBoundingClientRect();
+  if (rect.width < 1 || rect.height < 1) { host.style.position = 'absolute'; host.style.inset = '0'; }
+  if (canvases.length > 1 && getComputedStyle(canvases[0]).zIndex === 'auto') canvases[0].style.zIndex = '-1';
 }
-
-/** Mark the placeholder DOM as taken over by the renderer. */
-function signalLive(entry: Entry): void {
-  const mounted = entry.mounted;
-  if (mounted.live) return;
-  mounted.live = true;
-  if (opts.onLive) {
-    opts.onLive(mounted.sectionId, mounted.host);
-    return;
-  }
-  mounted.host.setAttribute('data-webgl', 'live');
-  // The section components keep a static poster inside the host until they are told the
-  // scene is up. They own that flag; until they are wired to this module it is hidden
-  // here so the canvas is actually visible (see INTEGRATION_REQUESTS.md §1).
-  for (const poster of Array.from(mounted.host.querySelectorAll<HTMLElement>('.webgl-fallback'))) {
-    poster.style.display = 'none';
-  }
+function setLive(entry: Entry, live: boolean): void {
+  const { mounted } = entry;
+  mounted.live = live;
+  if (live) mounted.host.setAttribute('data-webgl', 'live');
+  else mounted.host.removeAttribute('data-webgl');
+  for (const poster of mounted.host.querySelectorAll<HTMLElement>('.webgl-fallback')) poster.style.display = live ? 'none' : '';
+  for (const canvas of mounted.canvases) canvas.style.visibility = live ? '' : 'hidden';
 }
-
-function buildMount(kind: WebGLMount['kind'], canvases: HTMLCanvasElement[]): WebGLMount | null {
-  if (kind === 'card-ring') {
-    if (canvases.length < 2) return null;
-    return { kind: 'card-ring', canvases: [canvases[0], canvases[1]] };
-  }
-  if (!canvases.length) return null;
-  /* Every other mount shape is one canvas. This must pass `kind` through verbatim:
-     an earlier revision re-narrowed it to curved-panel/pointer-panel, which silently
-     dropped every scene added afterwards (testimonials and connectory requested no
-     WebGL context at all and left their canvases blank). */
-  return { kind, canvas: canvases[0] } as WebGLMount;
+function resizeEntry(entry: Entry, pixelRatio = dpr()): void {
+  const { mounted } = entry;
+  ensureHostBox(mounted.host, mounted.canvases);
+  const size = hostSize(mounted.host);
+  mounted.scene.resize(size.width, size.height, pixelRatio);
+  const container = opts.container ?? scrollContainer();
+  // Mutate the shared range so the runtime's existing registration sees layout changes.
+  if (container) Object.assign(mounted.range, scrollRangeFor(mounted.section, container));
 }
-
+function disposeEntry(id: SectionId, entry: Entry): void {
+  setLive(entry, false);
+  for (const canvas of entry.mounted.canvases) canvas.removeEventListener('webglcontextlost', entry.onContextLost);
+  if (entry.claimed && runtime) runtime.unregister(id);
+  else entry.mounted.scene.dispose();
+  entries.delete(id);
+}
 function mountOne(discovery: DiscoveredMount): Entry | null {
-  const spec = MOUNT_SPEC_BY_SCENE[discovery.sceneName];
-  const mount = buildMount(spec.kind, discovery.canvases);
-  if (!mount) return null;
+  const kind = MOUNT_SPEC_BY_SCENE[discovery.sceneName].kind;
+  const mount = kind === 'card-ring'
+    ? { kind, canvases: [discovery.canvases[0], discovery.canvases[1]] } as WebGLMount
+    : { kind, canvas: discovery.canvases[0] } as WebGLMount;
   const scene = createWebGLScene(discovery.sectionId, mount);
   if (!scene) return null;
-  const container = opts.container ?? scrollContainer();
-  ensureHostBox(discovery.host, discovery.canvases);
-  const { w, h } = hostSize(discovery.host);
-  const mounted: MountedScene = {
-    sectionId: discovery.sectionId,
-    scene,
-    host: discovery.host,
-    section: discovery.section,
-    canvases: discovery.canvases,
-    range: container ? scrollRangeFor(discovery.section, container) : { startPx: 0, endPx: 1 },
-    live: false,
+  const mounted: MountedScene = { ...discovery, scene, range: { startPx: 0, endPx: 1 }, live: false };
+  let lastMeasure = -Infinity;
+  const entry: Entry = {
+    mounted, claimed: false, onContextLost: () => setLive(entry, false),
+    driven: {
+      id: scene.id,
+      update(frame, progress) {
+        if (frame.timeSec - lastMeasure > 0.5) { resizeEntry(entry, frame.viewport.dpr); lastMeasure = frame.timeSec; }
+        scene.update(frame, progress);
+        const live = scene.ready === true;
+        if (mounted.live === live) return;
+        setLive(entry, live);
+        if (live) opts.onLive?.(mounted.sectionId, mounted.host);
+      },
+      resize: (...args) => scene.resize(...args),
+      resizeToHost: (pixelRatio) => resizeEntry(entry, pixelRatio),
+      dispose: () => { setLive(entry, false); scene.dispose(); },
+    },
   };
-  scene.resize(w, h, devicePixelRatio());
-  const entry: Entry = { mounted, claimed: false };
-  if (runtime) {
-    runtime.register(scene, mounted.range);
-    entry.claimed = true;
-  }
+  setLive(entry, false);
+  for (const canvas of mounted.canvases) canvas.addEventListener('webglcontextlost', entry.onContextLost);
+  resizeEntry(entry);
   entries.set(discovery.sectionId, entry);
-  pending.delete(discovery.sectionId);
+  if (runtime) { runtime.register(entry.driven, mounted.range); entry.claimed = true; }
   return entry;
 }
-
-/** Attempt every still-unmounted section. Returns true when nothing is left pending. */
 export function tryMountPending(): boolean {
-  for (const discovery of discoverMounts()) {
-    if (entries.has(discovery.sectionId)) continue;
-    const entry = mountOne(discovery);
-    if (entry && !entry.claimed) driver?.start();
-    if (entry) {
-      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => signalLive(entry));
-      else signalLive(entry);
-    }
+  if (!active) return true;
+  const discoveries = discoverMounts();
+  for (const [id, entry] of entries) {
+    const fresh = discoveries.find(item => item.sectionId === id);
+    if (!fresh || fresh.host !== entry.mounted.host || fresh.section !== entry.mounted.section ||
+      fresh.canvases.length !== entry.mounted.canvases.length || fresh.canvases.some((canvas, i) => canvas !== entry.mounted.canvases[i])) disposeEntry(id, entry);
   }
+  for (const discovery of discoveries) if (!entries.has(discovery.sectionId)) mountOne(discovery);
   pending.clear();
-  for (const meta of WEBGL_SECTIONS) {
-    if (meta.built && !entries.has(meta.sectionId)) pending.add(meta.sectionId);
-  }
+  for (const meta of WEBGL_SECTIONS) if (meta.built && !entries.has(meta.sectionId)) pending.add(meta.sectionId);
+  if (!runtime && entries.size) driver?.start();
+  if (!entries.size) driver?.stop();
   return pending.size === 0;
 }
-
-/**
- * Presentation-only loop for scenes no MotionRuntime claimed. It never instantiates
- * Lenis and never writes scroll: it reads `container.scrollTop`, which the app's single
- * Lenis instance animates.
- */
 class PresentationDriver {
   private raf = 0;
-  private startAt = 0;
-  /**
-   * Capture-only clock pin. `?heroTimeSec=<n>` freezes `frame.timeSec` so a screenshot can be
-   * taken at a known animation phase. Without it the hero ring is at a different rotation in
-   * every capture (it advances -0.05 turns/s), which makes a pixel diff against a still
-   * reference frame meaningless — the phase, not the geometry, dominates the delta.
-   */
-  private readonly frozenTimeSec: number | null =
-    typeof location === 'undefined'
-      ? null
-      : (() => {
-          const raw = new URLSearchParams(location.search).get('heroTimeSec');
-          if (raw === null) return null;
-          const n = Number(raw);
-          return Number.isFinite(n) ? n : null;
-        })();
-  private lastAt = 0;
+  private started = 0;
+  private previous = 0;
   private container: HTMLElement | null = null;
   private pointer = { x: 0, y: 0 };
-  private reduce: MediaQueryList | null = null;
-  private readonly frame: FrameInput = {
-    timeSec: 0,
-    deltaSec: 1 / 60,
-    scrollYPx: 0,
-    velocityPxPerSec: 0,
-    pointerNdc: { x: 0, y: 0 },
-    viewport: { width: 0, height: 0, dpr: 1 },
-    reducedMotion: false,
-  };
-
-  start(): void {
-    if (this.raf || typeof window === 'undefined') return;
-    this.bind(opts.container ?? scrollContainer());
-    this.startAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
-    this.lastAt = this.startAt;
-    this.raf = requestAnimationFrame(this.tick);
-  }
-
-  private bind(container: HTMLElement | null): void {
-    if (this.container === container) return;
-    this.unbind();
-    this.container = container;
-    if (!container) return;
-    container.addEventListener('pointermove', this.onPointer, { passive: true });
-    window.addEventListener('resize', this.onResize);
-    if (typeof window.matchMedia === 'function') {
-      this.reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-      this.reduce.addEventListener?.('change', this.onResize);
-    }
-  }
-
-  private unbind(): void {
-    this.container?.removeEventListener('pointermove', this.onPointer);
-    if (typeof window !== 'undefined') window.removeEventListener('resize', this.onResize);
-    this.reduce?.removeEventListener?.('change', this.onResize);
-    this.container = null;
-  }
-
   private readonly onPointer = (event: PointerEvent): void => {
-    const container = this.container;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
+    const rect = this.container!.getBoundingClientRect();
     this.pointer.x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
     this.pointer.y = 1 - ((event.clientY - rect.top) / Math.max(1, rect.height)) * 2;
   };
-
-  private readonly onResize = (): void => {
-    for (const entry of entries.values()) {
-      if (entry.claimed) continue;
-      ensureHostBox(entry.mounted.host, entry.mounted.canvases);
-      const { w, h } = hostSize(entry.mounted.host);
-      entry.mounted.scene.resize(w, h, devicePixelRatio());
-      const container = opts.container ?? scrollContainer();
-      if (container) entry.mounted.range = scrollRangeFor(entry.mounted.section, container);
-    }
-  };
-
-  private readonly tick = (now: number): void => {
+  private readonly onResize = (): void => { for (const entry of entries.values()) if (!entry.claimed) resizeEntry(entry); };
+  start(): void {
+    if (this.raf) return;
+    this.container = opts.container ?? scrollContainer();
+    if (!this.container) return;
+    this.container.addEventListener('pointermove', this.onPointer, { passive: true });
+    window.addEventListener('resize', this.onResize);
+    this.started = performance.now(); this.previous = this.started;
     this.raf = requestAnimationFrame(this.tick);
-    this.onResizeIfIdle();
+  }
+  private readonly tick = (now: number): void => {
+    if (!active || !this.container) return;
+    this.raf = requestAnimationFrame(this.tick);
     const container = this.container;
-    if (!container) return;
-    const frame = this.frame;
-    frame.timeSec = this.frozenTimeSec ?? (now - this.startAt) / 1000;
-    frame.deltaSec = Math.min(0.05, Math.max(1 / 240, (now - this.lastAt) / 1000));
-    this.lastAt = now;
-    frame.scrollYPx = container.scrollTop;
-    frame.velocityPxPerSec = 0;
-    frame.pointerNdc.x = this.pointer.x;
-    frame.pointerNdc.y = this.pointer.y;
-    frame.viewport.width = container.clientWidth;
-    frame.viewport.height = container.clientHeight;
-    frame.viewport.dpr = devicePixelRatio();
-    frame.reducedMotion = this.reduce?.matches ?? false;
-
+    const frozen = new URLSearchParams(location.search).get('heroTimeSec');
+    const frame: FrameInput = {
+      timeSec: frozen !== null && Number.isFinite(Number(frozen)) ? Number(frozen) : (now - this.started) / 1000,
+      deltaSec: Math.max(1 / 240, Math.min(0.05, (now - this.previous) / 1000)),
+      scrollYPx: container.scrollTop, velocityPxPerSec: 0, pointerNdc: this.pointer,
+      viewport: { width: container.clientWidth, height: container.clientHeight, dpr: dpr() }, reducedMotion: false,
+    };
+    this.previous = now;
     for (const entry of entries.values()) {
       if (entry.claimed) continue;
-      const { mounted } = entry;
-      const span = mounted.range.endPx - mounted.range.startPx;
-      const progress = span > 0 ? clamp01((frame.scrollYPx - mounted.range.startPx) / span) : 0;
-      mounted.scene.update(frame, progress);
-      if (!mounted.live) signalLive(entry);
+      const range = entry.mounted.range;
+      entry.driven.update(frame, clamp01((frame.scrollYPx - range.startPx) / Math.max(1, range.endPx - range.startPx)));
     }
-    // Reduced motion: one static frame is the whole animation.
-    if (frame.reducedMotion) this.stop();
   };
-
-  /** Re-measure the host rects when the layout changed without a window resize. */
-  private lastLayoutCheck = 0;
-  private onResizeIfIdle(): void {
-    if (this.lastAt - this.lastLayoutCheck < 500) return;
-    this.lastLayoutCheck = this.lastAt;
-    this.onResize();
-  }
-
   stop(): void {
-    if (this.raf && typeof window !== 'undefined') cancelAnimationFrame(this.raf);
-    this.raf = 0;
-    this.unbind();
+    cancelAnimationFrame(this.raf); this.raf = 0;
+    this.container?.removeEventListener('pointermove', this.onPointer);
+    window.removeEventListener('resize', this.onResize); this.container = null;
   }
 }
-
-function watch(): void {
-  if (typeof document === 'undefined') return;
-  deadline = (typeof performance !== 'undefined' ? performance.now() : Date.now()) + (opts.timeoutMs ?? 10_000);
+function watchMounts(): void {
   if (!observer && typeof MutationObserver !== 'undefined') {
-    observer = new MutationObserver(() => {
-      if (tryMountPending()) stopWatching();
-    });
+    observer = new MutationObserver(() => tryMountPending());
     observer.observe(document.documentElement, { childList: true, subtree: true });
   }
-  if (!retryTimer) {
-    retryTimer = setInterval(() => {
-      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
-      if (tryMountPending() || now > deadline) stopWatching();
-    }, 64);
-  }
-}
-
-function stopWatching(): void {
-  observer?.disconnect();
-  observer = null;
   if (retryTimer !== null) clearInterval(retryTimer);
-  retryTimer = null;
+  const deadline = performance.now() + (opts.timeoutMs ?? 10_000);
+  retryTimer = setInterval(() => {
+    if (tryMountPending() || performance.now() > deadline) { clearInterval(retryTimer!); retryTimer = null; }
+  }, 64);
 }
-
-/**
- * Mount every captured scene. Pass the motion runtime to let the single clock drive
- * them; omit it to fall back to the presentation-only loop.
- */
 export function mountWebGLScenes(motion?: MotionRuntime | null, options: MountOptions = {}): MountedScene[] {
-  opts = { ...opts, ...options };
-  if (motion) runtime = motion;
-  if (!driver && opts.allowFallbackDriver !== false) driver = new PresentationDriver();
-  if (motion) claimAll(motion);
-  const done = tryMountPending();
-  if (!done) watch();
-  return [...entries.values()].map((e) => e.mounted);
+  if (runtime && motion && runtime !== motion) disposeWebGLScenes();
+  active = true; opts = { ...options }; runtime = motion ?? runtime;
+  if (runtime) {
+    driver?.stop();
+    for (const entry of entries.values()) if (!entry.claimed) { runtime.register(entry.driven, entry.mounted.range); entry.claimed = true; }
+  } else if (!driver && opts.allowFallbackDriver !== false) driver = new PresentationDriver();
+  tryMountPending(); watchMounts();
+  return [...entries.values()].map(entry => entry.mounted);
 }
-
-function claimAll(motion: MotionRuntime): void {
-  for (const entry of entries.values()) {
-    if (entry.claimed) continue;
-    motion.register(entry.mounted.scene, entry.mounted.range);
-    entry.claimed = true;
-  }
-}
-
-/** Hand the scenes to a motion runtime created later than the mounts. */
-export function attachMotionRuntime(motion: MotionRuntime, options: MountOptions = {}): MountedScene[] {
-  opts = { ...opts, ...options };
-  runtime = motion;
-  claimAll(motion);
-  driver?.stop();
-  return [...entries.values()].map((e) => e.mounted);
-}
-
-/**
- * Idempotent auto-mount, armed from `sceneRegistry` module scope so it is listening
- * before any section exists. Opt out with `window.__FOLLOW_WEBGL_NO_AUTOMOUNT__ = true`.
- */
-export function ensureWebGLAutoMount(options: MountOptions = {}): void {
-  /* `sceneRegistry` imports this module and is imported by it, so this function can be
-     reached while this module body has not finished evaluating. Touch no module state
-     synchronously — everything below runs a microtask later. */
-  void Promise.resolve().then(() => {
-    if (autoStarted || typeof window === 'undefined' || typeof document === 'undefined') return;
-    if ((window as unknown as Record<string, unknown>).__FOLLOW_WEBGL_NO_AUTOMOUNT__) return;
-    autoStarted = true;
-    opts = { ...opts, ...options };
-    if (!driver) driver = new PresentationDriver();
-    const arm = (): void => {
-      if (!tryMountPending()) watch();
-    };
-    /* App.vue already refuses to build a runtime under prefers-reduced-motion, but it is
-       not the only mount path: this auto-mount arms from a module side-effect, so it
-       mounted all five scenes anyway and allocated six WebGL contexts before the
-       PresentationDriver's own reduced-motion check (which only stops the loop) ever
-       ran. Suppression has to happen before the contexts exist. If the user flips the
-       setting at runtime, arm on the next change. */
-    const reduce = typeof window.matchMedia === 'function'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)')
-      : null;
-    if (reduce?.matches) {
-      const onChange = (): void => {
-        if (reduce.matches) return;
-        reduce.removeEventListener('change', onChange);
-        arm();
-      };
-      reduce.addEventListener('change', onChange);
-      return;
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(arm), { once: true });
-    } else {
-      requestAnimationFrame(arm);
-    }
-  });
-}
-
-/** Unmount + dispose every scene and stop every listener (route teardown, tests). */
 export function disposeWebGLScenes(): void {
-  stopWatching();
-  driver?.stop();
-  driver = null;
-  for (const [id, entry] of entries) {
-    if (entry.claimed && runtime) runtime.unregister(id);
-    else entry.mounted.scene.dispose();
-  }
-  entries.clear();
-  pending.clear();
-  runtime = null;
-  autoStarted = false;
+  active = false; observer?.disconnect(); observer = null;
+  if (retryTimer !== null) clearInterval(retryTimer); retryTimer = null;
+  driver?.stop(); driver = null;
+  for (const [id, entry] of entries) disposeEntry(id, entry);
+  entries.clear(); pending.clear(); runtime = null; opts = {};
 }
-
-/** Introspection for the test bridge / diagnostics. */
-export function webGLMountState(): {
-  mounted: SectionId[];
-  pending: SectionId[];
-  live: SectionId[];
-  claimed: SectionId[];
-} {
-  const mounted: SectionId[] = [];
-  const live: SectionId[] = [];
-  const claimed: SectionId[] = [];
-  for (const [id, entry] of entries) {
-    mounted.push(id);
-    if (entry.mounted.live) live.push(id);
-    if (entry.claimed) claimed.push(id);
-  }
-  return { mounted, pending: [...pending], live, claimed };
+export function webGLMountState(): { mounted: SectionId[]; pending: SectionId[]; live: SectionId[]; claimed: SectionId[] } {
+  return { mounted: [...entries.keys()], pending: [...pending], live: [...entries].filter(([, entry]) => entry.mounted.live).map(([id]) => id), claimed: [...entries].filter(([, entry]) => entry.claimed).map(([id]) => id) };
 }

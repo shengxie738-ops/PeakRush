@@ -125,7 +125,10 @@ export interface TestimonialSnapshot {
   cards: CardLayout[];
 }
 
-export function createTestimonialCarousel(options: TestimonialCarouselOptions): SceneController {
+export function createTestimonialCarousel(options: TestimonialCarouselOptions): SceneController & {
+  snapshot(): TestimonialSnapshot;
+  goTo(next: number): void;
+} {
   const id = options.id ?? 'home.testimonials';
   const count = options.count ?? 8;
   const host = new WebGLHost(options.canvas);
@@ -168,9 +171,11 @@ export function createTestimonialCarousel(options: TestimonialCarouselOptions): 
   }
 
   let disposed = false;
-  let target = 0;
-  let shown = 0;
-  let tweenFrom = 0;
+  const container = options.canvas.parentElement;
+  const savedIndex = Number(container?.getAttribute('data-webgl-index') ?? 0);
+  let target = Number.isFinite(savedIndex) ? clamp(Math.round(savedIndex), 0, count - 1) : 0;
+  let shown = target;
+  let tweenFrom = target;
   let tweenStart = -1;
 
   const goTo = (next: number): void => {
@@ -179,17 +184,18 @@ export function createTestimonialCarousel(options: TestimonialCarouselOptions): 
     target = clamped;
     tweenFrom = shown;
     tweenStart = -1;
+    container?.setAttribute('data-webgl-index', String(target));
+    container?.dispatchEvent(new CustomEvent('peakrush:carousel-index', { detail: { index: target }, bubbles: true }));
   };
 
   /* --- interaction: Prev/Next + horizontal drag, matching the reference's handlers --- */
-  const container = options.canvas.parentElement;
   const onPrev = (): void => goTo(target - 1);
   const onNext = (): void => goTo(target + 1);
   let dragging = false;
   let dragStartX = 0;
   let dragFromIndex = 0;
   const onPointerDown = (e: PointerEvent): void => {
-    if ((e.target as HTMLElement).closest('a, .btn')) return;
+    if ((e.target as Element).closest('a, .btn')) return;
     dragging = true;
     dragStartX = e.clientX;
     dragFromIndex = target;
@@ -207,72 +213,74 @@ export function createTestimonialCarousel(options: TestimonialCarouselOptions): 
   };
   const slotWidth = (): number => (container?.clientWidth || window.innerWidth) / 1460 * 460;
 
-  container?.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('[data-carousel-step]');
-    if (!btn) return;
+  const onClick = (e: Event): void => {
+    const btn = (e.target as Element).closest('[data-carousel-step]');
+    if (!btn || btn.hasAttribute('disabled') || btn.getAttribute('aria-disabled') === 'true') return;
     if (btn.getAttribute('data-carousel-step') === 'next') onNext();
     else onPrev();
-  });
+  };
+  container?.addEventListener('click', onClick);
   options.canvas.addEventListener('pointerdown', onPointerDown);
   options.canvas.addEventListener('pointerup', onPointerUp);
   options.canvas.addEventListener('pointercancel', onPointerUp);
 
   const easeInOut = (t: number): number => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
-  return Object.assign(
-    {
-      id,
+  return {
+    id,
+    get ready(): boolean { return !disposed && host.isReady; },
 
-      update(frame: FrameInput, _progress: number): void {
-        if (disposed) return;
-        if (tweenStart < 0) tweenStart = frame.timeSec;
-        const t = clamp((frame.timeSec - tweenStart) / TWEEN_SEC, 0, 1);
-        shown = frame.reducedMotion ? target : tweenFrom + (target - tweenFrom) * easeInOut(t);
+    update(frame: FrameInput, _progress: number): void {
+      if (disposed) return;
+      if (tweenStart < 0) tweenStart = frame.timeSec;
+      const t = clamp((frame.timeSec - tweenStart) / TWEEN_SEC, 0, 1);
+      shown = frame.reducedMotion ? target : tweenFrom + (target - tweenFrom) * easeInOut(t);
 
-        const pointerX = frame.reducedMotion ? 0.5 : (frame.pointerNdc.x + 1) / 2;
-        cards.forEach((card, u) => {
-          const l = cardLayout(shown, pointerX, u);
-          card.mesh.visible = l.visible;
-          if (!l.visible) return;
-          card.mesh.position.set(l.position[0], l.position[1], l.position[2]);
-          card.mesh.rotation.set(l.rotation[0], l.rotation[1], l.rotation[2]);
-          (card.uniforms.progress!.value as THREE.Vector2).x = l.progressX;
-          card.uniforms.effect!.value = l.effect;
-          card.uniforms.radius!.value = l.radius;
-        });
+      const pointerX = frame.reducedMotion ? 0.5 : (frame.pointerNdc.x + 1) / 2;
+      cards.forEach((card, u) => {
+        const l = cardLayout(shown, pointerX, u);
+        card.mesh.visible = l.visible;
+        if (!l.visible) return;
+        card.mesh.position.set(l.position[0], l.position[1], l.position[2]);
+        card.mesh.rotation.set(l.rotation[0], l.rotation[1], l.rotation[2]);
+        (card.uniforms.progress!.value as THREE.Vector2).x = l.progressX;
+        card.uniforms.effect!.value = l.effect;
+        card.uniforms.radius!.value = l.radius;
+      });
 
-        host.setViewport();
-        host.render(scene, camera);
-      },
-
-      snapshot(): TestimonialSnapshot {
-        return {
-          activeIndex: target,
-          cameraPosition: camera.position.toArray() as [number, number, number],
-          cards: cards.map((_, u) => cardLayout(shown, 0.5, u)),
-        };
-      },
-
-      resize(width: number, height: number, dpr: number): void {
-        if (disposed) return;
-        host.setSize(width, height, dpr);
-        camera.aspect = height > 0 ? width / height : 1;
-        camera.updateProjectionMatrix();
-      },
-
-      dispose(): void {
-        if (disposed) return;
-        disposed = true;
-        options.canvas.removeEventListener('pointerdown', onPointerDown);
-        options.canvas.removeEventListener('pointerup', onPointerUp);
-        options.canvas.removeEventListener('pointercancel', onPointerUp);
-        geometry.dispose();
-        for (const { material } of cards) material.dispose();
-        for (const url of urls) textureRegistry.release(url);
-        scene.clear();
-        host.dispose();
-      },
+      host.setViewport();
+      host.render(scene, camera, urls.every((url) => textureRegistry.ready(url, { colorSpace: 'none' })));
     },
-    { goTo },
-  );
+
+    snapshot(): TestimonialSnapshot {
+      return {
+        activeIndex: target,
+        cameraPosition: camera.position.toArray() as [number, number, number],
+        cards: cards.map((_, u) => cardLayout(shown, 0.5, u)),
+      };
+    },
+
+    resize(width: number, height: number, dpr: number): void {
+      if (disposed) return;
+      host.setSize(width, height, dpr);
+      camera.aspect = height > 0 ? width / height : 1;
+      camera.updateProjectionMatrix();
+    },
+
+    dispose(): void {
+      if (disposed) return;
+      disposed = true;
+      container?.removeEventListener('click', onClick);
+      container?.classList.remove('is-dragging');
+      options.canvas.removeEventListener('pointerdown', onPointerDown);
+      options.canvas.removeEventListener('pointerup', onPointerUp);
+      options.canvas.removeEventListener('pointercancel', onPointerUp);
+      geometry.dispose();
+      for (const { material } of cards) material.dispose();
+      for (const url of urls) textureRegistry.release(url, { colorSpace: 'none' });
+      scene.clear();
+      host.dispose();
+    },
+    goTo,
+  };
 }

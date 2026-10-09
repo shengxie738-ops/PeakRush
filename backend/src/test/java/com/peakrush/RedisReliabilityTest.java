@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RedisReliabilityTest {
  LettuceConnectionFactory connection;Reservations reservations;long aid;long iid=1;String p;Map<String,Object> item;
  @BeforeEach void open(){
-  connection=new LettuceConnectionFactory("127.0.0.1",16379);connection.afterPropertiesSet();connection.start();
+  connection=new LettuceConnectionFactory(System.getenv().getOrDefault("REDIS_HOST","127.0.0.1"),Integer.parseInt(System.getenv().getOrDefault("REDIS_PORT","16379")));connection.afterPropertiesSet();connection.start();
   var template=new StringRedisTemplate(connection);template.afterPropertiesSet();
   reservations=new Reservations(template,new Json(new ObjectMapper()),new StockHints());aid=System.nanoTime();p=reservations.prefix(aid,iid);
   item=Json.map("activity_id",aid,"id",iid,"available_stock",10,"total_stock",10,"limit_per_user",1,"generation","test-generation","start_time",Instant.now().minusSeconds(10),"end_time",Instant.now().plusSeconds(120),"activity_status","PREHEATED");

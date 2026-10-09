@@ -4,11 +4,7 @@
  * reference `Landing7Connectory` + `Landing7ConnectoryWebGl` (Cc-BjTZB.js, CrHBTwDc.js).
  * ui-green, 2316px (content overflows the 200svh slots), 1 canvas.
  *
- * sceneRegistry marks landing-7 built:false (webgl-scenes.json: "未取到场景
- * （渲染门控/离屏）") and its single texture /images/landing/7.connectory/image.png
- * was never downloaded, so the measured .landing-7-connectory-webgl box keeps the
- * measured canvas count and a data-evidence="pending-T00-webgl-scene" marker; every
- * word of copy around it is the measured text.
+ * The existing collection image remains visible until its WebGL scene can draw.
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import BrushLink from '@/components/BrushLink.vue';
@@ -80,6 +76,9 @@ defineExpose({
                 data-evidence="pending-T00-webgl-scene"
               >
                 <canvas v-for="slot in canvasCount" :key="slot" aria-hidden="true" />
+                <span class="webgl-fallback">
+                  <img :src="IMG.connectoryImage" alt="好物上新" />
+                </span>
               </div>
             </DisplayHeading>
           </div>
