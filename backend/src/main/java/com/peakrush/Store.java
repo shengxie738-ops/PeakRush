@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
 @Service
+@org.springframework.context.annotation.DependsOn("catalogSchema")
 public class Store {
  final JdbcTemplate jdbc; final TransactionTemplate tx; final Json json;
  private record CachedItem(Map<String,Object> value,long until){}
@@ -29,13 +30,17 @@ public class Store {
  public static BigDecimal money(Object x){try{BigDecimal d=new BigDecimal(String.valueOf(x));if(d.signum()<=0||d.compareTo(new BigDecimal("999999999"))>0)throw new Exception();return d.setScale(2,java.math.RoundingMode.UNNECESSARY);}catch(Exception e){throw ApiException.bad("金额须为正数");}}
  public static int positive(Object x,int maximum){long n=Json.number(x);if(n<1||n>maximum)throw ApiException.bad("数量不在允许范围");return (int)n;}
  private String name(Map<String,Object>b){String v=Json.string(b,"name").trim();if(v.isEmpty()||v.length()>160)throw ApiException.bad("请输入有效名称");return v;}
- public Map<String,Object> product(Map<String,Object> r){return Json.map("id",r.get("id"),"name",r.get("name"),"description",r.get("description"),"imageUrl",r.get("image_url"),"originalPrice",r.get("original_price"));}
+ private static final Set<String> CATEGORIES=Set.of("数码影音","居家生活","运动户外","旅行出行","其他好物");
+ static String category(Object value){String c=value==null?"其他好物":String.valueOf(value).trim();if(!CATEGORIES.contains(c))throw ApiException.bad("请选择有效商品分类");return c;}
+ public Map<String,Object> product(Map<String,Object> r){return Json.map("id",r.get("id"),"name",r.get("name"),"description",r.get("description"),"imageUrl",r.get("image_url"),"originalPrice",r.get("original_price"),"category",r.getOrDefault("category","其他好物"));}
  public Map<String,Object> products(){return list(jdbc.queryForList("SELECT * FROM product WHERE active=TRUE ORDER BY id DESC").stream().map(this::product).toList());}
  public Map<String,Object> saveProduct(Long id,Map<String,Object>b){
   String n=name(b),image=Json.string(b,"imageUrl");
   if(image.length()>500||!(image.isBlank()||image.startsWith("/")||image.startsWith("https://")))throw ApiException.bad("图片须为站内路径或HTTPS地址");
-  if(id==null)id=insert("INSERT INTO product(name,description,image_url,original_price) VALUES(?,?,?,?)",n,Json.string(b,"description"),image,money(b.get("originalPrice")));
-  else{one("SELECT id FROM product WHERE id=?",id);jdbc.update("UPDATE product SET name=?,description=?,image_url=?,original_price=? WHERE id=?",n,Json.string(b,"description"),image,money(b.get("originalPrice")),id);}
+  String c=category(b.containsKey("category")?b.get("category"):id==null?null:one("SELECT category FROM product WHERE id=?",id).get("category"));
+  if(id==null)id=insert("INSERT INTO product(name,description,image_url,original_price,category) VALUES(?,?,?,?,?)",n,Json.string(b,"description"),image,money(b.get("originalPrice")),c);
+  else{one("SELECT id FROM product WHERE id=?",id);jdbc.update("UPDATE product SET name=?,description=?,image_url=?,original_price=?,category=? WHERE id=?",n,Json.string(b,"description"),image,money(b.get("originalPrice")),c,id);}
+  invalidateItems();
   return product(one("SELECT * FROM product WHERE id=?",id));
  }
  public void deleteProduct(long id){if(jdbc.queryForObject("SELECT COUNT(*) FROM seckill_item WHERE product_id=?",Long.class,id)>0)throw new ApiException(409,"PRODUCT_IN_USE","商品已绑定活动");jdbc.update("UPDATE product SET active=FALSE WHERE id=?",id);}
@@ -43,7 +48,7 @@ public class Store {
  public Map<String,Object> activities(boolean admin){return list(jdbc.queryForList("SELECT id FROM activity "+(admin?"":"WHERE status NOT IN ('DRAFT','OFFLINE') ")+"ORDER BY id").stream().map(r->activity(Json.number(r.get("id")))).toList());}
  public Map<String,Object> activity(long id){
   var a=one("SELECT * FROM activity WHERE id=?",id);
-  var items=jdbc.queryForList("SELECT i.*,p.name,p.description,p.image_url,p.original_price FROM seckill_item i JOIN product p ON p.id=i.product_id WHERE i.activity_id=? ORDER BY i.id",id).stream().map(r->Json.map("id",r.get("id"),"productId",r.get("product_id"),"name",r.get("name"),"description",r.get("description"),"imageUrl",r.get("image_url"),"originalPrice",r.get("original_price"),"seckillPrice",r.get("seckill_price"),"totalStock",r.get("total_stock"),"availableStock",r.get("available_stock"),"limitPerUser",r.get("limit_per_user"))).toList();
+  var items=jdbc.queryForList("SELECT i.*,p.name,p.description,p.image_url,p.original_price,p.category FROM seckill_item i JOIN product p ON p.id=i.product_id WHERE i.activity_id=? ORDER BY i.id",id).stream().map(r->Json.map("id",r.get("id"),"productId",r.get("product_id"),"name",r.get("name"),"description",r.get("description"),"imageUrl",r.get("image_url"),"originalPrice",r.get("original_price"),"category",r.get("category"),"seckillPrice",r.get("seckill_price"),"totalStock",r.get("total_stock"),"availableStock",r.get("available_stock"),"limitPerUser",r.get("limit_per_user"))).toList();
   String state=String.valueOf(a.get("status"));Instant now=Instant.now();
   if(state.equals("RUNNING")&&now.isAfter(instant(a.get("end_time"))))state="ENDED";
   return Json.map("id",id,"name",a.get("name"),"description",a.get("description"),"startTime",instant(a.get("start_time")),"endTime",instant(a.get("end_time")),"status",state,"architectureVersion","V"+a.get("architecture_version"),"items",items);

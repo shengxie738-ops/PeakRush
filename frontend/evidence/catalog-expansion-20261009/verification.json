@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-10-09T00:49:31+08:00",
+  "url": "http://127.0.0.1:5400/app/",
+  "commands": [
+    { "command": "npm test", "exitCode": 0, "passed": 68, "failed": 0, "newStorefrontTests": 10 },
+    { "command": "npm run build", "exitCode": 0, "checks": ["vue-tsc --noEmit", "vite build"], "modulesTransformed": 1776 },
+    { "command": "git diff --check", "exitCode": 0 }
+  ],
+  "browserChecks": [
+    { "case": "Default storefront with three expired API activities", "result": "Shows 本轮活动已结束, hides stale zero countdown, offers refresh; default catalog contains zero expired products" },
+    { "case": "Manually select historical watch session and refresh", "result": "Historical watch remains visible; 已结束 purchase button stays disabled" },
+    { "case": "Older API response without category", "result": "Historical item is shown under 其他好物; category choices and counts render" },
+    { "case": "Return from manual history to 全部好物", "result": "Returns to clear expired empty state" },
+    { "case": "Direct /app/activities/3", "result": "Historical activity and its item remain readable; purchase button is disabled" },
+    { "case": "390 x 844 viewport", "result": "documentElement.clientWidth=375 and scrollWidth=375; no horizontal page overflow" },
+    { "case": "Browser console after final reload and historical detail navigation", "result": "No error or warning entries" }
+  ],
+  "screenshots": ["desktop-ended.jpg", "mobile-ended.jpg", "desktop-history-detail.jpg"],
+  "limitations": [
+    "The running service still exposed the three original expired activities during these checks. Rendering all nine real products, newly generated images and all four real categories requires the parent task's backend restart and new demo activities.",
+    "Admin category persistence and purchase/payment flows were not exercised in this frontend subtask.",
+    "Nine-product aggregation, ordering, duplicate elimination, automatic expiry selection and category compatibility are covered by the pure helper tests; passing them is not a substitute for final integrated browser verification."
+  ]
+}

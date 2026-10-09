@@ -3,6 +3,7 @@
 **/target/
 **/node_modules/
 **/dist/
+courses/build/
 .env
 *.log
 *.pid

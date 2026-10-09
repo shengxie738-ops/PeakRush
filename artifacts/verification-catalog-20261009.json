@@ -1,0 +1,136 @@
+{
+  "checkedAt": "2026-10-08T17:21:20.774928+00:00",
+  "checks": [
+    {
+      "name": "nine unique actual products",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "four persisted categories",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "V3 current and next sessions",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "next session has a valid unexpired time window",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "nine different catalog images",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "image /assets/product-camera.png",
+      "passed": true,
+      "details": {
+        "bytes": 1978909
+      }
+    },
+    {
+      "name": "image /assets/product-earbuds.png",
+      "passed": true,
+      "details": {
+        "bytes": 1791193
+      }
+    },
+    {
+      "name": "image /assets/product-watch.png",
+      "passed": true,
+      "details": {
+        "bytes": 1685129
+      }
+    },
+    {
+      "name": "image /assets/products/carry-on.png",
+      "passed": true,
+      "details": {
+        "bytes": 2268730
+      }
+    },
+    {
+      "name": "image /assets/products/coffee-machine.png",
+      "passed": true,
+      "details": {
+        "bytes": 2355224
+      }
+    },
+    {
+      "name": "image /assets/products/desk-lamp.png",
+      "passed": true,
+      "details": {
+        "bytes": 2036927
+      }
+    },
+    {
+      "name": "image /assets/products/mechanical-keyboard.png",
+      "passed": true,
+      "details": {
+        "bytes": 2065180
+      }
+    },
+    {
+      "name": "image /assets/products/portable-speaker.png",
+      "passed": true,
+      "details": {
+        "bytes": 2693042
+      }
+    },
+    {
+      "name": "image /assets/products/trail-shoes.png",
+      "passed": true,
+      "details": {
+        "bytes": 2830789
+      }
+    },
+    {
+      "name": "catalog administration remains protected",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "new coffee product creates a V3 order",
+      "passed": true,
+      "details": {
+        "orderId": 441
+      }
+    },
+    {
+      "name": "new product mock payment",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "second new product creates an order",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "new product cancellation",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "paid order consumes one item",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "cancelled order restores exactly one item",
+      "passed": true,
+      "details": null
+    }
+  ],
+  "passed": true,
+  "nextStartsInFuture": true,
+  "activityIds": [
+    14,
+    15
+  ]
+}

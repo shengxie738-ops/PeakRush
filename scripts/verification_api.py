@@ -114,10 +114,10 @@ async def run(args):
     except Exception as exc:
         report["passed"]=False; report["error"]=str(exc); raise
     finally:
-        target=ROOT/"artifacts"/"verification-api.json"; target.parent.mkdir(exist_ok=True)
+        target=pathlib.Path(args.output) if args.output else ROOT/"artifacts"/"verification-api.json"; target.parent.mkdir(parents=True,exist_ok=True)
         target.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
         print(f"Report: {target}",flush=True)
 if __name__=="__main__":
-    parser=argparse.ArgumentParser();parser.add_argument("--base",default="http://127.0.0.1:8080");parser.add_argument("--versions",default="V0,V1,V2,V3")
+    parser=argparse.ArgumentParser();parser.add_argument("--base",default="http://127.0.0.1:8080");parser.add_argument("--versions",default="V0,V1,V2,V3");parser.add_argument("--output",help="Save a new dated report without replacing historical evidence")
     asyncio.run(run(parser.parse_args()))
 

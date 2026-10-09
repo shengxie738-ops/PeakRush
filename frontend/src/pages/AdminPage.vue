@@ -15,6 +15,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { api, post, errorMessage, ApiError } from "../api";
 import { session, requireLogin } from "../session";
 import { money, dateTime, activityLabel, productImage } from "../format";
+import { PRODUCT_CATEGORIES, productCategory } from "../storefront";
 import type {
   Product,
   Activity,
@@ -67,6 +68,7 @@ const productDialog = ref(false),
   productId = ref<number | null>(null),
   productForm = reactive({
     name: "",
+    category: "其他好物",
     description: "",
     imageUrl: "/assets/product-earbuds.png",
     originalPrice: 399,
@@ -197,12 +199,14 @@ function openProduct(p?: Product) {
     p
       ? {
           name: p.name,
+          category: productCategory(p),
           description: p.description,
           imageUrl: p.imageUrl,
           originalPrice: p.originalPrice,
         }
       : {
           name: "",
+          category: "其他好物",
           description: "",
           imageUrl: "/assets/product-earbuds.png",
           originalPrice: 399,
@@ -606,6 +610,9 @@ onUnmounted(() => window.clearInterval(timer));
                     <p>{{ row.description }}</p>
                   </div>
                 </div></template
+              ></el-table-column
+            ><el-table-column label="分类" width="120"
+              ><template #default="{ row }">{{ productCategory(row) }}</template
               ></el-table-column
             ><el-table-column label="原价" width="140"
               ><template #default="{ row }"
@@ -1011,7 +1018,10 @@ onUnmounted(() => window.clearInterval(timer));
         id="productName"
         v-model="productForm.name"
         maxlength="100"
-      /><label class="field-label" for="productDescription">商品描述</label
+      /><label class="field-label" for="productCategory">商品分类</label
+      ><el-select id="productCategory" v-model="productForm.category" class="product-category-select">
+        <el-option v-for="name in PRODUCT_CATEGORIES" :key="name" :label="name" :value="name" />
+      </el-select><label class="field-label" for="productDescription">商品描述</label
       ><el-input
         id="productDescription"
         v-model="productForm.description"
