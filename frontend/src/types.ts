@@ -94,6 +94,8 @@ export interface Metrics {
   paidOrders: number | null;
   dbAvailableStock: number | null;
   redisAvailableStock: number | null;
+  v4StreamPending: number | null;
+  v4StreamEvents: number | null;
   outboxPending: number | null;
   deadLetters: number | null;
   latencyP95Ms: number | null;

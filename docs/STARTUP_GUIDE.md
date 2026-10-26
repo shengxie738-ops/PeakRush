@@ -79,6 +79,7 @@ cd G:\高并发大作业项目\PeakRush
 
 - 首次或改过后端/前端代码后，去掉 `-SkipBuild`（会执行 `mvn package` 与 `npm ci && npm run build`，约 3–6 分钟）。
 - 若 Windows 保留了默认的 8080/8081 端口，可改用：`.\scripts\app-start.ps1 -BackendPort 9081 -GatewayPort 9080 -SkipBuild -SkipInfra`。前端仍在 5400；`app-status.ps1` 会读取运行清单中的实际端口。
+- 本机 Kafka 数据目录使用 10 年保留期并关闭日志压缩，规避 Windows 对索引文件重命名/删除的限制；`.runtime/kafka/data` 不会自动清理，可能随使用增长。
 - 只想构建不启动：`.\依赖环境\build-local.ps1`。
 - 演示账号：`demo / demo12345`、`admin / admin12345`，由后端 `DemoData` 在 local profile 首次启动时写入，重启不会重置。
 
