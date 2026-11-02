@@ -1,0 +1,1833 @@
+{
+  "schemaVersion": 2,
+  "generatedBy": "scripts/build-asset-manifest.mjs",
+  "referenceBuild": "v_1790676598601 / nuxt 63c1e131-150b-472a-8fd2-ea1d2a3b59fb",
+  "rightsPolicy": "Nothing here is owned or licensed by this project. Reference-sourced files are permission-required; untraceable files are unverified.",
+  "counts": {
+    "total": 105,
+    "measured": 105,
+    "notReferencedBySrc": 0,
+    "assets": 107
+  },
+  "assets": [
+    {
+      "id": "assets-cards-Card-1-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-1.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-1.png",
+      "servedAt": "/assets/cards/Card-1.png",
+      "bytes": 125136,
+      "sha256": "854cd75e2282207b",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-1\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-2-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-2.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-2.png",
+      "servedAt": "/assets/cards/Card-2.png",
+      "bytes": 117775,
+      "sha256": "c2523d1a8cb7e599",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-2\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-3-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-3.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-3.png",
+      "servedAt": "/assets/cards/Card-3.png",
+      "bytes": 114946,
+      "sha256": "f6a303897162e4e0",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-3\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-4-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-4.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-4.png",
+      "servedAt": "/assets/cards/Card-4.png",
+      "bytes": 166067,
+      "sha256": "45e3c3df2d6f50b0",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-4\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-5-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-5.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-5.png",
+      "servedAt": "/assets/cards/Card-5.png",
+      "bytes": 187894,
+      "sha256": "682671732ac76540",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-5\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-6-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-6.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-6.png",
+      "servedAt": "/assets/cards/Card-6.png",
+      "bytes": 137765,
+      "sha256": "68fe6b1fb61c1180",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-6\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-7-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-7.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-7.png",
+      "servedAt": "/assets/cards/Card-7.png",
+      "bytes": 157277,
+      "sha256": "b65f57764e5638a1",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-7\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-8-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-8.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-8.png",
+      "servedAt": "/assets/cards/Card-8.png",
+      "bytes": 131491,
+      "sha256": "8b3cae0d4e6928b8",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-8\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-Card-9-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/1.intro/webgl/Card-9.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/Card-9.png",
+      "servedAt": "/assets/cards/Card-9.png",
+      "bytes": 59802,
+      "sha256": "f6301ac4aced4e6c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Card-9\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-nexus-card-1-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/3.nexus/card-1.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/nexus/card-1.png",
+      "servedAt": "/assets/cards/nexus/card-1.png",
+      "bytes": 781722,
+      "sha256": "a55e46f751bd2904",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"card-1\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-cards-nexus-card-2-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/3.nexus/card-2.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/cards/nexus/card-2.png",
+      "servedAt": "/assets/cards/nexus/card-2.png",
+      "bytes": 175420,
+      "sha256": "39b38ae45ca71504",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"card-2\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-cross-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/4.follow-art/cross.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/cross.svg",
+      "servedAt": "/assets/decor/cross.svg",
+      "bytes": 16296,
+      "sha256": "833c0ea41ce02905",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"cross\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-emoji-smile-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/emoji-smile.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/emoji-smile.svg",
+      "servedAt": "/assets/decor/emoji-smile.svg",
+      "bytes": 97708,
+      "sha256": "692341a90f085b7d",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"emoji-smile\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-flower-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/flower.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/flower.svg",
+      "servedAt": "/assets/decor/flower.svg",
+      "bytes": 13550,
+      "sha256": "28682c944b188922",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"flower\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-helix-decoration-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/helix-decoration.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/helix-decoration.svg",
+      "servedAt": "/assets/decor/helix-decoration.svg",
+      "bytes": 19245,
+      "sha256": "554a8721555f4ade",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"helix-decoration\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-image-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/image.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/image.png",
+      "servedAt": "/assets/decor/image.png",
+      "bytes": 1157401,
+      "sha256": "df35e8d798b42e33",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"image\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-line-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/line.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/line.svg",
+      "servedAt": "/assets/decor/line.svg",
+      "bytes": 97557,
+      "sha256": "9263f3394c785862",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"line\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-loop-arrows-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/loop-arrows.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/loop-arrows.svg",
+      "servedAt": "/assets/decor/loop-arrows.svg",
+      "bytes": 98916,
+      "sha256": "63715ff17900c1bd",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"loop-arrows\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-media-play-white-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/common/media-play-white.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/media-play-white.svg",
+      "servedAt": "/assets/decor/media-play-white.svg",
+      "bytes": 172,
+      "sha256": "de1923931339aca4",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"media-play-white\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-media-play-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/common/media-play.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/media-play.svg",
+      "servedAt": "/assets/decor/media-play.svg",
+      "bytes": 172,
+      "sha256": "c89584d7cbc52588",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"media-play\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-menu-decoration-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/common/menu-decoration.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/menu-decoration.png",
+      "servedAt": "/assets/decor/menu-decoration.png",
+      "bytes": 6601,
+      "sha256": "bc862661e6a5f33f",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"menu-decoration\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-promo-arrow-orange-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/promo-arrow-orange.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/promo-arrow-orange.svg",
+      "servedAt": "/assets/decor/promo-arrow-orange.svg",
+      "bytes": 14487,
+      "sha256": "1981f9ccd1320ccd",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"promo-arrow-orange\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-promo-arrow-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/promo-arrow.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/promo-arrow.svg",
+      "servedAt": "/assets/decor/promo-arrow.svg",
+      "bytes": 14483,
+      "sha256": "6920d6462b74037a",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"promo-arrow\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-1-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-1.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-1.png",
+      "servedAt": "/assets/decor/Review-1.png",
+      "bytes": 80807,
+      "sha256": "48caf58a0d49f6c7",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-1\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-2-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-2.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-2.png",
+      "servedAt": "/assets/decor/Review-2.png",
+      "bytes": 243845,
+      "sha256": "8e380d0ad66223d2",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-2\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-3-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-3.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-3.png",
+      "servedAt": "/assets/decor/Review-3.png",
+      "bytes": 254933,
+      "sha256": "a74d643e5f271a84",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-3\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-4-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-4.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-4.png",
+      "servedAt": "/assets/decor/Review-4.png",
+      "bytes": 123424,
+      "sha256": "744349a451755795",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-4\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-5-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-5.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-5.png",
+      "servedAt": "/assets/decor/Review-5.png",
+      "bytes": 134225,
+      "sha256": "af6bb852291e802a",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-5\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-6-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-6.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-6.png",
+      "servedAt": "/assets/decor/Review-6.png",
+      "bytes": 253028,
+      "sha256": "4828ac0c476e44d1",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-6\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-7-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-7.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-7.png",
+      "servedAt": "/assets/decor/Review-7.png",
+      "bytes": 238156,
+      "sha256": "e6bfea96c9e671cd",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-7\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-Review-8-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/9.testimonials/Review-8.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/Review-8.png",
+      "servedAt": "/assets/decor/Review-8.png",
+      "bytes": 241827,
+      "sha256": "e328491283b9933c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Review-8\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-speech-balloon-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/9.testimonials/speech-balloon.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/speech-balloon.svg",
+      "servedAt": "/assets/decor/speech-balloon.svg",
+      "bytes": 25939,
+      "sha256": "533b8d13efb7fc7e",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"speech-balloon\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-star-white-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/common/star-white.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/star-white.svg",
+      "servedAt": "/assets/decor/star-white.svg",
+      "bytes": 5932,
+      "sha256": "574b1d6dcbbd9747",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"star-white\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-star-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/star.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/star.svg",
+      "servedAt": "/assets/decor/star.svg",
+      "bytes": 12362,
+      "sha256": "fde9a26c9b40351c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"star\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-subscribe-black-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/common/subscribe-black.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/subscribe-black.svg",
+      "servedAt": "/assets/decor/subscribe-black.svg",
+      "bytes": 4588,
+      "sha256": "c6b7d8aeb77d504b",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"subscribe-black\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-subscribe-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/card/edit/subscribe.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/subscribe.svg",
+      "servedAt": "/assets/decor/subscribe.svg",
+      "bytes": 4588,
+      "sha256": "7176845f85091492",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"subscribe\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-the-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/the.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/the.svg",
+      "servedAt": "/assets/decor/the.svg",
+      "bytes": 9744,
+      "sha256": "2b55c40fb4bc42c2",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"the\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-title-decoration-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/nexus-card/subscription-and-pricing/title-decoration.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/title-decoration.svg",
+      "servedAt": "/assets/decor/title-decoration.svg",
+      "bytes": 26081,
+      "sha256": "de73146121d90dec",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"title-decoration\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-usd-currency-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/common/usd-currency.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/usd-currency.svg",
+      "servedAt": "/assets/decor/usd-currency.svg",
+      "bytes": 11516,
+      "sha256": "ca932d7a6e47acb4",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"usd-currency\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-decor-vortex-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/common/vortex.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/decor/vortex.svg",
+      "servedAt": "/assets/decor/vortex.svg",
+      "bytes": 70439,
+      "sha256": "d7f7679b76c1a43c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"vortex\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-anton-persianov-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/anton-persianov.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/anton-persianov.jpg",
+      "servedAt": "/assets/people/anton-persianov.jpg",
+      "bytes": 399207,
+      "sha256": "e14f2dc0da75ca62",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"anton-persianov\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-bruno-mellis-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/bruno-mellis.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/bruno-mellis.jpg",
+      "servedAt": "/assets/people/bruno-mellis.jpg",
+      "bytes": 284222,
+      "sha256": "159ed70942767a4c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"bruno-mellis\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-diana-novicka-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/diana-novicka.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/diana-novicka.jpg",
+      "servedAt": "/assets/people/diana-novicka.jpg",
+      "bytes": 382311,
+      "sha256": "b842c4d833d4cf31",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"diana-novicka\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-evelina-gorbacova-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/evelina-gorbacova.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/evelina-gorbacova.jpg",
+      "servedAt": "/assets/people/evelina-gorbacova.jpg",
+      "bytes": 304663,
+      "sha256": "0a0fcedb6fc5407a",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"evelina-gorbacova\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-ksenija-labecka-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/ksenija-labecka.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/ksenija-labecka.jpg",
+      "servedAt": "/assets/people/ksenija-labecka.jpg",
+      "bytes": 314086,
+      "sha256": "238e845bf9f661a1",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"ksenija-labecka\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-1-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-1.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-1.jpg",
+      "servedAt": "/assets/people/person-1.jpg",
+      "bytes": 346962,
+      "sha256": "e36f8275321bc6e4",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-1\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-10-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-10.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-10.jpg",
+      "servedAt": "/assets/people/person-10.jpg",
+      "bytes": 218384,
+      "sha256": "6950668cea4f32c2",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-10\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-2-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-2.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-2.jpg",
+      "servedAt": "/assets/people/person-2.jpg",
+      "bytes": 1311832,
+      "sha256": "93bfbcb4d3ebe936",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-2\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-3-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-3.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-3.jpg",
+      "servedAt": "/assets/people/person-3.jpg",
+      "bytes": 745741,
+      "sha256": "685dbaba9d9ca5d2",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-3\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-4-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-4.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-4.jpg",
+      "servedAt": "/assets/people/person-4.jpg",
+      "bytes": 1053492,
+      "sha256": "14f61eb28ecce23b",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-4\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-5-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-5.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-5.jpg",
+      "servedAt": "/assets/people/person-5.jpg",
+      "bytes": 907053,
+      "sha256": "b88d14f04ee3256d",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-5\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-6-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-6.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-6.jpg",
+      "servedAt": "/assets/people/person-6.jpg",
+      "bytes": 222638,
+      "sha256": "b284d1fd664c1117",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-6\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-7-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-7.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-7.jpg",
+      "servedAt": "/assets/people/person-7.jpg",
+      "bytes": 98219,
+      "sha256": "252d1eaefb047d4f",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-7\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-8-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-8.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-8.jpg",
+      "servedAt": "/assets/people/person-8.jpg",
+      "bytes": 81684,
+      "sha256": "dc47c0e2651174be",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-8\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-person-9-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/team/person-9.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/person-9.jpg",
+      "servedAt": "/assets/people/person-9.jpg",
+      "bytes": 309046,
+      "sha256": "4f0a8effcb451f99",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"person-9\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-pricila-lto-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/pricila-lto.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/pricila-lto.jpg",
+      "servedAt": "/assets/people/pricila-lto.jpg",
+      "bytes": 237834,
+      "sha256": "6bb95a3f7d773400",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"pricila-lto\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-1-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-1.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-1.png",
+      "servedAt": "/assets/people/trail-1.png",
+      "bytes": 321606,
+      "sha256": "f065098dfc8fcdf0",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-1\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-10-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-10.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-10.png",
+      "servedAt": "/assets/people/trail-10.png",
+      "bytes": 233487,
+      "sha256": "29e505447da61cae",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-10\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-11-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-11.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-11.png",
+      "servedAt": "/assets/people/trail-11.png",
+      "bytes": 141517,
+      "sha256": "a8aa597a8bd2adfa",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-11\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-12-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-12.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-12.png",
+      "servedAt": "/assets/people/trail-12.png",
+      "bytes": 213417,
+      "sha256": "84614b418834e8c0",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-12\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-13-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-13.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-13.png",
+      "servedAt": "/assets/people/trail-13.png",
+      "bytes": 284487,
+      "sha256": "d8e48ee2b99cc44b",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-13\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-14-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-14.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-14.png",
+      "servedAt": "/assets/people/trail-14.png",
+      "bytes": 259441,
+      "sha256": "47fd481e0ba4743d",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-14\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-15-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-15.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-15.png",
+      "servedAt": "/assets/people/trail-15.png",
+      "bytes": 96445,
+      "sha256": "d10d5b439280f2a9",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-15\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-16-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-16.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-16.png",
+      "servedAt": "/assets/people/trail-16.png",
+      "bytes": 429458,
+      "sha256": "198aed447e6190b5",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-16\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-17-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-17.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-17.png",
+      "servedAt": "/assets/people/trail-17.png",
+      "bytes": 304471,
+      "sha256": "f9f6222f02b94bea",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-17\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-18-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-18.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-18.png",
+      "servedAt": "/assets/people/trail-18.png",
+      "bytes": 349945,
+      "sha256": "95144b09484497d5",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-18\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-2-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-2.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-2.png",
+      "servedAt": "/assets/people/trail-2.png",
+      "bytes": 238296,
+      "sha256": "2d4360f4eefe0ed2",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-2\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-3-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-3.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-3.png",
+      "servedAt": "/assets/people/trail-3.png",
+      "bytes": 43288,
+      "sha256": "7023dba54e89dc34",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-3\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-4-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-4.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-4.png",
+      "servedAt": "/assets/people/trail-4.png",
+      "bytes": 328391,
+      "sha256": "26340d762fe73fc5",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-4\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-5-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-5.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-5.png",
+      "servedAt": "/assets/people/trail-5.png",
+      "bytes": 180527,
+      "sha256": "5158a227d9d4eefc",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-5\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-6-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-6.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-6.png",
+      "servedAt": "/assets/people/trail-6.png",
+      "bytes": 119679,
+      "sha256": "2336b10da3775c15",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-6\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-7-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-7.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-7.png",
+      "servedAt": "/assets/people/trail-7.png",
+      "bytes": 295493,
+      "sha256": "9f3b72f999a18035",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-7\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-8-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-8.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-8.png",
+      "servedAt": "/assets/people/trail-8.png",
+      "bytes": 289883,
+      "sha256": "f8aeedbcffacb4c9",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-8\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-trail-9-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/landing/10.join-us/trail-9.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/trail-9.png",
+      "servedAt": "/assets/people/trail-9.png",
+      "bytes": 148506,
+      "sha256": "35afde73d32233b7",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"trail-9\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-us-word-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/landing/10.join-us/us-word.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/us-word.svg",
+      "servedAt": "/assets/people/us-word.svg",
+      "bytes": 9488,
+      "sha256": "624d33f75844c3df",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"us-word\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-people-veronika-gorbacova-jpg",
+      "kind": "image-texture",
+      "referenceUrl": "/images/about/2.team/veronika-gorbacova.jpg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/people/veronika-gorbacova.jpg",
+      "servedAt": "/assets/people/veronika-gorbacova.jpg",
+      "bytes": 266890,
+      "sha256": "12d8a350300b3709",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"veronika-gorbacova\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-product-video-preview-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/video-preview.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/product/video-preview.png",
+      "servedAt": "/assets/product/video-preview.png",
+      "bytes": 4648005,
+      "sha256": "13bc34c04cf3cc43",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"video-preview\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-aac-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/aac.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/aac.svg",
+      "servedAt": "/assets/subpages/about/aac.svg",
+      "bytes": 3279,
+      "sha256": "b657e3f9f13162ab",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"aac\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-all-about-art-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/all-about-art.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/all-about-art.svg",
+      "servedAt": "/assets/subpages/about/all-about-art.svg",
+      "bytes": 17588,
+      "sha256": "b9b4bdd137324212",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"all-about-art\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-art-fairs-service-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/art-fairs-service.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/art-fairs-service.svg",
+      "servedAt": "/assets/subpages/about/art-fairs-service.svg",
+      "bytes": 13075,
+      "sha256": "01c192760ace7b3d",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"art-fairs-service\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-cci-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/cci.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/cci.svg",
+      "servedAt": "/assets/subpages/about/cci.svg",
+      "bytes": 6860,
+      "sha256": "ad1d84b69307dbfd",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"cci\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-museum-of-pacific-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/museum-of-pacific.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/museum-of-pacific.svg",
+      "servedAt": "/assets/subpages/about/museum-of-pacific.svg",
+      "bytes": 35697,
+      "sha256": "837cc8128ff59472",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"museum-of-pacific\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-vaa-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/vaa.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/vaa.svg",
+      "servedAt": "/assets/subpages/about/vaa.svg",
+      "bytes": 30353,
+      "sha256": "d9a10c2b58b5c969",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"vaa\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-volta-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/volta.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/volta.svg",
+      "servedAt": "/assets/subpages/about/volta.svg",
+      "bytes": 1896,
+      "sha256": "10554e8ad3261f75",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"volta\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-worlding-project-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/worlding-project.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/worlding-project.svg",
+      "servedAt": "/assets/subpages/about/worlding-project.svg",
+      "bytes": 6937,
+      "sha256": "5501c45c34f04e7e",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"worlding-project\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-young-painter-prize-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/young-painter-prize.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/young-painter-prize.svg",
+      "servedAt": "/assets/subpages/about/young-painter-prize.svg",
+      "bytes": 60934,
+      "sha256": "b8a4cf4376ee12de",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"young-painter-prize\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-about-zuzeum-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/about/4.partners/zuzeum.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/about/zuzeum.svg",
+      "servedAt": "/assets/subpages/about/zuzeum.svg",
+      "bytes": 38732,
+      "sha256": "bd61cea86960e1ba",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"zuzeum\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-18-83-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/18-83.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/18-83.png",
+      "servedAt": "/assets/subpages/gift-card/18-83.png",
+      "bytes": 6383,
+      "sha256": "637199c393cb0516",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"18-83\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-all-about-art-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/all-about-art.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/all-about-art.png",
+      "servedAt": "/assets/subpages/gift-card/all-about-art.png",
+      "bytes": 12625,
+      "sha256": "ee6cd0dd9d370312",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"all-about-art\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-art-plugged-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/art-plugged.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/art-plugged.png",
+      "servedAt": "/assets/subpages/gift-card/art-plugged.png",
+      "bytes": 5943,
+      "sha256": "e09efcadb9c56a88",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"art-plugged\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-artdaily-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/artdaily.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/artdaily.png",
+      "servedAt": "/assets/subpages/gift-card/artdaily.png",
+      "bytes": 10092,
+      "sha256": "897c82e3c33d2c40",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"artdaily\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-buy-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/gift-card/buy.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/buy.svg",
+      "servedAt": "/assets/subpages/gift-card/buy.svg",
+      "bytes": 16432,
+      "sha256": "21f53307d8c2d75c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"buy\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-cold-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/cold.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/cold.png",
+      "servedAt": "/assets/subpages/gift-card/cold.png",
+      "bytes": 3880,
+      "sha256": "8dfd3b2fd5e8f00e",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"cold\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-image-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/image.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/image.png",
+      "servedAt": "/assets/subpages/gift-card/image.png",
+      "bytes": 484758,
+      "sha256": "ac8a01b8d842b2d9",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"image\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-vaa-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/vaa.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/vaa.png",
+      "servedAt": "/assets/subpages/gift-card/vaa.png",
+      "bytes": 8588,
+      "sha256": "edccd7294a342924",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"vaa\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-vao-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/vao.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/vao.png",
+      "servedAt": "/assets/subpages/gift-card/vao.png",
+      "bytes": 7988,
+      "sha256": "b7e4691a39622468",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"vao\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-video-preview-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/video-preview.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/video-preview.png",
+      "servedAt": "/assets/subpages/gift-card/video-preview.png",
+      "bytes": 460700,
+      "sha256": "aa09d1dc075bdcf5",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"video-preview\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-world-art-news-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/world-art-news.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/world-art-news.png",
+      "servedAt": "/assets/subpages/gift-card/world-art-news.png",
+      "bytes": 11344,
+      "sha256": "d851b853c7d48460",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"world-art-news\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-gift-card-ypp-png",
+      "kind": "image-texture",
+      "referenceUrl": "/images/gift-card/ypp.png",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/gift-card/ypp.png",
+      "servedAt": "/assets/subpages/gift-card/ypp.png",
+      "bytes": 10983,
+      "sha256": "39faa4007a09a7fa",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"ypp\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-nexus-card-the-word-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/nexus-card/icons/the-word.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/nexus-card/the-word.svg",
+      "servedAt": "/assets/subpages/nexus-card/the-word.svg",
+      "bytes": 11465,
+      "sha256": "85dc5cb03b1fd09f",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"the-word\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-nexus-card-time-forward-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/nexus-card/icons/time-forward.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/nexus-card/time-forward.svg",
+      "servedAt": "/assets/subpages/nexus-card/time-forward.svg",
+      "bytes": 322,
+      "sha256": "586e1cff8867cf1c",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"time-forward\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "assets-subpages-nexus-card-your-word-svg",
+      "kind": "vector",
+      "referenceUrl": "/images/nexus-card/icons/your-word.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/assets/subpages/nexus-card/your-word.svg",
+      "servedAt": "/assets/subpages/nexus-card/your-word.svg",
+      "bytes": 9816,
+      "sha256": "9bde63ec03fec4d9",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"your-word\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "fonts-Hardbop-Bold-woff2",
+      "kind": "font",
+      "referenceUrl": "/fonts/Hardbop-Bold.woff2",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/fonts/Hardbop-Bold.woff2",
+      "servedAt": "/fonts/Hardbop-Bold.woff2",
+      "bytes": 42672,
+      "sha256": "f64f3fcfc135e128",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"Hardbop-Bold\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "fonts-HeadingNow-73Book-woff2",
+      "kind": "font",
+      "referenceUrl": "/fonts/HeadingNow-73Book.woff2",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/fonts/HeadingNow-73Book.woff2",
+      "servedAt": "/fonts/HeadingNow-73Book.woff2",
+      "bytes": 76116,
+      "sha256": "9bdd3bd7d0d8dbe0",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"HeadingNow-73Book\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "icons-svg",
+      "kind": "vector",
+      "referenceUrl": "/_nuxt/icons.g7tMF2ID.svg",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/icons.svg",
+      "servedAt": "/icons.svg",
+      "bytes": 114527,
+      "sha256": "6232e09452762d2d",
+      "rights": "permission-required",
+      "usedBy": [
+        "see grep of src for \"icons\""
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "fonts-HeadingNow-73Book-woff",
+      "kind": "font",
+      "referenceUrl": "/fonts/HeadingNow-73Book.woff",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/fonts/HeadingNow-73Book.woff",
+      "servedAt": "/fonts/HeadingNow-73Book.woff",
+      "bytes": 81008,
+      "sha256": "9b6a44a6a39e2074",
+      "rights": "permission-required",
+      "usedBy": [
+        "src/styles/typography.css @font-face woff fallback"
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    },
+    {
+      "id": "fonts-Hardbop-Bold-woff",
+      "kind": "font",
+      "referenceUrl": "/fonts/Hardbop-Bold.woff",
+      "sourceEvidenceId": "evidence/reference/asset-manifest.json",
+      "status": "MEASURED",
+      "localPath": "public/fonts/Hardbop-Bold.woff",
+      "servedAt": "/fonts/Hardbop-Bold.woff",
+      "bytes": 44252,
+      "sha256": "3a548f64738c24b6",
+      "rights": "permission-required",
+      "usedBy": [
+        "src/styles/typography.css @font-face woff fallback"
+      ],
+      "fallbackId": null,
+      "nextAction": "confirm redistribution rights before any public deployment"
+    }
+  ]
+}

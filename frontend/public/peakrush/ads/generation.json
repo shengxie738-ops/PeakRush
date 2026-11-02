@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-08",
+  "generation": "Built-in image_gen tool",
+  "brief": "10 distinct product advertising concepts for PeakRush. Each product uses a different composition, palette, lighting and visual language; avoid warm beige limestone studio photography.",
+  "assets": [
+    {
+      "key": "earbuds",
+      "file": "earbuds.webp",
+      "name": "无线耳机",
+      "direction": "紫色声浪 · 音频广告",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A pair of matte black wireless earbuds and open charging case, floating diagonally inside a translucent violet soundwave ribbon. Deep plum background fading to black. Glossy purple fluid shapes, crisp rim lighting, high-end audio campaign key visual, abstract and sculptural. Product large and beautifully realistic, both earbuds distinct and entirely visible.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-f38e957b-60f1-444a-b553-609fb5c6515c.png"
+    },
+    {
+      "key": "watch",
+      "file": "watch.webp",
+      "name": "智能手表",
+      "direction": "精密机械 · 腕上科技",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A graphite rectangular smartwatch with black woven strap, fully visible, face showing crisp understated amber analog hands. Pure black stage with one sharp white spotlight, fine white exploded technical diagram lines and small unlabeled circular precision markings behind the watch. Dramatic monochrome macro material detail with amber face as the only color. Luxury watch engineering advertisement, serious precise visual language.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-6d43eaf9-095f-44da-9ddf-9291d4627996.png"
+    },
+    {
+      "key": "camera",
+      "file": "camera.webp",
+      "name": "便携相机",
+      "direction": "黑白街头 · 影像大片",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A realistic compact silver and black mirrorless camera with lens, fully visible and dominant foreground, resting on rain-wet dark asphalt in a city at night. Strict black and white cinematic film photography, backlight, reflections, fine rain droplets, distant out-of-focus city lights and dramatic grain. Professional camera campaign evoking street documentary photography. Hero product is sharp and unobstructed.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-67451daf-1f51-42ef-821a-2032d680ff80.png"
+    },
+    {
+      "key": "phone",
+      "file": "phone.webp",
+      "name": "苹果风格手机",
+      "direction": "极简留白 · 新品发布",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A premium silver titanium Apple iPhone style phone, its distinctive triple-lens back visible, floating upright and slightly tilted against an immaculate bright white seamless background. A second thin edge of its glass screen visible in the same single phone, pale cool silver cast shadow beneath. Super minimalist technology launch advertising, pristine high-key realism, precise polished material detail, generous white negative space, no props, no pedestal. Phone fills 70 percent of image.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-3c19fa27-3c31-4e94-a812-ceacd1a49280.png"
+    },
+    {
+      "key": "laptop",
+      "file": "laptop.webp",
+      "name": "轻薄笔记本",
+      "direction": "蓝色光场 · 未来计算",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: An open silver ultra-thin aluminum laptop levitating above a luminous electric-blue perspective grid in a deep cobalt architectural space. Screen shows a crisp abstract blue cyan computational light field. The laptop keyboard and trackpad are clearly visible, complete realistic geometry. Precise volumetric blue light beams receding behind it, premium futuristic computing launch key visual, bold clean wide-angle CGI advertising. Product fills 65 percent of image.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-8ed8aecc-a342-473e-9d01-b1ddc7106f80.png"
+    },
+    {
+      "key": "sneakers",
+      "file": "sneakers.webp",
+      "name": "运动鞋",
+      "direction": "高速冲击 · 运动广告",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: One premium ivory athletic sneaker with small acid-yellow accents, flying diagonally from lower left toward upper right, large complete shoe fully visible. Black charcoal background with an explosive acid-yellow powder burst and sharp curved white motion streaks behind. Dynamic sports brand campaign, energetic high-speed flash photography, exquisitely real mesh, stitched upper and rubber outsole, no repeated shoes.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-0a5fc89b-7b65-44b8-95bb-b50e0a734b9d.png"
+    },
+    {
+      "key": "jacket",
+      "file": "jacket.webp",
+      "name": "机能外套",
+      "direction": "撞色构图 · 时装大片",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: One contemporary burnt-orange technical zip-front jacket with black zipper, entire garment including both sleeves visible, sculpturally floating as if worn by an invisible body. Rich cyan backdrop with a single graphic navy rectangle crossing one corner, hard directional fashion-studio light and geometric shadow. Avant-garde high-fashion editorial advertising, crisp textile folds, purposeful asymmetric art direction. No person, no mannequin, no hanger.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-17a56535-f69c-41ee-965b-c5d866f8dde2.png"
+    },
+    {
+      "key": "drone",
+      "file": "drone.webp",
+      "name": "大疆风格无人机",
+      "direction": "自然航拍 · 自由探索",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A compact pale gray DJI Mini style quadcopter drone with all four arms unfolded and four correct propellers, gimbal camera clear at the front, flying close to camera over a vast green island coastline and turquoise sea. Drone dominant in foreground fills 60 percent of frame, breathtaking distant coastal panorama beneath, natural clear daylight and realistic outdoor aerial photography. Adventure technology campaign, cinematic depth, crisp engineered drone geometry.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-210ad33c-494f-40f9-bba7-6990b88b4308.png"
+    },
+    {
+      "key": "tablet",
+      "file": "tablet.webp",
+      "name": "平板电脑",
+      "direction": "纸艺层叠 · 数字创作",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A thin graphite tablet in landscape orientation with black bezel, screen showing a vibrant flat abstract magenta and coral artwork, one white stylus floating along its lower edge. Background is a handcrafted graphic composition of layered pastel mint, salmon and lilac paper-cut waves, flat and tactile with clean soft shadows. Creative design-tool advertisement mixing true photographic tablet realism and playful editorial paper-craft set design. Entire tablet visible at a modest three-quarter angle.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-c7a0626a-0f48-4fae-9074-28476b315267.png"
+    },
+    {
+      "key": "console",
+      "file": "console.webp",
+      "name": "掌上游戏机",
+      "direction": "像素街机 · 游戏世界",
+      "prompt": "Use case: ads-marketing. Generate ONE square 1:1 professional commercial product advertising key visual for PeakRush's homepage carousel, at high resolution. Art direction should match a top creative agency, concept design studio or technology brand launch. Premium realistic product materials, coherent deliberate composition, one obvious recognizable hero product, thumbnail-legible silhouette, comfortable outer margin. Product and environment are fully opaque. No typography, no captions, no prices, no watermarks, no people. Do NOT use warm beige studio backgrounds, limestone plinths, cream platforms, dried flowers or generic soft warm product photography. Specific unique advertising concept: A realistic portable handheld gaming console with graphite display, blue left controller and red right controller, shown completely and front-facing at a slight diagonal. Deep midnight background surrounded by small luminous orange pixelated cubes, lime green eight-bit geometric paths and retro grid stars. Screen glows with a stylized colorful game-world landscape without text. Vibrant retro-futurist arcade campaign, product tack sharp, playful pixel-art world blended with premium realistic product photography.",
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11b99-3280-7d63-87c2-a91eea511c7c\\exec-034e94a9-5b54-48f0-b2df-3ab9ab625705.png"
+    }
+  ]
+}

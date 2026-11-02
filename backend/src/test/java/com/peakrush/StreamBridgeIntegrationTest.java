@@ -21,13 +21,14 @@ import static org.mockito.Mockito.*;
 class StreamBridgeIntegrationTest {
  @Test void freshAndAbandonedStreamEventsReachRealKafkaAndIdempotentMySqlHandler() throws Exception {
   var fixture=new MySqlTransactionsTest();fixture.create();
-  var connection=new LettuceConnectionFactory("127.0.0.1",16379);connection.afterPropertiesSet();connection.start();
+  var connection=new LettuceConnectionFactory(System.getenv().getOrDefault("REDIS_HOST","127.0.0.1"),Integer.parseInt(System.getenv().getOrDefault("REDIS_PORT","16379")));connection.afterPropertiesSet();connection.start();
   var template=new StringRedisTemplate(connection);template.afterPropertiesSet();
   var json=new Json(new ObjectMapper().findAndRegisterModules());var hints=new StockHints();var reservations=new Reservations(template,json,hints);
   String prefix=reservations.prefix(fixture.aid,fixture.iid),stream=prefix+"events",topic="peakrush-bridge-test-"+UUID.randomUUID();
-  var properties=new HashMap<String,Object>();properties.put("bootstrap.servers","127.0.0.1:19092");properties.put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");properties.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");properties.put("acks","all");properties.put("enable.idempotence",true);
+  String bootstrapServers=System.getenv().getOrDefault("KAFKA_BOOTSTRAP_SERVERS","127.0.0.1:19092");
+  var properties=new HashMap<String,Object>();properties.put("bootstrap.servers",bootstrapServers);properties.put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");properties.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");properties.put("acks","all");properties.put("enable.idempotence",true);
   var producerFactory=new DefaultKafkaProducerFactory<String,String>(properties);var kafka=new KafkaTemplate<String,String>(producerFactory);
-  try(var admin=AdminClient.create(Map.of("bootstrap.servers","127.0.0.1:19092"))){
+  try(var admin=AdminClient.create(Map.of("bootstrap.servers",bootstrapServers))){
    admin.createTopics(List.of(new NewTopic(topic,1,(short)1))).all().get(15,TimeUnit.SECONDS);
    var item=new LinkedHashMap<>(fixture.db.item(fixture.aid,fixture.iid));item.put("activity_status","PREHEATED");item.put("architecture_version",4);
    reservations.warmup(item);reservations.enabled(fixture.aid,fixture.iid,true);
@@ -40,7 +41,7 @@ class StreamBridgeIntegrationTest {
    var abandoned=reservations.streams().read(org.springframework.data.redis.connection.stream.Consumer.from("bridge","crashed-process"),StreamReadOptions.empty().count(1),StreamOffset.create(stream,ReadOffset.lastConsumed()));
    assertNotNull(abandoned);assertEquals(1,abandoned.size());
    Thread.sleep(6100);reservations.reserve(second);
-   var consumerProperties=new HashMap<String,Object>();consumerProperties.put("bootstrap.servers","127.0.0.1:19092");consumerProperties.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");consumerProperties.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");consumerProperties.put("enable.auto.commit",false);consumerProperties.put("auto.offset.reset","earliest");
+   var consumerProperties=new HashMap<String,Object>();consumerProperties.put("bootstrap.servers",bootstrapServers);consumerProperties.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");consumerProperties.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");consumerProperties.put("enable.auto.commit",false);consumerProperties.put("auto.offset.reset","earliest");
    try(var consumer=new KafkaConsumer<String,String>(consumerProperties)){
     var partition=new TopicPartition(topic,0);consumer.assign(List.of(partition));consumer.seekToBeginning(List.of(partition));
     worker.bridge();

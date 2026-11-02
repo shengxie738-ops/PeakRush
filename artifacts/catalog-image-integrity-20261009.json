@@ -1,0 +1,50 @@
+[
+  {
+    "file": "carry-on.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "ad433151f64f68d10d80f898a19ea2a3ed0058b2ab7dc533fc54e3f3dbe02b36"
+  },
+  {
+    "file": "coffee-machine.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "ceb10c671f2368aa0ad4b92aede11066fd271ff41d1fcddb149a2b4133501249"
+  },
+  {
+    "file": "desk-lamp.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "12549bacbcdc492206f0ce8c83ed437ddfa10d27c189b7b445a96d5d14edd1c2"
+  },
+  {
+    "file": "mechanical-keyboard.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "67fd706192ea161cc7a52902c0f79a3526f0f874cf87474c546d32a465d1d648"
+  },
+  {
+    "file": "portable-speaker.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "29e9d350f58872c3fa81aad050acdd32b5dd2a423a13be840fbcfa682976be21"
+  },
+  {
+    "file": "trail-shoes.png",
+    "size": [
+      1536,
+      1024
+    ],
+    "sha256": "d04e4f3b5d8bfb82bca45806b9ad6536da5cb3bc5f53a4e9487cab318bc8230b"
+  }
+]

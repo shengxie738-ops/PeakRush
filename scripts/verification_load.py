@@ -104,7 +104,8 @@ async def run(args):
          "HTTP throughput includes business rejections; order TPS is separate.",
          "Configured virtual users is not a claim of 2000 simultaneous requests; observed in-flight is reported."]
       }
-      target=ROOT/"artifacts"/f"load-{version}-{int(time.time())}.json";target.parent.mkdir(exist_ok=True)
+      output_dir=pathlib.Path(args.output_dir) if args.output_dir else ROOT/"artifacts"
+      target=output_dir/f"load-{version}-{int(time.time())}.json";target.parent.mkdir(parents=True,exist_ok=True)
       target.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
       await api.call("POST",f"/api/admin/experiments/{experiment['id']}/results",report,admin)
       await api.call("POST",f"/api/admin/activities/{aid}/offline",{},admin)
@@ -112,6 +113,7 @@ async def run(args):
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("--base",default="http://127.0.0.1:8080");p.add_argument("--versions",default="V0,V1,V2,V3")
     p.add_argument("--users",type=int,default=2000);p.add_argument("--rps",type=int,default=1000);p.add_argument("--seconds",type=int,default=30);p.add_argument("--stock",type=int,default=1000)
+    p.add_argument("--output-dir",default=None,help="Report directory; defaults to artifacts/")
     p.add_argument("--burst",action="store_true",help="Release one task per virtual user from one barrier; report actual in-flight and 429 responses")
     args=p.parse_args()
     if min(args.users,args.rps,args.seconds,args.stock)<1:p.error("positive sizes required")

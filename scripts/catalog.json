@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "products": [
+    { "key": "earbuds", "name": "轻羽无线耳机", "description": "轻盈佩戴，沉浸聆听。主动降噪与持久续航，让通勤和专注都有好声音。", "category": "数码影音", "imageUrl": "/assets/product-earbuds.png", "originalPrice": 399, "seckillPrice": 199, "totalStock": 100, "limitPerUser": 1 },
+    { "key": "camera", "name": "复古全画幅微单相机", "description": "以细腻光影记录热爱。经典机身与灵活操控，陪你捕捉旅途中的每一个故事。", "category": "数码影音", "imageUrl": "/assets/product-camera.png", "originalPrice": 12999, "seckillPrice": 9999, "totalStock": 50, "limitPerUser": 1 },
+    { "key": "watch", "name": "全天候运动智能手表", "description": "将节奏戴在腕间。日常健康观察与多种运动记录，陪伴每一次认真出发。", "category": "数码影音", "imageUrl": "/assets/product-watch.png", "originalPrice": 1599, "seckillPrice": 1299, "totalStock": 100, "limitPerUser": 1 },
+    { "key": "coffee-machine", "name": "晨光意式咖啡机", "description": "从研磨后的醇香开始一天。紧凑金属机身搭配蒸汽奶泡，让家中也有咖啡馆的仪式感。", "category": "居家生活", "imageUrl": "/assets/products/coffee-machine.png", "originalPrice": 2499, "seckillPrice": 1899, "totalStock": 80, "limitPerUser": 1 },
+    { "key": "portable-speaker", "name": "声岛便携蓝牙音箱", "description": "把喜欢的音乐带在身边。织物质感与轻巧提携设计，让桌面、露营和旅途都拥有自在声场。", "category": "数码影音", "imageUrl": "/assets/products/portable-speaker.png", "originalPrice": 699, "seckillPrice": 399, "totalStock": 150, "limitPerUser": 1 },
+    { "key": "mechanical-keyboard", "name": "序列机械键盘", "description": "指尖落下，灵感成行。清晰触感、紧凑布局与无线连接，为工作和创作留出更多空间。", "category": "数码影音", "imageUrl": "/assets/products/mechanical-keyboard.png", "originalPrice": 599, "seckillPrice": 399, "totalStock": 120, "limitPerUser": 1 },
+    { "key": "desk-lamp", "name": "光序桌面台灯", "description": "为日常留一束温暖的光。柔和弧形灯罩与细腻金属质感，让阅读、放松和夜晚的独处更从容。", "category": "居家生活", "imageUrl": "/assets/products/desk-lamp.png", "originalPrice": 499, "seckillPrice": 299, "totalStock": 150, "limitPerUser": 1 },
+    { "key": "trail-shoes", "name": "山径轻量越野鞋", "description": "轻装跨过城市与山野。稳健抓地与舒适包裹，陪你探索每一条值得奔赴的路线。", "category": "运动户外", "imageUrl": "/assets/products/trail-shoes.png", "originalPrice": 699, "seckillPrice": 499, "totalStock": 120, "limitPerUser": 1 },
+    { "key": "carry-on", "name": "远行轻量登机箱", "description": "将出发收纳得井然有序。利落箱体、顺滑滚轮与分区内衬，让短途旅行轻快而从容。", "category": "旅行出行", "imageUrl": "/assets/products/carry-on.png", "originalPrice": 899, "seckillPrice": 599, "totalStock": 100, "limitPerUser": 1 }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "startedAt": "2026-10-08T17:03:57.702833+00:00",
+  "base": "http://127.0.0.1:8080",
+  "catalogVersion": 1,
+  "products": [
+    {
+      "key": "earbuds",
+      "id": 1,
+      "name": "轻羽无线耳机",
+      "category": "数码影音",
+      "imageUrl": "/assets/product-earbuds.png",
+      "originalPrice": 399.0,
+      "outcome": "category-updated",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "camera",
+      "id": 2,
+      "name": "复古全画幅微单相机",
+      "category": "数码影音",
+      "imageUrl": "/assets/product-camera.png",
+      "originalPrice": 12999.0,
+      "outcome": "category-updated",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "watch",
+      "id": 3,
+      "name": "全天候运动智能手表",
+      "category": "数码影音",
+      "imageUrl": "/assets/product-watch.png",
+      "originalPrice": 1599.0,
+      "outcome": "category-updated",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "coffee-machine",
+      "id": 12,
+      "name": "晨光意式咖啡机",
+      "category": "居家生活",
+      "imageUrl": "/assets/products/coffee-machine.png",
+      "originalPrice": 2499.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "portable-speaker",
+      "id": 13,
+      "name": "声岛便携蓝牙音箱",
+      "category": "数码影音",
+      "imageUrl": "/assets/products/portable-speaker.png",
+      "originalPrice": 699.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "mechanical-keyboard",
+      "id": 14,
+      "name": "序列机械键盘",
+      "category": "数码影音",
+      "imageUrl": "/assets/products/mechanical-keyboard.png",
+      "originalPrice": 599.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "desk-lamp",
+      "id": 15,
+      "name": "光序桌面台灯",
+      "category": "居家生活",
+      "imageUrl": "/assets/products/desk-lamp.png",
+      "originalPrice": 499.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "trail-shoes",
+      "id": 16,
+      "name": "山径轻量越野鞋",
+      "category": "运动户外",
+      "imageUrl": "/assets/products/trail-shoes.png",
+      "originalPrice": 699.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    },
+    {
+      "key": "carry-on",
+      "id": 17,
+      "name": "远行轻量登机箱",
+      "category": "旅行出行",
+      "imageUrl": "/assets/products/carry-on.png",
+      "originalPrice": 899.0,
+      "outcome": "created",
+      "otherImageMatchIds": []
+    }
+  ],
+  "activities": [
+    {
+      "role": "current",
+      "id": 14,
+      "name": "今日精选 · 九款好物",
+      "marker": "[PEAKRUSH_CATALOG_V1:current]",
+      "outcome": "created",
+      "otherActiveRoleIds": [],
+      "status": "RUNNING",
+      "startTime": "2026-10-08T16:58:57.858Z",
+      "endTime": "2026-10-09T17:03:57.858Z",
+      "architectureVersion": "V3",
+      "items": [
+        {
+          "id": 14,
+          "productId": 1,
+          "seckillPrice": 199.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        },
+        {
+          "id": 15,
+          "productId": 2,
+          "seckillPrice": 9999.0,
+          "totalStock": 50,
+          "availableStock": 50,
+          "limitPerUser": 1
+        },
+        {
+          "id": 16,
+          "productId": 3,
+          "seckillPrice": 1299.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        },
+        {
+          "id": 17,
+          "productId": 12,
+          "seckillPrice": 1899.0,
+          "totalStock": 80,
+          "availableStock": 80,
+          "limitPerUser": 1
+        },
+        {
+          "id": 18,
+          "productId": 13,
+          "seckillPrice": 399.0,
+          "totalStock": 150,
+          "availableStock": 150,
+          "limitPerUser": 1
+        },
+        {
+          "id": 19,
+          "productId": 14,
+          "seckillPrice": 399.0,
+          "totalStock": 120,
+          "availableStock": 120,
+          "limitPerUser": 1
+        },
+        {
+          "id": 20,
+          "productId": 15,
+          "seckillPrice": 299.0,
+          "totalStock": 150,
+          "availableStock": 150,
+          "limitPerUser": 1
+        },
+        {
+          "id": 21,
+          "productId": 16,
+          "seckillPrice": 499.0,
+          "totalStock": 120,
+          "availableStock": 120,
+          "limitPerUser": 1
+        },
+        {
+          "id": 22,
+          "productId": 17,
+          "seckillPrice": 599.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        }
+      ]
+    },
+    {
+      "role": "next",
+      "id": 15,
+      "name": "下一场精选 · 九款好物",
+      "marker": "[PEAKRUSH_CATALOG_V1:next]",
+      "outcome": "created",
+      "otherActiveRoleIds": [],
+      "status": "RUNNING",
+      "startTime": "2026-10-08T19:03:57.858Z",
+      "endTime": "2026-10-09T19:03:57.858Z",
+      "architectureVersion": "V3",
+      "items": [
+        {
+          "id": 23,
+          "productId": 1,
+          "seckillPrice": 199.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        },
+        {
+          "id": 24,
+          "productId": 2,
+          "seckillPrice": 9999.0,
+          "totalStock": 50,
+          "availableStock": 50,
+          "limitPerUser": 1
+        },
+        {
+          "id": 25,
+          "productId": 3,
+          "seckillPrice": 1299.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        },
+        {
+          "id": 26,
+          "productId": 12,
+          "seckillPrice": 1899.0,
+          "totalStock": 80,
+          "availableStock": 80,
+          "limitPerUser": 1
+        },
+        {
+          "id": 27,
+          "productId": 13,
+          "seckillPrice": 399.0,
+          "totalStock": 150,
+          "availableStock": 150,
+          "limitPerUser": 1
+        },
+        {
+          "id": 28,
+          "productId": 14,
+          "seckillPrice": 399.0,
+          "totalStock": 120,
+          "availableStock": 120,
+          "limitPerUser": 1
+        },
+        {
+          "id": 29,
+          "productId": 15,
+          "seckillPrice": 299.0,
+          "totalStock": 150,
+          "availableStock": 150,
+          "limitPerUser": 1
+        },
+        {
+          "id": 30,
+          "productId": 16,
+          "seckillPrice": 499.0,
+          "totalStock": 120,
+          "availableStock": 120,
+          "limitPerUser": 1
+        },
+        {
+          "id": 31,
+          "productId": 17,
+          "seckillPrice": 599.0,
+          "totalStock": 100,
+          "availableStock": 100,
+          "limitPerUser": 1
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "phase": "complete",
+  "completedAt": "2026-10-08T17:03:58.257634+00:00"
+}

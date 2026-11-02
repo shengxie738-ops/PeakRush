@@ -58,18 +58,27 @@ public class Admin {
   long id=db.insert("INSERT INTO experiment(name,architecture_version,concurrency_count,duration_seconds,stock,notes) VALUES(?,?,?,?,?,?)",name,Store.version(b.get("architectureVersion")),Store.positive(b.get("concurrency"),100000),Store.positive(b.get("durationSeconds"),86400),Store.positive(b.get("stock"),10000000),Json.string(b,"notes"));
   return experiment(id);
  }
- public Map<String,Object> results(long id,Map<String,Object> data){db.one("SELECT id FROM experiment WHERE id=?",id);db.jdbc.update("UPDATE experiment SET results_json=? WHERE id=?",json.write(data),id);return experiment(id);}
+ public Map<String,Object> results(long id,Map<String,Object> data){
+  var row=db.one("SELECT id,CONCAT('V',architecture_version) AS version FROM experiment WHERE id=?",id);
+  Object reported=data.get("version");
+  if(reported!=null&&!String.valueOf(row.get("version")).equals(String.valueOf(reported)))throw new ApiException(400,"VERSION_MISMATCH","结果文件版本与实验版本不一致");
+  db.jdbc.update("UPDATE experiment SET results_json=? WHERE id=?",json.write(data),id);return experiment(id);
+ }
  public Map<String,Object> metrics(){
-  List<Map<String,Object>> inventory=new ArrayList<>();long pending=0,redisStock=0;boolean available=true;
+  List<Map<String,Object>> inventory=new ArrayList<>();long pending=0,redisStock=0,streamPending=0,streamEvents=0;boolean available=true;
   for(var i:db.allItems()){
    long iid=Json.number(i.get("id")),aid=Json.number(i.get("activity_id"));
    Long stock=null,count=0L;try{if(Json.number(i.get("architecture_version"))>=2){String p=redis.prefix(aid,iid);String raw=redis.redis.opsForValue().get(p+"stock");stock=raw==null?null:Long.valueOf(raw);count=redis.redis.opsForZSet().zCard(p+"pending");if(stock!=null)redisStock+=stock;if(count!=null)pending+=count;}}catch(Exception e){available=false;}
+   if(Json.number(i.get("architecture_version"))>=4)try{
+    var streams=redis.streams();String stream=redis.prefix(aid,iid)+"events";Long length=streams.size(stream);
+    if(length!=null){streamEvents+=length;if(length>0){var summary=streams.pending(stream,"bridge");if(summary!=null)streamPending+=summary.getTotalPendingMessages();}}
+   }catch(Exception e){available=false;}
    long occupied=db.jdbc.queryForObject("SELECT COALESCE(SUM(quantity),0) FROM seckill_order WHERE item_id=? AND status IN ('CREATED','PAID')",Long.class,iid);
    inventory.add(Json.map("id",iid,"activityId",aid,"architectureVersion","V"+i.get("architecture_version"),"totalStock",i.get("total_stock"),"availableStock",i.get("available_stock"),"redisAvailableStock",stock,"occupiedQuantity",occupied,"pendingReservations",count));
   }
   long orders=db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_order",Long.class);
   long failures=db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_request WHERE status IN ('FAILED','SOLD_OUT')",Long.class);
   Double p95=null;var timer=meters.find("peakrush.api.duration").timer();if(timer!=null){for(var p:timer.takeSnapshot().percentileValues())if(p.percentile()==.95)p95=p.value(TimeUnit.MILLISECONDS);}
-  return Json.map("requests",db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_request",Long.class)+pending,"successes",orders,"failures",failures,"pending",pending,"orders",orders,"paidOrders",db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_order WHERE status='PAID'",Long.class),"dbAvailableStock",db.jdbc.queryForObject("SELECT COALESCE(SUM(available_stock),0) FROM seckill_item",Long.class),"redisAvailableStock",available?redisStock:null,"outboxPending",db.jdbc.queryForObject("SELECT COUNT(*) FROM recovery_outbox WHERE status='PENDING'",Long.class),"deadLetters",db.jdbc.queryForObject("SELECT COUNT(*) FROM dead_letter_record WHERE status IN ('OPEN','REPLAYED')",Long.class),"latencyP95Ms",p95,"kafkaLag",lag.read(),"versions",db.jdbc.queryForList("SELECT CONCAT('V',architecture_version) AS version,COUNT(*) AS activities FROM activity GROUP BY architecture_version"),"inventory",inventory,"requestStates",db.jdbc.queryForList("SELECT status,COUNT(*) AS count FROM seckill_request GROUP BY status"));
+  return Json.map("requests",db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_request",Long.class)+pending,"successes",orders,"failures",failures,"pending",pending,"orders",orders,"paidOrders",db.jdbc.queryForObject("SELECT COUNT(*) FROM seckill_order WHERE status='PAID'",Long.class),"dbAvailableStock",db.jdbc.queryForObject("SELECT COALESCE(SUM(available_stock),0) FROM seckill_item",Long.class),"redisAvailableStock",available?redisStock:null,"v4StreamPending",available?streamPending:null,"v4StreamEvents",available?streamEvents:null,"outboxPending",db.jdbc.queryForObject("SELECT COUNT(*) FROM recovery_outbox WHERE status='PENDING'",Long.class),"deadLetters",db.jdbc.queryForObject("SELECT COUNT(*) FROM dead_letter_record WHERE status IN ('OPEN','REPLAYED')",Long.class),"latencyP95Ms",p95,"kafkaLag",lag.read(),"versions",db.jdbc.queryForList("SELECT CONCAT('V',architecture_version) AS version,COUNT(*) AS activities FROM activity GROUP BY architecture_version"),"inventory",inventory,"requestStates",db.jdbc.queryForList("SELECT status,COUNT(*) AS count FROM seckill_request GROUP BY status"));
  }
 }

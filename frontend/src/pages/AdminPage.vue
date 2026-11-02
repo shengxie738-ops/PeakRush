@@ -15,6 +15,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { api, post, errorMessage, ApiError } from "../api";
 import { session, requireLogin } from "../session";
 import { money, dateTime, activityLabel, productImage } from "../format";
+import { PRODUCT_CATEGORIES, productCategory } from "../storefront";
 import type {
   Product,
   Activity,
@@ -67,6 +68,7 @@ const productDialog = ref(false),
   productId = ref<number | null>(null),
   productForm = reactive({
     name: "",
+    category: "其他好物",
     description: "",
     imageUrl: "/assets/product-earbuds.png",
     originalPrice: 399,
@@ -197,12 +199,14 @@ function openProduct(p?: Product) {
     p
       ? {
           name: p.name,
+          category: productCategory(p),
           description: p.description,
           imageUrl: p.imageUrl,
           originalPrice: p.originalPrice,
         }
       : {
           name: "",
+          category: "其他好物",
           description: "",
           imageUrl: "/assets/product-earbuds.png",
           originalPrice: 399,
@@ -607,6 +611,9 @@ onUnmounted(() => window.clearInterval(timer));
                   </div>
                 </div></template
               ></el-table-column
+            ><el-table-column label="分类" width="120"
+              ><template #default="{ row }">{{ productCategory(row) }}</template
+              ></el-table-column
             ><el-table-column label="原价" width="140"
               ><template #default="{ row }"
                 >¥{{ money(row.originalPrice) }}</template
@@ -764,6 +771,14 @@ onUnmounted(() => window.clearInterval(timer));
                   <dd>{{ val(metrics.redisAvailableStock) }}</dd>
                 </div>
                 <div>
+                  <dt>V4 Stream 待确认</dt>
+                  <dd>{{ val(metrics.v4StreamPending) }}</dd>
+                </div>
+                <div>
+                  <dt>V4 Stream 事件总量</dt>
+                  <dd>{{ val(metrics.v4StreamEvents) }}</dd>
+                </div>
+                <div>
                   <dt>待发送 / 待补偿任务</dt>
                   <dd>{{ val(metrics.outboxPending) }}</dd>
                 </div>
@@ -778,6 +793,10 @@ onUnmounted(() => window.clearInterval(timer));
               <p>
                 受理请求、成功订单和已支付订单分别统计。Redis
                 预占与数据库落单之间存在处理中状态，运行期间两侧库存可能暂时不同。
+              </p>
+              <p>
+                V4 预占事件先写入 Redis Stream，桥接确认 Kafka 后才 XACK；“Stream
+                待确认”即尚未确认的事件数，进程中断后可从 PEL 恢复。
               </p>
               <p>
                 “未采集”表示服务尚未提供该指标，不代表数值为零。吞吐和延迟比较需要使用同一环境与同一压测场景。
@@ -802,7 +821,7 @@ onUnmounted(() => window.clearInterval(timer));
           ><div class="section-heading">
             <div>
               <h2>架构对比实验</h2>
-              <p>记录配置，导入真实测试数据，比较 V0 — V3。</p>
+              <p>记录配置，导入真实测试数据，比较 V0 — V4。</p>
             </div>
             <el-button
               type="primary"
@@ -1011,7 +1030,10 @@ onUnmounted(() => window.clearInterval(timer));
         id="productName"
         v-model="productForm.name"
         maxlength="100"
-      /><label class="field-label" for="productDescription">商品描述</label
+      /><label class="field-label" for="productCategory">商品分类</label
+      ><el-select id="productCategory" v-model="productForm.category" class="product-category-select">
+        <el-option v-for="name in PRODUCT_CATEGORIES" :key="name" :label="name" :value="name" />
+      </el-select><label class="field-label" for="productDescription">商品描述</label
       ><el-input
         id="productDescription"
         v-model="productForm.description"
@@ -1069,9 +1091,8 @@ onUnmounted(() => window.clearInterval(timer));
             ><el-option
               v-for="v in ['V0', 'V1', 'V2', 'V3', 'V4']"
               :key="v"
-              :label="v === 'V4' ? 'V4 · 后续开发' : v"
+              :label="v === 'V4' ? 'V4 · Stream 桥接' : v"
               :value="v"
-              :disabled="v === 'V4'"
           /></el-select>
         </div>
         <div>
@@ -1204,9 +1225,8 @@ onUnmounted(() => window.clearInterval(timer));
             ><el-option
               v-for="v in ['V0', 'V1', 'V2', 'V3', 'V4']"
               :key="v"
-              :label="v === 'V4' ? 'V4 · 后续开发' : v"
+              :label="v === 'V4' ? 'V4 · Stream 桥接' : v"
               :value="v"
-              :disabled="v === 'V4'"
           /></el-select>
         </div>
         <div>

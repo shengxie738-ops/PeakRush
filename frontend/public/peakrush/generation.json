@@ -1,0 +1,59 @@
+{
+  "brand": "PeakRush",
+  "date": "2026-10-08",
+  "generation": "Built-in image_gen tool",
+  "requestedModel": "image2.5",
+  "modelSelection": "Unavailable in tool; exact backing model not verifiable",
+  "assets": [
+    {
+      "key": "earbuds",
+      "file": "product-1.png",
+      "prompt": "Use case: product-mockup. Asset type: FLAT portrait 700x1080 ratio product card texture to map onto a rotating curved 3D shopping card on PeakRush's orange China flash sale website. Produce one beautifully designed FLAT full-bleed card, straight on, absolutely no perspective or depicted card edge. Matte near-black #101010 background. Top header white exact brand text \"PeakRush\" (P e a k R u s h), small orange label \"限时好物\". Large white exact product heading \"轻羽无线耳机\". Photorealistic hero product: a pair of matte black wireless earbuds and their rounded black charging case, product centered in the middle 55% of canvas on a softly lit warm cream studio stage, dramatic refined natural studio lighting, beautiful realistic material, distinct product clearly recognizable and complete. Bottom black panel has big vivid orange exact price \"¥199\", beneath it small muted white exact caption \"好物与热爱，准点相遇\", and a small orange pill exact label \"去抢购\". Editorial luxury shopping composition, restrained clean Swiss grid, print-perfect Chinese lettering, generous padding. No third-party brand logo, no people, no artist names, no Apple Wallet, no USD, no watermark. This is concept promotional art; do not add inventory, discount claims, or social proof. Crisp product photography and typography. Output fills entire portrait canvas."
+    },
+    {
+      "key": "watch",
+      "file": "product-2.png",
+      "prompt": "Use case: product-mockup. Asset type: FLAT portrait 700x1080 ratio product card texture to map onto a rotating curved 3D shopping card on PeakRush's orange China flash sale website. Produce one beautifully designed FLAT full-bleed card, straight on, absolutely no perspective or depicted card edge. Matte near-black #101010 background. Top header white exact brand text \"PeakRush\" (P e a k R u s h), small orange label \"限时好物\". Large white exact product heading \"轻动智能手表\". Photorealistic hero product: a premium graphite smartwatch with a dark screen and black woven sport strap, product centered in the middle 55% of canvas on a softly lit warm cream studio stage, dramatic refined natural studio lighting, beautiful realistic material, distinct product clearly recognizable and complete. Bottom black panel has big vivid orange exact price \"¥299\", beneath it small muted white exact caption \"好物与热爱，准点相遇\", and a small orange pill exact label \"去抢购\". Editorial luxury shopping composition, restrained clean Swiss grid, print-perfect Chinese lettering, generous padding. No third-party brand logo, no people, no artist names, no Apple Wallet, no USD, no watermark. This is concept promotional art; do not add inventory, discount claims, or social proof. Crisp product photography and typography. Output fills entire portrait canvas."
+    },
+    {
+      "key": "camera",
+      "file": "product-3.png",
+      "prompt": "Use case: product-mockup. Asset type: FLAT portrait 700x1080 ratio product card texture to map onto a rotating curved 3D shopping card on PeakRush's orange China flash sale website. Produce one beautifully designed FLAT full-bleed card, straight on, absolutely no perspective or depicted card edge. Matte near-black #101010 background. Top header white exact brand text \"PeakRush\" (P e a k R u s h), small orange label \"限时好物\". Large white exact product heading \"随行便携相机\". Photorealistic hero product: a refined compact silver and black mirrorless digital camera, a single small lens, product centered in the middle 55% of canvas on a softly lit warm cream studio stage, dramatic refined natural studio lighting, beautiful realistic material, distinct product clearly recognizable and complete. Bottom black panel has big vivid orange exact price \"¥899\", beneath it small muted white exact caption \"好物与热爱，准点相遇\", and a small orange pill exact label \"去抢购\". Editorial luxury shopping composition, restrained clean Swiss grid, print-perfect Chinese lettering, generous padding. No third-party brand logo, no people, no artist names, no Apple Wallet, no USD, no watermark. This is concept promotional art; do not add inventory, discount claims, or social proof. Crisp product photography and typography. Output fills entire portrait canvas."
+    },
+    {
+      "key": "scene",
+      "prompt": "Use case: product-mockup. Asset type: portrait 4:5 advertising photo for PeakRush Chinese flash-sale shopping homepage, mapped on a subtly curved interactive WebGL plane. Beautiful premium product studio composition, warm orange terracotta and cream podiums, matte black wireless earbuds and charging case prominent in foreground, graphite smartwatch with woven band behind, compact silver-black digital camera further back. Products have no third-party logo. Realistic detailed product materials, soft window sunlight, warm shadows, refined modern Chinese ecommerce brand art direction. Products fill 65% of composition, ample top negative space, clean uncluttered. No text at all, no pricing, no humans, no screen UI, no watermark. Vertical fully opaque photo.",
+      "file": "shopping-scene.png"
+    },
+    {
+      "key": "collection",
+      "prompt": "Use case: ui-mockup. Asset type: flat full-frame tall 2:3 product collection board texture, NOT a perspective phone or card, for a curved scrolling WebGL panel in PeakRush Chinese limited-time shopping homepage. Editorial black background clean sophisticated vertical layout, title exact \"PeakRush\", subtitle exact \"好物准点开抢\". Six equally sized product tiles arranged as 2 columns and 3 rows, each tile an exquisitely realistic product studio photo on warm pale cream background: black wireless earbuds, graphite smartwatch, silver-black compact camera, cream reusable thermos, white minimalist headphones, terracotta portable speaker. Short precise Chinese category labels \"数码\", \"穿戴\", \"影像\", \"生活\", \"音频\", \"好物\". Orange accents #f57d32, white fine typography, generous spacing. Bottom caption exact \"让好物与热爱，准点相遇\". Everything straight-on, flat opaque, no tilt no device frame, no real-world third-party brand logos, no people, no Apple Wallet, no artist references, no USD prices, no watermark.",
+      "file": "collection.png"
+    },
+    {
+      "key": "photo1",
+      "prompt": "Use case: product-mockup. Square 1:1 photorealistic studio ecommerce product photograph for Chinese PeakRush shopping site. Two elegant matte black wireless earbuds with their rounded black charging case, centered and fully visible, no brand logo, warm ivory limestone plinth, soft beige background, subtle warm sunlight, natural detailed textures and shadows, upscale minimal composition. No text, no watermark, no people. Product fills 65% of image.",
+      "file": "photo-1.png"
+    },
+    {
+      "key": "photo2",
+      "prompt": "Use case: product-mockup. Square 1:1 photorealistic studio ecommerce product photograph for Chinese PeakRush shopping site. One graphite rectangular smartwatch on elegant black woven sport strap, centered and fully visible, dark watch face showing understated orange clock rings, no brand logo, warm ivory limestone plinth, soft beige background, subtle warm sunlight, natural detailed textures and shadows, upscale minimal composition. No text, no watermark, no people. Product fills 65% of image.",
+      "file": "photo-2.png"
+    },
+    {
+      "key": "photo3",
+      "prompt": "Use case: product-mockup. Square 1:1 photorealistic studio ecommerce product photograph for Chinese PeakRush shopping site. One compact silver and black digital camera with its small lens facing viewer, centered and fully visible, no brand logo, warm ivory limestone plinth, soft beige background, subtle warm sunlight, natural detailed textures and shadows, upscale minimal composition. No text, no watermark, no people. Product fills 65% of image.",
+      "file": "photo-3.png"
+    },
+    {
+      "key": "wide",
+      "prompt": "Use case: ui-mockup. Asset type: flat full-frame wide 1460:780 landscape product collection board texture for PeakRush Chinese flash-sale website WebGL plane. NOT a perspective screen. Black editorial background, exact brand \"PeakRush\" in white and orange top left, short exact Chinese heading \"好物准点开抢\". Across middle six beautifully lit premium product photos on pale cream rectangular panels: black earbuds with case, graphite smartwatch, silver-black compact camera, cream thermos, white headphones, terracotta speaker. Each complete and recognizable with proportional real materials. Warm studio lighting. Minimal orange accents #f57d32 and ample margin. Tiny bottom exact Chinese caption \"让好物与热爱，准点相遇\". No people, no artist names, no foreign payment logos, no third-party brands, no fake discount or sales number, no watermark. Opaque straight-on crisp 2D composition.",
+      "file": "collection-wide.png"
+    }
+  ],
+  "aliases": {
+    "nexus-product-1.png": "product-1.png",
+    "nexus-product-3.png": "product-3.png"
+  },
+  "note": "Independent texture URLs preserve the existing hero sRGB and curved-panel raw color-space modes. Illustrative promotional prices; current activity prices are supplied by the business app."
+}

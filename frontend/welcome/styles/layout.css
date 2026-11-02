@@ -1,0 +1,1013 @@
+/* ==========================================================================
+   layout.css — follow.art desktop clone
+   ==========================================================================
+   Provenance: evidence/reference/raw/_nuxt/entry.D4FdtiYZ.css plus the 11
+   route/component chunks, captured 2026-09-29T16:12Z (Nuxt build
+   63c1e131-150b-472a-8fd2-ea1d2a3b59fb); reference viewport 1376x772 @ dpr 1.5.
+
+   Every declaration in this file is a verbatim lift from those chunks. Values
+   that could not be located are flagged  UNKNOWN - pending measurement  and
+   carry a conservative default. Machine-readable evidence per token lives in
+   design/tokens.reference.json.
+
+   The reference authors six named layers and the order is load-bearing. The
+   order statement is repeated at the top of every file in src/styles/ so the
+   cascade is right whatever the eventual import order is.
+   ========================================================================== */
+
+@layer reset, base, utilities, components-base, components, overrides;
+
+/* --------------------------------------------------------------------------
+   1. THE SCROLL CONTAINER
+   reference-lock.json -> scrollModel:
+     container             "DIV.scrollable__area.lenis"
+     containerScrollHeight  7563   (clientHeight 772)
+     htmlBodyOverflow      "clip"
+     windowScrollUsable     false
+     nativeScrollTop assignment is reverted by Lenis
+
+   The reference does not hard-code `overflow:clip` on html/body. It pins a
+   root scroll area with position:fixed and clips the document with :has():
+
+     .scrollable--root                    { position:fixed; inset:0 }
+     .scrollable__area                    { height:100svh; overflow-y:scroll }
+     body/html:has(.scrollable--root)     { overflow:clip }
+
+   so the clone must render
+     <div class="scrollable scrollable--root">
+       <div class="scrollable__area lenis">
+         <div class="scrollable__area-inner"> ... sections ... </div>
+       </div>
+     </div>
+
+   NOTE ON UNITS: the reference uses 100svh throughout. Grepping `dvh` across
+   all 12 chunks returns zero hits, and `100vh` is used nowhere in the scroll
+   or section geometry. svh is reproduced verbatim - swapping in dvh/vh would
+   change the 772px page height every section is calibrated against.
+   -------------------------------------------------------------------------- */
+@layer components-base {
+  .scrollable{max-width:100%;position:relative;transition:background .4s ease;width:100%;--scrollable-height:100%;--scrollable-max-height:100svh}
+  .scrollable__area{height:var(--scrollable-height);max-height:var(--scrollable-max-height);overflow:hidden;overflow-y:scroll;overscroll-behavior:contain;scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none}
+  .scrollable__area::-webkit-scrollbar{display:none}
+  .scrollable__scrollbar{z-index:999}
+  .scrollable--fullscreen,.scrollable--root{--scrollable-height:100svh;--scrollable-max-height:100svh}
+  .scrollable--fullscreen>.scrollable__area>div>.scrollable__area-inner,.scrollable--root>.scrollable__area>div>.scrollable__area-inner{min-height:100svh}
+  .scrollable--root.scrollable--android{overflow:hidden}
+  .scrollable--container-height{flex:1;height:0}
+  .scrollable--height-by-flex{flex:1 0 auto;height:0}
+  .scrollable--root{top:0;right:0;bottom:0;left:0;position:fixed}
+  body:has(.scrollable--root),html:has(.scrollable--root){overflow:clip}
+  .with-modal .scrollable--root>.scrollbar,.with-overlay .scrollable--root>.scrollbar{opacity:0}
+}
+
+/* Lenis 1.3.3 ships these UNLAYERED - kept unlayered so they still outrank
+   the author layers exactly as they do on the reference. */
+html.lenis,html.lenis body{height:auto}.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-smooth iframe{pointer-events:none}.lenis.lenis-autoToggle{transition-behavior:allow-discrete;transition-duration:1ms;transition-property:overflow}
+
+/* --------------------------------------------------------------------------
+   2. SECTION GEOMETRY  -  Section.BriOt6td.css, verbatim
+   A section is a one-cell grid whose layers stack into the named area
+   `sticky_content`. The 200vh height is NOT min-height:200vh - it is the sum
+   of three svh slots cancelled back out by negative margins:
+
+     .section                 min-height: calc(--s-mh + --s-upd + --s-und)
+                              margin-top:    calc(--s-upd * -1)
+                              margin-bottom: calc(--s-und * -1)
+     .section--full-height        --s-mh: 100svh
+     .section--under-previous     --s-upd: 100svh
+     .section--under-next         --s-und: 100svh
+
+     1544px = 2 x 772px = --s-mh(100svh) + --s-upd or --s-und(100svh)
+
+   Against reference-lock.json's measured home heights (1376x772):
+     1544, 1544, 2123, 1544, 1544, 1544, 2316, 808
+   six are exactly 200svh; sections 3 and 8 are flow height (--s-mh:0svh with
+   grid-auto-rows:1fr doing the work), and 7 overflows 200svh from content.
+
+   Padding is NOT on .section. Each SectionLayer carries spacing utilities
+   directly - the home page uses class="px-1 pb-1 pt-promo-header", i.e.
+   var(--spacing) sideways, var(--spacing) bottom, var(--spacing-promo-header)
+   top to clear the fixed promo header.
+
+   `contain:content` on the sticky layer is in the reference and matters for
+   its WebGL canvases. The `--s-und:var(--md,100svh) var(--n-md,0svh)` pair on
+   `.section--under-next' + BS + ':md-up` is the breakpoint switch from section 1
+   applied to section stacking.
+   -------------------------------------------------------------------------- */
+@layer components-base {
+  .sticky{align-self:start;display:flex;flex-direction:column;min-width:0;position:relative}
+  .sticky>*{flex:1}
+  .sticky--sticky{contain:content;position:sticky;top:0}
+  .sticky--full-height{min-height:100svh}
+  .section__layer{align-self:start;grid-area:sticky_content;min-height:var(--s-mh);min-width:0;position:relative}
+  .section__layer:where(:not(.section__layer--sticky)){margin-top:var(--s-upd)}
+  .section__layer--sticky{contain:content;height:var(--s-h);position:sticky;top:0}
+  .section__layer--above{z-index:1}
+  .section__layer--full-height{--s-mh:100svh}
+  .section{--s-upd:0svh;--s-und:0svh;--s-mh:0svh;--s-h:auto;display:grid;grid-auto-rows:1fr;grid-template-areas:"sticky_content";grid-template-columns:1fr;grid-template-rows:auto;margin-bottom:calc(var(--s-und)*-1);margin-top:calc(var(--s-upd)*-1);min-height:calc(var(--s-mh) + var(--s-upd) + var(--s-und));position:relative}
+  .section:after{content:"";display:block;height:calc(var(--s-upd) + var(--s-und))}
+  .section:has(.section__layer:not(.section__layer--sticky)):after{height:var(--s-und)}
+  .section--under-previous{--s-upd:100svh}
+  .section--under-next{--s-und:100svh}
+  .section--under-next\:sm-down{--s-und:var(--md,0svh) var(--n-md,100svh)}
+  .section--under-next\:md-up{--s-und:var(--md,100svh) var(--n-md,0svh)}
+  .section--under-next+.section--under-previous{margin-top:calc(-100svh - var(--s-upd))}
+  .section--full-height{--s-mh:100svh}
+  .section--no-overflow{clip-path:inset(var(--s-upd) 0 var(--s-und) 0)}
+  .section--above{z-index:1}
+}
+
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px) {
+@layer components-base {
+  .sticky--sticky\:md-up{contain:content;position:sticky;top:0}
+  .sticky--full-height\:md-up{min-height:100svh}
+  .section__layer--sticky\:md-up{contain:content;height:var(--s-h);position:sticky;top:0}}
+}
+
+@media (max-width:567px) and (max-aspect-ratio:13/9),(max-width:667px) and (min-aspect-ratio:13/9),(max-width:979px) and (max-height:415px) and (min-aspect-ratio:13/9) {
+@layer components-base {
+  .section__layer--sticky\:sm-down{contain:content;height:var(--s-h);position:sticky;top:0}}
+}
+
+/* --------------------------------------------------------------------------
+   3. THE 12-COLUMN GUTTER GRID  (@layer utilities)
+   Not CSS Grid: a flex row plus measured columns, with all arithmetic exposed
+   as private tokens so components can read --grid-col-item-width.
+     --grid-col-count   12
+     --grid-col-gutter  var(--md, calc(--scale-px*20)) var(--n-md, ...*10)
+     --grid-row-width   100%
+     --grid-col-item-width = (rowWidth - gx*(count-1)) / count
+     --grid-col-width      = itemWidth*size + gx*(size-1)
+     --grid-col-offset-width = itemWidth*offset + gx*offset
+
+   There is NO max-width container anywhere in the reference: grep for
+   `max-width:` returns only 100% and viewport-derived component values. The
+   layout is full-bleed minus var(--spacing).
+
+   At 1376x772 with md-up active: gutter = 19.11px. Inside .px-1 the row
+   measures 1337.78px, so --grid-col-item-width = (1337.78 - 19.11*11)/12 =
+   93.22px and a .col--6 = 93.22*6 + 19.11*5 = 654.87px.
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .row{--grid-gx:0px;--grid-gy:0px;--grid-col-item-width:calc((var(--grid-row-width) - var(--grid-gx)*(var(--grid-col-count) - 1))/var(--grid-col-count));align-items:flex-start;display:flex;flex-wrap:wrap;gap:var(--grid-gy) var(--grid-gx)}
+  .row--gx{--grid-gx:var(--grid-col-gutter)}
+  .row--gy{--grid-gy:var(--grid-col-gutter)}
+  .col{--grid-col-size:12;--grid-col-offset:0;--grid-col-width:calc(var(--grid-col-item-width)*var(--grid-col-size, var(--grid-col-count)) + var(--grid-gx)*(var(--grid-col-size) - 1));--grid-col-offset-width:calc(var(--grid-col-item-width)*var(--grid-col-offset, var(--grid-col-count)) + var(--grid-gx)*var(--grid-col-offset));flex:1;flex:0 1 var(--grid-col-width);margin-left:var(--grid-col-offset-width);max-width:100%;width:var(--grid-col-width)}
+  .row{--grid-col-count:12;--grid-col-gutter:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10));--grid-row-width:100%}
+  .row--column{flex-direction:column}
+  .col--grow{flex-grow:1}
+  .col--no-grow{flex-grow:0}
+  .col--no-shrink{flex-shrink:0}
+  .row--middle{align-items:center}
+  .row--bottom{align-items:flex-end}
+  .row--stretch{align-items:stretch}
+  .col-divider__right{align-content:center;position:relative}
+  .col-divider__right:before{border-left:1px solid var(--t-line);bottom:0;content:"";left:calc(var(--spacing-grid-gutter)*-1);position:absolute;top:0}
+  .row>.col--1,.row>.col--1\:xs{--grid-col-size:1}
+  .row>.offset--1,.row>.offset--1\:xs{--grid-col-offset:1}
+  .row>.col--2,.row>.col--2\:xs{--grid-col-size:2}
+  .row>.offset--2,.row>.offset--2\:xs{--grid-col-offset:2}
+  .row>.col--3,.row>.col--3\:xs{--grid-col-size:3}
+  .row>.offset--3,.row>.offset--3\:xs{--grid-col-offset:3}
+  .row>.col--4,.row>.col--4\:xs{--grid-col-size:4}
+  .row>.offset--4,.row>.offset--4\:xs{--grid-col-offset:4}
+  .row>.col--5,.row>.col--5\:xs{--grid-col-size:5}
+  .row>.offset--5,.row>.offset--5\:xs{--grid-col-offset:5}
+  .row>.col--6,.row>.col--6\:xs{--grid-col-size:6}
+  .row>.offset--6,.row>.offset--6\:xs{--grid-col-offset:6}
+  .row>.col--7,.row>.col--7\:xs{--grid-col-size:7}
+  .row>.offset--7,.row>.offset--7\:xs{--grid-col-offset:7}
+  .row>.col--8,.row>.col--8\:xs{--grid-col-size:8}
+  .row>.offset--8,.row>.offset--8\:xs{--grid-col-offset:8}
+  .row>.col--9,.row>.col--9\:xs{--grid-col-size:9}
+  .row>.offset--9,.row>.offset--9\:xs{--grid-col-offset:9}
+  .row>.col--10,.row>.col--10\:xs{--grid-col-size:10}
+  .row>.offset--10,.row>.offset--10\:xs{--grid-col-offset:10}
+  .row>.col--11,.row>.col--11\:xs{--grid-col-size:11}
+  .row>.offset--11,.row>.offset--11\:xs{--grid-col-offset:11}
+  .row>.col--12,.row>.col--12\:xs{--grid-col-size:12}
+  .row>.offset--12,.row>.offset--12\:xs{--grid-col-offset:12}
+  .col--first{order:-1}
+  .col--last{order:1}
+}
+
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px) {
+@layer utilities {
+  .row--column\:md{flex-direction:column}
+  .col--grow\:md{flex-grow:1}
+  .col--no-grow\:md{flex-grow:0}
+  .col--no-shrink\:md{flex-shrink:0}
+  .row--top\:md{align-items:flex-start}
+  .row--middle\:md{align-items:center}
+  .row--bottom\:md{align-items:flex-end}
+  .col-divider__right\:md{align-content:center;position:relative}
+  .col-divider__right\:md:before{border-left:1px solid var(--t-line);bottom:0;content:"";left:calc(var(--spacing-grid-gutter)*-1);position:absolute;top:0}
+  .row>.col--1\:md{--grid-col-size:1}
+  .row>.offset--1\:md{--grid-col-offset:1}
+  .row>.col--2\:md{--grid-col-size:2}
+  .row>.offset--2\:md{--grid-col-offset:2}
+  .row>.col--3\:md{--grid-col-size:3}
+  .row>.offset--3\:md{--grid-col-offset:3}
+  .row>.col--4\:md{--grid-col-size:4}
+  .row>.offset--4\:md{--grid-col-offset:4}
+  .row>.col--5\:md{--grid-col-size:5}
+  .row>.offset--5\:md{--grid-col-offset:5}
+  .row>.col--6\:md{--grid-col-size:6}
+  .row>.offset--6\:md{--grid-col-offset:6}
+  .row>.col--7\:md{--grid-col-size:7}
+  .row>.offset--7\:md{--grid-col-offset:7}
+  .row>.col--8\:md{--grid-col-size:8}
+  .row>.offset--8\:md{--grid-col-offset:8}
+  .row>.col--9\:md{--grid-col-size:9}
+  .row>.offset--9\:md{--grid-col-offset:9}
+  .row>.col--10\:md{--grid-col-size:10}
+  .row>.offset--10\:md{--grid-col-offset:10}
+  .row>.col--11\:md{--grid-col-size:11}
+  .row>.offset--11\:md{--grid-col-offset:11}
+  .row>.col--12\:md{--grid-col-size:12}
+  .row>.offset--12\:md{--grid-col-offset:12}
+  .col--first\:md{order:-1}
+  .col--normal\:md{order:0}
+  .col--last\:md{order:1}
+}
+}
+
+/* --------------------------------------------------------------------------
+   4. SPACING UTILITIES - the reference set, verbatim, for the states that can
+   be live at desktop width.
+     * the always-on base rules. The `:xs` suffix is NOT a mobile query: the
+       reference emits `.px-1, .px-1:xs { ... }` from one declaration, so both
+       names resolve unconditionally and `:xs` means "extra-small / default".
+     * the `:md` variants, inside the same media query that turns --md on.
+   Deliberately omitted: the `:xxxxl` duplicates inside
+   @media (min-width:2400px) and (min-height:700px) - 344 rules re-declaring the
+   identical calc(var(--spacing)*N) bodies. They are recorded in
+   design/tokens.reference.json; the --xxxxl switch in tokens.css still moves
+   --spacing itself to 30*--scale-px past 2400px, so the result holds.
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .pt-0,.pt-0\:xs,.py-0,.py-0\:xs{padding-top:0}
+  .pt-0\.25,.pt-0\.25\:xs,.py-0\.25,.py-0\.25\:xs{padding-top:calc(var(--spacing)*.25)}
+  .pt-0\.5,.pt-0\.5\:xs,.py-0\.5,.py-0\.5\:xs{padding-top:calc(var(--spacing)*.5)}
+  .pt-0\.75,.pt-0\.75\:xs,.py-0\.75,.py-0\.75\:xs{padding-top:calc(var(--spacing)*.75)}
+  .pt-1,.pt-1\:xs,.py-1,.py-1\:xs{padding-top:var(--spacing)}
+  .pt-1\.25,.pt-1\.25\:xs,.py-1\.25,.py-1\.25\:xs{padding-top:calc(var(--spacing)*1.25)}
+  .pt-1\.5,.pt-1\.5\:xs,.py-1\.5,.py-1\.5\:xs{padding-top:calc(var(--spacing)*1.5)}
+  .pt-1\.75,.pt-1\.75\:xs,.py-1\.75,.py-1\.75\:xs{padding-top:calc(var(--spacing)*1.75)}
+  .pt-2,.pt-2\:xs,.py-2,.py-2\:xs{padding-top:calc(var(--spacing)*2)}
+  .pt-2\.25,.pt-2\.25\:xs,.py-2\.25,.py-2\.25\:xs{padding-top:calc(var(--spacing)*2.25)}
+  .pt-2\.5,.pt-2\.5\:xs,.py-2\.5,.py-2\.5\:xs{padding-top:calc(var(--spacing)*2.5)}
+  .pt-2\.75,.pt-2\.75\:xs,.py-2\.75,.py-2\.75\:xs{padding-top:calc(var(--spacing)*2.75)}
+  .pt-3,.pt-3\:xs,.py-3,.py-3\:xs{padding-top:calc(var(--spacing)*3)}
+  .pt-3\.25,.pt-3\.25\:xs,.py-3\.25,.py-3\.25\:xs{padding-top:calc(var(--spacing)*3.25)}
+  .pt-3\.5,.pt-3\.5\:xs,.py-3\.5,.py-3\.5\:xs{padding-top:calc(var(--spacing)*3.5)}
+  .pt-3\.75,.pt-3\.75\:xs,.py-3\.75,.py-3\.75\:xs{padding-top:calc(var(--spacing)*3.75)}
+  .pt-4,.pt-4\:xs,.py-4,.py-4\:xs{padding-top:calc(var(--spacing)*4)}
+  .pt-4\.25,.pt-4\.25\:xs,.py-4\.25,.py-4\.25\:xs{padding-top:calc(var(--spacing)*4.25)}
+  .pt-4\.5,.pt-4\.5\:xs,.py-4\.5,.py-4\.5\:xs{padding-top:calc(var(--spacing)*4.5)}
+  .pt-4\.75,.pt-4\.75\:xs,.py-4\.75,.py-4\.75\:xs{padding-top:calc(var(--spacing)*4.75)}
+  .pt-5,.pt-5\:xs,.py-5,.py-5\:xs{padding-top:calc(var(--spacing)*5)}
+  .pt-5\.25,.pt-5\.25\:xs,.py-5\.25,.py-5\.25\:xs{padding-top:calc(var(--spacing)*5.25)}
+  .pt-5\.5,.pt-5\.5\:xs,.py-5\.5,.py-5\.5\:xs{padding-top:calc(var(--spacing)*5.5)}
+  .pt-5\.75,.pt-5\.75\:xs,.py-5\.75,.py-5\.75\:xs{padding-top:calc(var(--spacing)*5.75)}
+  .pt-6,.pt-6\:xs,.py-6,.py-6\:xs{padding-top:calc(var(--spacing)*6)}
+  .pt-6\.5,.pt-6\.5\:xs,.py-6\.5,.py-6\.5\:xs{padding-top:calc(var(--spacing)*6.5)}
+  .pt-7,.pt-7\:xs,.py-7,.py-7\:xs{padding-top:calc(var(--spacing)*7)}
+  .pt-7\.25,.pt-7\.25\:xs,.py-7\.25,.py-7\.25\:xs{padding-top:calc(var(--spacing)*7.25)}
+  .pt-7\.5,.pt-7\.5\:xs,.py-7\.5,.py-7\.5\:xs{padding-top:calc(var(--spacing)*7.5)}
+  .pt-7\.75,.pt-7\.75\:xs,.py-7\.75,.py-7\.75\:xs{padding-top:calc(var(--spacing)*7.75)}
+  .pt-8,.pt-8\:xs,.py-8,.py-8\:xs{padding-top:calc(var(--spacing)*8)}
+  .pt-8\.25,.pt-8\.25\:xs,.py-8\.25,.py-8\.25\:xs{padding-top:calc(var(--spacing)*8.25)}
+  .pt-8\.5,.pt-8\.5\:xs,.py-8\.5,.py-8\.5\:xs{padding-top:calc(var(--spacing)*8.5)}
+  .pt-8\.75,.pt-8\.75\:xs,.py-8\.75,.py-8\.75\:xs{padding-top:calc(var(--spacing)*8.75)}
+  .pt-9,.pt-9\:xs,.py-9,.py-9\:xs{padding-top:calc(var(--spacing)*9)}
+  .pt-9\.5,.pt-9\.5\:xs,.py-9\.5,.py-9\.5\:xs{padding-top:calc(var(--spacing)*9.5)}
+  .pt-10,.pt-10\:xs,.py-10,.py-10\:xs{padding-top:calc(var(--spacing)*10)}
+  .pt-11,.pt-11\:xs,.py-11,.py-11\:xs{padding-top:calc(var(--spacing)*11)}
+  .pt-12,.pt-12\:xs,.py-12,.py-12\:xs{padding-top:calc(var(--spacing)*12)}
+  .pt-13,.pt-13\:xs,.py-13,.py-13\:xs{padding-top:calc(var(--spacing)*13)}
+  .pt-13\.75,.pt-13\.75\:xs,.py-13\.75,.py-13\.75\:xs{padding-top:calc(var(--spacing)*13.75)}
+  .pt-14,.pt-14\:xs,.py-14,.py-14\:xs{padding-top:calc(var(--spacing)*14)}
+  .pt-15,.pt-15\:xs,.py-15,.py-15\:xs{padding-top:calc(var(--spacing)*15)}
+  .pb-0,.pb-0\:xs,.py-0,.py-0\:xs{padding-bottom:0}
+  .pb-0\.25,.pb-0\.25\:xs,.py-0\.25,.py-0\.25\:xs{padding-bottom:calc(var(--spacing)*.25)}
+  .pb-0\.5,.pb-0\.5\:xs,.py-0\.5,.py-0\.5\:xs{padding-bottom:calc(var(--spacing)*.5)}
+  .pb-0\.75,.pb-0\.75\:xs,.py-0\.75,.py-0\.75\:xs{padding-bottom:calc(var(--spacing)*.75)}
+  .pb-1,.pb-1\:xs,.py-1,.py-1\:xs{padding-bottom:var(--spacing)}
+  .pb-1\.25,.pb-1\.25\:xs,.py-1\.25,.py-1\.25\:xs{padding-bottom:calc(var(--spacing)*1.25)}
+  .pb-1\.5,.pb-1\.5\:xs,.py-1\.5,.py-1\.5\:xs{padding-bottom:calc(var(--spacing)*1.5)}
+  .pb-1\.75,.pb-1\.75\:xs,.py-1\.75,.py-1\.75\:xs{padding-bottom:calc(var(--spacing)*1.75)}
+  .pb-2,.pb-2\:xs,.py-2,.py-2\:xs{padding-bottom:calc(var(--spacing)*2)}
+  .pb-2\.25,.pb-2\.25\:xs,.py-2\.25,.py-2\.25\:xs{padding-bottom:calc(var(--spacing)*2.25)}
+  .pb-2\.5,.pb-2\.5\:xs,.py-2\.5,.py-2\.5\:xs{padding-bottom:calc(var(--spacing)*2.5)}
+  .pb-2\.75,.pb-2\.75\:xs,.py-2\.75,.py-2\.75\:xs{padding-bottom:calc(var(--spacing)*2.75)}
+  .pb-3,.pb-3\:xs,.py-3,.py-3\:xs{padding-bottom:calc(var(--spacing)*3)}
+  .pb-3\.25,.pb-3\.25\:xs,.py-3\.25,.py-3\.25\:xs{padding-bottom:calc(var(--spacing)*3.25)}
+  .pb-3\.5,.pb-3\.5\:xs,.py-3\.5,.py-3\.5\:xs{padding-bottom:calc(var(--spacing)*3.5)}
+  .pb-3\.75,.pb-3\.75\:xs,.py-3\.75,.py-3\.75\:xs{padding-bottom:calc(var(--spacing)*3.75)}
+  .pb-4,.pb-4\:xs,.py-4,.py-4\:xs{padding-bottom:calc(var(--spacing)*4)}
+  .pb-4\.25,.pb-4\.25\:xs,.py-4\.25,.py-4\.25\:xs{padding-bottom:calc(var(--spacing)*4.25)}
+  .pb-4\.5,.pb-4\.5\:xs,.py-4\.5,.py-4\.5\:xs{padding-bottom:calc(var(--spacing)*4.5)}
+  .pb-4\.75,.pb-4\.75\:xs,.py-4\.75,.py-4\.75\:xs{padding-bottom:calc(var(--spacing)*4.75)}
+  .pb-5,.pb-5\:xs,.py-5,.py-5\:xs{padding-bottom:calc(var(--spacing)*5)}
+  .pb-5\.25,.pb-5\.25\:xs,.py-5\.25,.py-5\.25\:xs{padding-bottom:calc(var(--spacing)*5.25)}
+  .pb-5\.5,.pb-5\.5\:xs,.py-5\.5,.py-5\.5\:xs{padding-bottom:calc(var(--spacing)*5.5)}
+  .pb-5\.75,.pb-5\.75\:xs,.py-5\.75,.py-5\.75\:xs{padding-bottom:calc(var(--spacing)*5.75)}
+  .pb-6,.pb-6\:xs,.py-6,.py-6\:xs{padding-bottom:calc(var(--spacing)*6)}
+  .pb-6\.5,.pb-6\.5\:xs,.py-6\.5,.py-6\.5\:xs{padding-bottom:calc(var(--spacing)*6.5)}
+  .pb-7,.pb-7\:xs,.py-7,.py-7\:xs{padding-bottom:calc(var(--spacing)*7)}
+  .pb-7\.25,.pb-7\.25\:xs,.py-7\.25,.py-7\.25\:xs{padding-bottom:calc(var(--spacing)*7.25)}
+  .pb-7\.5,.pb-7\.5\:xs,.py-7\.5,.py-7\.5\:xs{padding-bottom:calc(var(--spacing)*7.5)}
+  .pb-7\.75,.pb-7\.75\:xs,.py-7\.75,.py-7\.75\:xs{padding-bottom:calc(var(--spacing)*7.75)}
+  .pb-8,.pb-8\:xs,.py-8,.py-8\:xs{padding-bottom:calc(var(--spacing)*8)}
+  .pb-8\.25,.pb-8\.25\:xs,.py-8\.25,.py-8\.25\:xs{padding-bottom:calc(var(--spacing)*8.25)}
+  .pb-8\.5,.pb-8\.5\:xs,.py-8\.5,.py-8\.5\:xs{padding-bottom:calc(var(--spacing)*8.5)}
+  .pb-8\.75,.pb-8\.75\:xs,.py-8\.75,.py-8\.75\:xs{padding-bottom:calc(var(--spacing)*8.75)}
+  .pb-9,.pb-9\:xs,.py-9,.py-9\:xs{padding-bottom:calc(var(--spacing)*9)}
+  .pb-9\.5,.pb-9\.5\:xs,.py-9\.5,.py-9\.5\:xs{padding-bottom:calc(var(--spacing)*9.5)}
+  .pb-10,.pb-10\:xs,.py-10,.py-10\:xs{padding-bottom:calc(var(--spacing)*10)}
+  .pb-11,.pb-11\:xs,.py-11,.py-11\:xs{padding-bottom:calc(var(--spacing)*11)}
+  .pb-12,.pb-12\:xs,.py-12,.py-12\:xs{padding-bottom:calc(var(--spacing)*12)}
+  .pb-13,.pb-13\:xs,.py-13,.py-13\:xs{padding-bottom:calc(var(--spacing)*13)}
+  .pb-13\.75,.pb-13\.75\:xs,.py-13\.75,.py-13\.75\:xs{padding-bottom:calc(var(--spacing)*13.75)}
+  .pb-14,.pb-14\:xs,.py-14,.py-14\:xs{padding-bottom:calc(var(--spacing)*14)}
+  .pb-15,.pb-15\:xs,.py-15,.py-15\:xs{padding-bottom:calc(var(--spacing)*15)}
+  .pl-0,.pl-0\:xs,.px-0,.px-0\:xs{padding-left:0}
+  .pl-0\.25,.pl-0\.25\:xs,.px-0\.25,.px-0\.25\:xs{padding-left:calc(var(--spacing)*.25)}
+  .pl-0\.5,.pl-0\.5\:xs,.px-0\.5,.px-0\.5\:xs{padding-left:calc(var(--spacing)*.5)}
+  .pl-0\.75,.pl-0\.75\:xs,.px-0\.75,.px-0\.75\:xs{padding-left:calc(var(--spacing)*.75)}
+  .pl-1,.pl-1\:xs,.px-1,.px-1\:xs{padding-left:var(--spacing)}
+  .pl-1\.25,.pl-1\.25\:xs,.px-1\.25,.px-1\.25\:xs{padding-left:calc(var(--spacing)*1.25)}
+  .pl-1\.5,.pl-1\.5\:xs,.px-1\.5,.px-1\.5\:xs{padding-left:calc(var(--spacing)*1.5)}
+  .pl-1\.75,.pl-1\.75\:xs,.px-1\.75,.px-1\.75\:xs{padding-left:calc(var(--spacing)*1.75)}
+  .pl-2,.pl-2\:xs,.px-2,.px-2\:xs{padding-left:calc(var(--spacing)*2)}
+  .pl-2\.25,.pl-2\.25\:xs,.px-2\.25,.px-2\.25\:xs{padding-left:calc(var(--spacing)*2.25)}
+  .pl-2\.5,.pl-2\.5\:xs,.px-2\.5,.px-2\.5\:xs{padding-left:calc(var(--spacing)*2.5)}
+  .pl-2\.75,.pl-2\.75\:xs,.px-2\.75,.px-2\.75\:xs{padding-left:calc(var(--spacing)*2.75)}
+  .pl-3,.pl-3\:xs,.px-3,.px-3\:xs{padding-left:calc(var(--spacing)*3)}
+  .pl-3\.25,.pl-3\.25\:xs,.px-3\.25,.px-3\.25\:xs{padding-left:calc(var(--spacing)*3.25)}
+  .pl-3\.5,.pl-3\.5\:xs,.px-3\.5,.px-3\.5\:xs{padding-left:calc(var(--spacing)*3.5)}
+  .pl-3\.75,.pl-3\.75\:xs,.px-3\.75,.px-3\.75\:xs{padding-left:calc(var(--spacing)*3.75)}
+  .pl-4,.pl-4\:xs,.px-4,.px-4\:xs{padding-left:calc(var(--spacing)*4)}
+  .pl-4\.25,.pl-4\.25\:xs,.px-4\.25,.px-4\.25\:xs{padding-left:calc(var(--spacing)*4.25)}
+  .pl-4\.5,.pl-4\.5\:xs,.px-4\.5,.px-4\.5\:xs{padding-left:calc(var(--spacing)*4.5)}
+  .pl-4\.75,.pl-4\.75\:xs,.px-4\.75,.px-4\.75\:xs{padding-left:calc(var(--spacing)*4.75)}
+  .pl-5,.pl-5\:xs,.px-5,.px-5\:xs{padding-left:calc(var(--spacing)*5)}
+  .pl-5\.25,.pl-5\.25\:xs,.px-5\.25,.px-5\.25\:xs{padding-left:calc(var(--spacing)*5.25)}
+  .pl-5\.5,.pl-5\.5\:xs,.px-5\.5,.px-5\.5\:xs{padding-left:calc(var(--spacing)*5.5)}
+  .pl-5\.75,.pl-5\.75\:xs,.px-5\.75,.px-5\.75\:xs{padding-left:calc(var(--spacing)*5.75)}
+  .pl-6,.pl-6\:xs,.px-6,.px-6\:xs{padding-left:calc(var(--spacing)*6)}
+  .pl-6\.5,.pl-6\.5\:xs,.px-6\.5,.px-6\.5\:xs{padding-left:calc(var(--spacing)*6.5)}
+  .pl-7,.pl-7\:xs,.px-7,.px-7\:xs{padding-left:calc(var(--spacing)*7)}
+  .pl-7\.25,.pl-7\.25\:xs,.px-7\.25,.px-7\.25\:xs{padding-left:calc(var(--spacing)*7.25)}
+  .pl-7\.5,.pl-7\.5\:xs,.px-7\.5,.px-7\.5\:xs{padding-left:calc(var(--spacing)*7.5)}
+  .pl-7\.75,.pl-7\.75\:xs,.px-7\.75,.px-7\.75\:xs{padding-left:calc(var(--spacing)*7.75)}
+  .pl-8,.pl-8\:xs,.px-8,.px-8\:xs{padding-left:calc(var(--spacing)*8)}
+  .pl-8\.25,.pl-8\.25\:xs,.px-8\.25,.px-8\.25\:xs{padding-left:calc(var(--spacing)*8.25)}
+  .pl-8\.5,.pl-8\.5\:xs,.px-8\.5,.px-8\.5\:xs{padding-left:calc(var(--spacing)*8.5)}
+  .pl-8\.75,.pl-8\.75\:xs,.px-8\.75,.px-8\.75\:xs{padding-left:calc(var(--spacing)*8.75)}
+  .pl-9,.pl-9\:xs,.px-9,.px-9\:xs{padding-left:calc(var(--spacing)*9)}
+  .pl-9\.5,.pl-9\.5\:xs,.px-9\.5,.px-9\.5\:xs{padding-left:calc(var(--spacing)*9.5)}
+  .pl-10,.pl-10\:xs,.px-10,.px-10\:xs{padding-left:calc(var(--spacing)*10)}
+  .pl-11,.pl-11\:xs,.px-11,.px-11\:xs{padding-left:calc(var(--spacing)*11)}
+  .pl-12,.pl-12\:xs,.px-12,.px-12\:xs{padding-left:calc(var(--spacing)*12)}
+  .pl-13,.pl-13\:xs,.px-13,.px-13\:xs{padding-left:calc(var(--spacing)*13)}
+  .pl-13\.75,.pl-13\.75\:xs,.px-13\.75,.px-13\.75\:xs{padding-left:calc(var(--spacing)*13.75)}
+  .pl-14,.pl-14\:xs,.px-14,.px-14\:xs{padding-left:calc(var(--spacing)*14)}
+  .pl-15,.pl-15\:xs,.px-15,.px-15\:xs{padding-left:calc(var(--spacing)*15)}
+  .pr-0,.pr-0\:xs,.px-0,.px-0\:xs{padding-right:0}
+  .pr-0\.25,.pr-0\.25\:xs,.px-0\.25,.px-0\.25\:xs{padding-right:calc(var(--spacing)*.25)}
+  .pr-0\.5,.pr-0\.5\:xs,.px-0\.5,.px-0\.5\:xs{padding-right:calc(var(--spacing)*.5)}
+  .pr-0\.75,.pr-0\.75\:xs,.px-0\.75,.px-0\.75\:xs{padding-right:calc(var(--spacing)*.75)}
+  .pr-1,.pr-1\:xs,.px-1,.px-1\:xs{padding-right:var(--spacing)}
+  .pr-1\.25,.pr-1\.25\:xs,.px-1\.25,.px-1\.25\:xs{padding-right:calc(var(--spacing)*1.25)}
+  .pr-1\.5,.pr-1\.5\:xs,.px-1\.5,.px-1\.5\:xs{padding-right:calc(var(--spacing)*1.5)}
+  .pr-1\.75,.pr-1\.75\:xs,.px-1\.75,.px-1\.75\:xs{padding-right:calc(var(--spacing)*1.75)}
+  .pr-2,.pr-2\:xs,.px-2,.px-2\:xs{padding-right:calc(var(--spacing)*2)}
+  .pr-2\.25,.pr-2\.25\:xs,.px-2\.25,.px-2\.25\:xs{padding-right:calc(var(--spacing)*2.25)}
+  .pr-2\.5,.pr-2\.5\:xs,.px-2\.5,.px-2\.5\:xs{padding-right:calc(var(--spacing)*2.5)}
+  .pr-2\.75,.pr-2\.75\:xs,.px-2\.75,.px-2\.75\:xs{padding-right:calc(var(--spacing)*2.75)}
+  .pr-3,.pr-3\:xs,.px-3,.px-3\:xs{padding-right:calc(var(--spacing)*3)}
+  .pr-3\.25,.pr-3\.25\:xs,.px-3\.25,.px-3\.25\:xs{padding-right:calc(var(--spacing)*3.25)}
+  .pr-3\.5,.pr-3\.5\:xs,.px-3\.5,.px-3\.5\:xs{padding-right:calc(var(--spacing)*3.5)}
+  .pr-3\.75,.pr-3\.75\:xs,.px-3\.75,.px-3\.75\:xs{padding-right:calc(var(--spacing)*3.75)}
+  .pr-4,.pr-4\:xs,.px-4,.px-4\:xs{padding-right:calc(var(--spacing)*4)}
+  .pr-4\.25,.pr-4\.25\:xs,.px-4\.25,.px-4\.25\:xs{padding-right:calc(var(--spacing)*4.25)}
+  .pr-4\.5,.pr-4\.5\:xs,.px-4\.5,.px-4\.5\:xs{padding-right:calc(var(--spacing)*4.5)}
+  .pr-4\.75,.pr-4\.75\:xs,.px-4\.75,.px-4\.75\:xs{padding-right:calc(var(--spacing)*4.75)}
+  .pr-5,.pr-5\:xs,.px-5,.px-5\:xs{padding-right:calc(var(--spacing)*5)}
+  .pr-5\.25,.pr-5\.25\:xs,.px-5\.25,.px-5\.25\:xs{padding-right:calc(var(--spacing)*5.25)}
+  .pr-5\.5,.pr-5\.5\:xs,.px-5\.5,.px-5\.5\:xs{padding-right:calc(var(--spacing)*5.5)}
+  .pr-5\.75,.pr-5\.75\:xs,.px-5\.75,.px-5\.75\:xs{padding-right:calc(var(--spacing)*5.75)}
+  .pr-6,.pr-6\:xs,.px-6,.px-6\:xs{padding-right:calc(var(--spacing)*6)}
+  .pr-6\.5,.pr-6\.5\:xs,.px-6\.5,.px-6\.5\:xs{padding-right:calc(var(--spacing)*6.5)}
+  .pr-7,.pr-7\:xs,.px-7,.px-7\:xs{padding-right:calc(var(--spacing)*7)}
+  .pr-7\.25,.pr-7\.25\:xs,.px-7\.25,.px-7\.25\:xs{padding-right:calc(var(--spacing)*7.25)}
+  .pr-7\.5,.pr-7\.5\:xs,.px-7\.5,.px-7\.5\:xs{padding-right:calc(var(--spacing)*7.5)}
+  .pr-7\.75,.pr-7\.75\:xs,.px-7\.75,.px-7\.75\:xs{padding-right:calc(var(--spacing)*7.75)}
+  .pr-8,.pr-8\:xs,.px-8,.px-8\:xs{padding-right:calc(var(--spacing)*8)}
+  .pr-8\.25,.pr-8\.25\:xs,.px-8\.25,.px-8\.25\:xs{padding-right:calc(var(--spacing)*8.25)}
+  .pr-8\.5,.pr-8\.5\:xs,.px-8\.5,.px-8\.5\:xs{padding-right:calc(var(--spacing)*8.5)}
+  .pr-8\.75,.pr-8\.75\:xs,.px-8\.75,.px-8\.75\:xs{padding-right:calc(var(--spacing)*8.75)}
+  .pr-9,.pr-9\:xs,.px-9,.px-9\:xs{padding-right:calc(var(--spacing)*9)}
+  .pr-9\.5,.pr-9\.5\:xs,.px-9\.5,.px-9\.5\:xs{padding-right:calc(var(--spacing)*9.5)}
+  .pr-10,.pr-10\:xs,.px-10,.px-10\:xs{padding-right:calc(var(--spacing)*10)}
+  .pr-11,.pr-11\:xs,.px-11,.px-11\:xs{padding-right:calc(var(--spacing)*11)}
+  .pr-12,.pr-12\:xs,.px-12,.px-12\:xs{padding-right:calc(var(--spacing)*12)}
+  .pr-13,.pr-13\:xs,.px-13,.px-13\:xs{padding-right:calc(var(--spacing)*13)}
+  .pr-13\.75,.pr-13\.75\:xs,.px-13\.75,.px-13\.75\:xs{padding-right:calc(var(--spacing)*13.75)}
+  .pr-14,.pr-14\:xs,.px-14,.px-14\:xs{padding-right:calc(var(--spacing)*14)}
+  .pr-15,.pr-15\:xs,.px-15,.px-15\:xs{padding-right:calc(var(--spacing)*15)}
+  .mt-0,.mt-0\:xs,.my-0,.my-0\:xs{margin-top:0}
+  .mt-0\.25,.mt-0\.25\:xs,.my-0\.25,.my-0\.25\:xs{margin-top:calc(var(--spacing)*.25)}
+  .mt-0\.5,.mt-0\.5\:xs,.my-0\.5,.my-0\.5\:xs{margin-top:calc(var(--spacing)*.5)}
+  .mt-0\.75,.mt-0\.75\:xs,.my-0\.75,.my-0\.75\:xs{margin-top:calc(var(--spacing)*.75)}
+  .mt-1,.mt-1\:xs,.my-1,.my-1\:xs{margin-top:var(--spacing)}
+  .mt-1\.25,.mt-1\.25\:xs,.my-1\.25,.my-1\.25\:xs{margin-top:calc(var(--spacing)*1.25)}
+  .mt-1\.5,.mt-1\.5\:xs,.my-1\.5,.my-1\.5\:xs{margin-top:calc(var(--spacing)*1.5)}
+  .mt-1\.75,.mt-1\.75\:xs,.my-1\.75,.my-1\.75\:xs{margin-top:calc(var(--spacing)*1.75)}
+  .mt-2,.mt-2\:xs,.my-2,.my-2\:xs{margin-top:calc(var(--spacing)*2)}
+  .mt-2\.25,.mt-2\.25\:xs,.my-2\.25,.my-2\.25\:xs{margin-top:calc(var(--spacing)*2.25)}
+  .mt-2\.5,.mt-2\.5\:xs,.my-2\.5,.my-2\.5\:xs{margin-top:calc(var(--spacing)*2.5)}
+  .mt-2\.75,.mt-2\.75\:xs,.my-2\.75,.my-2\.75\:xs{margin-top:calc(var(--spacing)*2.75)}
+  .mt-3,.mt-3\:xs,.my-3,.my-3\:xs{margin-top:calc(var(--spacing)*3)}
+  .mt-3\.25,.mt-3\.25\:xs,.my-3\.25,.my-3\.25\:xs{margin-top:calc(var(--spacing)*3.25)}
+  .mt-3\.5,.mt-3\.5\:xs,.my-3\.5,.my-3\.5\:xs{margin-top:calc(var(--spacing)*3.5)}
+  .mt-3\.75,.mt-3\.75\:xs,.my-3\.75,.my-3\.75\:xs{margin-top:calc(var(--spacing)*3.75)}
+  .mt-4,.mt-4\:xs,.my-4,.my-4\:xs{margin-top:calc(var(--spacing)*4)}
+  .mt-4\.25,.mt-4\.25\:xs,.my-4\.25,.my-4\.25\:xs{margin-top:calc(var(--spacing)*4.25)}
+  .mt-4\.5,.mt-4\.5\:xs,.my-4\.5,.my-4\.5\:xs{margin-top:calc(var(--spacing)*4.5)}
+  .mt-4\.75,.mt-4\.75\:xs,.my-4\.75,.my-4\.75\:xs{margin-top:calc(var(--spacing)*4.75)}
+  .mt-5,.mt-5\:xs,.my-5,.my-5\:xs{margin-top:calc(var(--spacing)*5)}
+  .mt-5\.25,.mt-5\.25\:xs,.my-5\.25,.my-5\.25\:xs{margin-top:calc(var(--spacing)*5.25)}
+  .mt-5\.5,.mt-5\.5\:xs,.my-5\.5,.my-5\.5\:xs{margin-top:calc(var(--spacing)*5.5)}
+  .mt-5\.75,.mt-5\.75\:xs,.my-5\.75,.my-5\.75\:xs{margin-top:calc(var(--spacing)*5.75)}
+  .mt-6,.mt-6\:xs,.my-6,.my-6\:xs{margin-top:calc(var(--spacing)*6)}
+  .mt-6\.5,.mt-6\.5\:xs,.my-6\.5,.my-6\.5\:xs{margin-top:calc(var(--spacing)*6.5)}
+  .mt-7,.mt-7\:xs,.my-7,.my-7\:xs{margin-top:calc(var(--spacing)*7)}
+  .mt-7\.25,.mt-7\.25\:xs,.my-7\.25,.my-7\.25\:xs{margin-top:calc(var(--spacing)*7.25)}
+  .mt-7\.5,.mt-7\.5\:xs,.my-7\.5,.my-7\.5\:xs{margin-top:calc(var(--spacing)*7.5)}
+  .mt-7\.75,.mt-7\.75\:xs,.my-7\.75,.my-7\.75\:xs{margin-top:calc(var(--spacing)*7.75)}
+  .mt-8,.mt-8\:xs,.my-8,.my-8\:xs{margin-top:calc(var(--spacing)*8)}
+  .mt-8\.25,.mt-8\.25\:xs,.my-8\.25,.my-8\.25\:xs{margin-top:calc(var(--spacing)*8.25)}
+  .mt-8\.5,.mt-8\.5\:xs,.my-8\.5,.my-8\.5\:xs{margin-top:calc(var(--spacing)*8.5)}
+  .mt-8\.75,.mt-8\.75\:xs,.my-8\.75,.my-8\.75\:xs{margin-top:calc(var(--spacing)*8.75)}
+  .mt-9,.mt-9\:xs,.my-9,.my-9\:xs{margin-top:calc(var(--spacing)*9)}
+  .mt-9\.5,.mt-9\.5\:xs,.my-9\.5,.my-9\.5\:xs{margin-top:calc(var(--spacing)*9.5)}
+  .mt-10,.mt-10\:xs,.my-10,.my-10\:xs{margin-top:calc(var(--spacing)*10)}
+  .mt-11,.mt-11\:xs,.my-11,.my-11\:xs{margin-top:calc(var(--spacing)*11)}
+  .mt-12,.mt-12\:xs,.my-12,.my-12\:xs{margin-top:calc(var(--spacing)*12)}
+  .mt-13,.mt-13\:xs,.my-13,.my-13\:xs{margin-top:calc(var(--spacing)*13)}
+  .mt-13\.75,.mt-13\.75\:xs,.my-13\.75,.my-13\.75\:xs{margin-top:calc(var(--spacing)*13.75)}
+  .mt-14,.mt-14\:xs,.my-14,.my-14\:xs{margin-top:calc(var(--spacing)*14)}
+  .mt-15,.mt-15\:xs,.my-15,.my-15\:xs{margin-top:calc(var(--spacing)*15)}
+  .mb-0,.mb-0\:xs,.my-0,.my-0\:xs{margin-bottom:0}
+  .mb-0\.25,.mb-0\.25\:xs,.my-0\.25,.my-0\.25\:xs{margin-bottom:calc(var(--spacing)*.25)}
+  .mb-0\.5,.mb-0\.5\:xs,.my-0\.5,.my-0\.5\:xs{margin-bottom:calc(var(--spacing)*.5)}
+  .mb-0\.75,.mb-0\.75\:xs,.my-0\.75,.my-0\.75\:xs{margin-bottom:calc(var(--spacing)*.75)}
+  .mb-1,.mb-1\:xs,.my-1,.my-1\:xs{margin-bottom:var(--spacing)}
+  .mb-1\.25,.mb-1\.25\:xs,.my-1\.25,.my-1\.25\:xs{margin-bottom:calc(var(--spacing)*1.25)}
+  .mb-1\.5,.mb-1\.5\:xs,.my-1\.5,.my-1\.5\:xs{margin-bottom:calc(var(--spacing)*1.5)}
+  .mb-1\.75,.mb-1\.75\:xs,.my-1\.75,.my-1\.75\:xs{margin-bottom:calc(var(--spacing)*1.75)}
+  .mb-2,.mb-2\:xs,.my-2,.my-2\:xs{margin-bottom:calc(var(--spacing)*2)}
+  .mb-2\.25,.mb-2\.25\:xs,.my-2\.25,.my-2\.25\:xs{margin-bottom:calc(var(--spacing)*2.25)}
+  .mb-2\.5,.mb-2\.5\:xs,.my-2\.5,.my-2\.5\:xs{margin-bottom:calc(var(--spacing)*2.5)}
+  .mb-2\.75,.mb-2\.75\:xs,.my-2\.75,.my-2\.75\:xs{margin-bottom:calc(var(--spacing)*2.75)}
+  .mb-3,.mb-3\:xs,.my-3,.my-3\:xs{margin-bottom:calc(var(--spacing)*3)}
+  .mb-3\.25,.mb-3\.25\:xs,.my-3\.25,.my-3\.25\:xs{margin-bottom:calc(var(--spacing)*3.25)}
+  .mb-3\.5,.mb-3\.5\:xs,.my-3\.5,.my-3\.5\:xs{margin-bottom:calc(var(--spacing)*3.5)}
+  .mb-3\.75,.mb-3\.75\:xs,.my-3\.75,.my-3\.75\:xs{margin-bottom:calc(var(--spacing)*3.75)}
+  .mb-4,.mb-4\:xs,.my-4,.my-4\:xs{margin-bottom:calc(var(--spacing)*4)}
+  .mb-4\.25,.mb-4\.25\:xs,.my-4\.25,.my-4\.25\:xs{margin-bottom:calc(var(--spacing)*4.25)}
+  .mb-4\.5,.mb-4\.5\:xs,.my-4\.5,.my-4\.5\:xs{margin-bottom:calc(var(--spacing)*4.5)}
+  .mb-4\.75,.mb-4\.75\:xs,.my-4\.75,.my-4\.75\:xs{margin-bottom:calc(var(--spacing)*4.75)}
+  .mb-5,.mb-5\:xs,.my-5,.my-5\:xs{margin-bottom:calc(var(--spacing)*5)}
+  .mb-5\.25,.mb-5\.25\:xs,.my-5\.25,.my-5\.25\:xs{margin-bottom:calc(var(--spacing)*5.25)}
+  .mb-5\.5,.mb-5\.5\:xs,.my-5\.5,.my-5\.5\:xs{margin-bottom:calc(var(--spacing)*5.5)}
+  .mb-5\.75,.mb-5\.75\:xs,.my-5\.75,.my-5\.75\:xs{margin-bottom:calc(var(--spacing)*5.75)}
+  .mb-6,.mb-6\:xs,.my-6,.my-6\:xs{margin-bottom:calc(var(--spacing)*6)}
+  .mb-6\.5,.mb-6\.5\:xs,.my-6\.5,.my-6\.5\:xs{margin-bottom:calc(var(--spacing)*6.5)}
+  .mb-7,.mb-7\:xs,.my-7,.my-7\:xs{margin-bottom:calc(var(--spacing)*7)}
+  .mb-7\.25,.mb-7\.25\:xs,.my-7\.25,.my-7\.25\:xs{margin-bottom:calc(var(--spacing)*7.25)}
+  .mb-7\.5,.mb-7\.5\:xs,.my-7\.5,.my-7\.5\:xs{margin-bottom:calc(var(--spacing)*7.5)}
+  .mb-7\.75,.mb-7\.75\:xs,.my-7\.75,.my-7\.75\:xs{margin-bottom:calc(var(--spacing)*7.75)}
+  .mb-8,.mb-8\:xs,.my-8,.my-8\:xs{margin-bottom:calc(var(--spacing)*8)}
+  .mb-8\.25,.mb-8\.25\:xs,.my-8\.25,.my-8\.25\:xs{margin-bottom:calc(var(--spacing)*8.25)}
+  .mb-8\.5,.mb-8\.5\:xs,.my-8\.5,.my-8\.5\:xs{margin-bottom:calc(var(--spacing)*8.5)}
+  .mb-8\.75,.mb-8\.75\:xs,.my-8\.75,.my-8\.75\:xs{margin-bottom:calc(var(--spacing)*8.75)}
+  .mb-9,.mb-9\:xs,.my-9,.my-9\:xs{margin-bottom:calc(var(--spacing)*9)}
+  .mb-9\.5,.mb-9\.5\:xs,.my-9\.5,.my-9\.5\:xs{margin-bottom:calc(var(--spacing)*9.5)}
+  .mb-10,.mb-10\:xs,.my-10,.my-10\:xs{margin-bottom:calc(var(--spacing)*10)}
+  .mb-11,.mb-11\:xs,.my-11,.my-11\:xs{margin-bottom:calc(var(--spacing)*11)}
+  .mb-12,.mb-12\:xs,.my-12,.my-12\:xs{margin-bottom:calc(var(--spacing)*12)}
+  .mb-13,.mb-13\:xs,.my-13,.my-13\:xs{margin-bottom:calc(var(--spacing)*13)}
+  .mb-13\.75,.mb-13\.75\:xs,.my-13\.75,.my-13\.75\:xs{margin-bottom:calc(var(--spacing)*13.75)}
+  .mb-14,.mb-14\:xs,.my-14,.my-14\:xs{margin-bottom:calc(var(--spacing)*14)}
+  .mb-15,.mb-15\:xs,.my-15,.my-15\:xs{margin-bottom:calc(var(--spacing)*15)}
+  .ml-0,.ml-0\:xs,.mx-0,.mx-0\:xs{margin-left:0}
+  .ml-0\.25,.ml-0\.25\:xs,.mx-0\.25,.mx-0\.25\:xs{margin-left:calc(var(--spacing)*.25)}
+  .ml-0\.5,.ml-0\.5\:xs,.mx-0\.5,.mx-0\.5\:xs{margin-left:calc(var(--spacing)*.5)}
+  .ml-0\.75,.ml-0\.75\:xs,.mx-0\.75,.mx-0\.75\:xs{margin-left:calc(var(--spacing)*.75)}
+  .ml-1,.ml-1\:xs,.mx-1,.mx-1\:xs{margin-left:var(--spacing)}
+  .ml-1\.25,.ml-1\.25\:xs,.mx-1\.25,.mx-1\.25\:xs{margin-left:calc(var(--spacing)*1.25)}
+  .ml-1\.5,.ml-1\.5\:xs,.mx-1\.5,.mx-1\.5\:xs{margin-left:calc(var(--spacing)*1.5)}
+  .ml-1\.75,.ml-1\.75\:xs,.mx-1\.75,.mx-1\.75\:xs{margin-left:calc(var(--spacing)*1.75)}
+  .ml-2,.ml-2\:xs,.mx-2,.mx-2\:xs{margin-left:calc(var(--spacing)*2)}
+  .ml-2\.25,.ml-2\.25\:xs,.mx-2\.25,.mx-2\.25\:xs{margin-left:calc(var(--spacing)*2.25)}
+  .ml-2\.5,.ml-2\.5\:xs,.mx-2\.5,.mx-2\.5\:xs{margin-left:calc(var(--spacing)*2.5)}
+  .ml-2\.75,.ml-2\.75\:xs,.mx-2\.75,.mx-2\.75\:xs{margin-left:calc(var(--spacing)*2.75)}
+  .ml-3,.ml-3\:xs,.mx-3,.mx-3\:xs{margin-left:calc(var(--spacing)*3)}
+  .ml-3\.25,.ml-3\.25\:xs,.mx-3\.25,.mx-3\.25\:xs{margin-left:calc(var(--spacing)*3.25)}
+  .ml-3\.5,.ml-3\.5\:xs,.mx-3\.5,.mx-3\.5\:xs{margin-left:calc(var(--spacing)*3.5)}
+  .ml-3\.75,.ml-3\.75\:xs,.mx-3\.75,.mx-3\.75\:xs{margin-left:calc(var(--spacing)*3.75)}
+  .ml-4,.ml-4\:xs,.mx-4,.mx-4\:xs{margin-left:calc(var(--spacing)*4)}
+  .ml-4\.25,.ml-4\.25\:xs,.mx-4\.25,.mx-4\.25\:xs{margin-left:calc(var(--spacing)*4.25)}
+  .ml-4\.5,.ml-4\.5\:xs,.mx-4\.5,.mx-4\.5\:xs{margin-left:calc(var(--spacing)*4.5)}
+  .ml-4\.75,.ml-4\.75\:xs,.mx-4\.75,.mx-4\.75\:xs{margin-left:calc(var(--spacing)*4.75)}
+  .ml-5,.ml-5\:xs,.mx-5,.mx-5\:xs{margin-left:calc(var(--spacing)*5)}
+  .ml-5\.25,.ml-5\.25\:xs,.mx-5\.25,.mx-5\.25\:xs{margin-left:calc(var(--spacing)*5.25)}
+  .ml-5\.5,.ml-5\.5\:xs,.mx-5\.5,.mx-5\.5\:xs{margin-left:calc(var(--spacing)*5.5)}
+  .ml-5\.75,.ml-5\.75\:xs,.mx-5\.75,.mx-5\.75\:xs{margin-left:calc(var(--spacing)*5.75)}
+  .ml-6,.ml-6\:xs,.mx-6,.mx-6\:xs{margin-left:calc(var(--spacing)*6)}
+  .ml-6\.5,.ml-6\.5\:xs,.mx-6\.5,.mx-6\.5\:xs{margin-left:calc(var(--spacing)*6.5)}
+  .ml-7,.ml-7\:xs,.mx-7,.mx-7\:xs{margin-left:calc(var(--spacing)*7)}
+  .ml-7\.25,.ml-7\.25\:xs,.mx-7\.25,.mx-7\.25\:xs{margin-left:calc(var(--spacing)*7.25)}
+  .ml-7\.5,.ml-7\.5\:xs,.mx-7\.5,.mx-7\.5\:xs{margin-left:calc(var(--spacing)*7.5)}
+  .ml-7\.75,.ml-7\.75\:xs,.mx-7\.75,.mx-7\.75\:xs{margin-left:calc(var(--spacing)*7.75)}
+  .ml-8,.ml-8\:xs,.mx-8,.mx-8\:xs{margin-left:calc(var(--spacing)*8)}
+  .ml-8\.25,.ml-8\.25\:xs,.mx-8\.25,.mx-8\.25\:xs{margin-left:calc(var(--spacing)*8.25)}
+  .ml-8\.5,.ml-8\.5\:xs,.mx-8\.5,.mx-8\.5\:xs{margin-left:calc(var(--spacing)*8.5)}
+  .ml-8\.75,.ml-8\.75\:xs,.mx-8\.75,.mx-8\.75\:xs{margin-left:calc(var(--spacing)*8.75)}
+  .ml-9,.ml-9\:xs,.mx-9,.mx-9\:xs{margin-left:calc(var(--spacing)*9)}
+  .ml-9\.5,.ml-9\.5\:xs,.mx-9\.5,.mx-9\.5\:xs{margin-left:calc(var(--spacing)*9.5)}
+  .ml-10,.ml-10\:xs,.mx-10,.mx-10\:xs{margin-left:calc(var(--spacing)*10)}
+  .ml-11,.ml-11\:xs,.mx-11,.mx-11\:xs{margin-left:calc(var(--spacing)*11)}
+  .ml-12,.ml-12\:xs,.mx-12,.mx-12\:xs{margin-left:calc(var(--spacing)*12)}
+  .ml-13,.ml-13\:xs,.mx-13,.mx-13\:xs{margin-left:calc(var(--spacing)*13)}
+  .ml-13\.75,.ml-13\.75\:xs,.mx-13\.75,.mx-13\.75\:xs{margin-left:calc(var(--spacing)*13.75)}
+  .ml-14,.ml-14\:xs,.mx-14,.mx-14\:xs{margin-left:calc(var(--spacing)*14)}
+  .ml-15,.ml-15\:xs,.mx-15,.mx-15\:xs{margin-left:calc(var(--spacing)*15)}
+  .mr-0,.mr-0\:xs,.mx-0,.mx-0\:xs{margin-right:0}
+  .mr-0\.25,.mr-0\.25\:xs,.mx-0\.25,.mx-0\.25\:xs{margin-right:calc(var(--spacing)*.25)}
+  .mr-0\.5,.mr-0\.5\:xs,.mx-0\.5,.mx-0\.5\:xs{margin-right:calc(var(--spacing)*.5)}
+  .mr-0\.75,.mr-0\.75\:xs,.mx-0\.75,.mx-0\.75\:xs{margin-right:calc(var(--spacing)*.75)}
+  .mr-1,.mr-1\:xs,.mx-1,.mx-1\:xs{margin-right:var(--spacing)}
+  .mr-1\.25,.mr-1\.25\:xs,.mx-1\.25,.mx-1\.25\:xs{margin-right:calc(var(--spacing)*1.25)}
+  .mr-1\.5,.mr-1\.5\:xs,.mx-1\.5,.mx-1\.5\:xs{margin-right:calc(var(--spacing)*1.5)}
+  .mr-1\.75,.mr-1\.75\:xs,.mx-1\.75,.mx-1\.75\:xs{margin-right:calc(var(--spacing)*1.75)}
+  .mr-2,.mr-2\:xs,.mx-2,.mx-2\:xs{margin-right:calc(var(--spacing)*2)}
+  .mr-2\.25,.mr-2\.25\:xs,.mx-2\.25,.mx-2\.25\:xs{margin-right:calc(var(--spacing)*2.25)}
+  .mr-2\.5,.mr-2\.5\:xs,.mx-2\.5,.mx-2\.5\:xs{margin-right:calc(var(--spacing)*2.5)}
+  .mr-2\.75,.mr-2\.75\:xs,.mx-2\.75,.mx-2\.75\:xs{margin-right:calc(var(--spacing)*2.75)}
+  .mr-3,.mr-3\:xs,.mx-3,.mx-3\:xs{margin-right:calc(var(--spacing)*3)}
+  .mr-3\.25,.mr-3\.25\:xs,.mx-3\.25,.mx-3\.25\:xs{margin-right:calc(var(--spacing)*3.25)}
+  .mr-3\.5,.mr-3\.5\:xs,.mx-3\.5,.mx-3\.5\:xs{margin-right:calc(var(--spacing)*3.5)}
+  .mr-3\.75,.mr-3\.75\:xs,.mx-3\.75,.mx-3\.75\:xs{margin-right:calc(var(--spacing)*3.75)}
+  .mr-4,.mr-4\:xs,.mx-4,.mx-4\:xs{margin-right:calc(var(--spacing)*4)}
+  .mr-4\.25,.mr-4\.25\:xs,.mx-4\.25,.mx-4\.25\:xs{margin-right:calc(var(--spacing)*4.25)}
+  .mr-4\.5,.mr-4\.5\:xs,.mx-4\.5,.mx-4\.5\:xs{margin-right:calc(var(--spacing)*4.5)}
+  .mr-4\.75,.mr-4\.75\:xs,.mx-4\.75,.mx-4\.75\:xs{margin-right:calc(var(--spacing)*4.75)}
+  .mr-5,.mr-5\:xs,.mx-5,.mx-5\:xs{margin-right:calc(var(--spacing)*5)}
+  .mr-5\.25,.mr-5\.25\:xs,.mx-5\.25,.mx-5\.25\:xs{margin-right:calc(var(--spacing)*5.25)}
+  .mr-5\.5,.mr-5\.5\:xs,.mx-5\.5,.mx-5\.5\:xs{margin-right:calc(var(--spacing)*5.5)}
+  .mr-5\.75,.mr-5\.75\:xs,.mx-5\.75,.mx-5\.75\:xs{margin-right:calc(var(--spacing)*5.75)}
+  .mr-6,.mr-6\:xs,.mx-6,.mx-6\:xs{margin-right:calc(var(--spacing)*6)}
+  .mr-6\.5,.mr-6\.5\:xs,.mx-6\.5,.mx-6\.5\:xs{margin-right:calc(var(--spacing)*6.5)}
+  .mr-7,.mr-7\:xs,.mx-7,.mx-7\:xs{margin-right:calc(var(--spacing)*7)}
+  .mr-7\.25,.mr-7\.25\:xs,.mx-7\.25,.mx-7\.25\:xs{margin-right:calc(var(--spacing)*7.25)}
+  .mr-7\.5,.mr-7\.5\:xs,.mx-7\.5,.mx-7\.5\:xs{margin-right:calc(var(--spacing)*7.5)}
+  .mr-7\.75,.mr-7\.75\:xs,.mx-7\.75,.mx-7\.75\:xs{margin-right:calc(var(--spacing)*7.75)}
+  .mr-8,.mr-8\:xs,.mx-8,.mx-8\:xs{margin-right:calc(var(--spacing)*8)}
+  .mr-8\.25,.mr-8\.25\:xs,.mx-8\.25,.mx-8\.25\:xs{margin-right:calc(var(--spacing)*8.25)}
+  .mr-8\.5,.mr-8\.5\:xs,.mx-8\.5,.mx-8\.5\:xs{margin-right:calc(var(--spacing)*8.5)}
+  .mr-8\.75,.mr-8\.75\:xs,.mx-8\.75,.mx-8\.75\:xs{margin-right:calc(var(--spacing)*8.75)}
+  .mr-9,.mr-9\:xs,.mx-9,.mx-9\:xs{margin-right:calc(var(--spacing)*9)}
+  .mr-9\.5,.mr-9\.5\:xs,.mx-9\.5,.mx-9\.5\:xs{margin-right:calc(var(--spacing)*9.5)}
+  .mr-10,.mr-10\:xs,.mx-10,.mx-10\:xs{margin-right:calc(var(--spacing)*10)}
+  .mr-11,.mr-11\:xs,.mx-11,.mx-11\:xs{margin-right:calc(var(--spacing)*11)}
+  .mr-12,.mr-12\:xs,.mx-12,.mx-12\:xs{margin-right:calc(var(--spacing)*12)}
+  .mr-13,.mr-13\:xs,.mx-13,.mx-13\:xs{margin-right:calc(var(--spacing)*13)}
+  .mr-13\.75,.mr-13\.75\:xs,.mx-13\.75,.mx-13\.75\:xs{margin-right:calc(var(--spacing)*13.75)}
+  .mr-14,.mr-14\:xs,.mx-14,.mx-14\:xs{margin-right:calc(var(--spacing)*14)}
+  .mr-15,.mr-15\:xs,.mx-15,.mx-15\:xs{margin-right:calc(var(--spacing)*15)}
+}
+
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px) {
+@layer utilities {
+  .pt-0\:md,.py-0\:md{padding-top:0}
+  .pt-0\.25\:md,.py-0\.25\:md{padding-top:calc(var(--spacing)*.25)}
+  .pt-0\.5\:md,.py-0\.5\:md{padding-top:calc(var(--spacing)*.5)}
+  .pt-0\.75\:md,.py-0\.75\:md{padding-top:calc(var(--spacing)*.75)}
+  .pt-1\:md,.py-1\:md{padding-top:var(--spacing)}
+  .pt-1\.25\:md,.py-1\.25\:md{padding-top:calc(var(--spacing)*1.25)}
+  .pt-1\.5\:md,.py-1\.5\:md{padding-top:calc(var(--spacing)*1.5)}
+  .pt-1\.75\:md,.py-1\.75\:md{padding-top:calc(var(--spacing)*1.75)}
+  .pt-2\:md,.py-2\:md{padding-top:calc(var(--spacing)*2)}
+  .pt-2\.25\:md,.py-2\.25\:md{padding-top:calc(var(--spacing)*2.25)}
+  .pt-2\.5\:md,.py-2\.5\:md{padding-top:calc(var(--spacing)*2.5)}
+  .pt-2\.75\:md,.py-2\.75\:md{padding-top:calc(var(--spacing)*2.75)}
+  .pt-3\:md,.py-3\:md{padding-top:calc(var(--spacing)*3)}
+  .pt-3\.25\:md,.py-3\.25\:md{padding-top:calc(var(--spacing)*3.25)}
+  .pt-3\.5\:md,.py-3\.5\:md{padding-top:calc(var(--spacing)*3.5)}
+  .pt-3\.75\:md,.py-3\.75\:md{padding-top:calc(var(--spacing)*3.75)}
+  .pt-4\:md,.py-4\:md{padding-top:calc(var(--spacing)*4)}
+  .pt-4\.25\:md,.py-4\.25\:md{padding-top:calc(var(--spacing)*4.25)}
+  .pt-4\.5\:md,.py-4\.5\:md{padding-top:calc(var(--spacing)*4.5)}
+  .pt-4\.75\:md,.py-4\.75\:md{padding-top:calc(var(--spacing)*4.75)}
+  .pt-5\:md,.py-5\:md{padding-top:calc(var(--spacing)*5)}
+  .pt-5\.25\:md,.py-5\.25\:md{padding-top:calc(var(--spacing)*5.25)}
+  .pt-5\.5\:md,.py-5\.5\:md{padding-top:calc(var(--spacing)*5.5)}
+  .pt-5\.75\:md,.py-5\.75\:md{padding-top:calc(var(--spacing)*5.75)}
+  .pt-6\:md,.py-6\:md{padding-top:calc(var(--spacing)*6)}
+  .pt-6\.5\:md,.py-6\.5\:md{padding-top:calc(var(--spacing)*6.5)}
+  .pt-7\:md,.py-7\:md{padding-top:calc(var(--spacing)*7)}
+  .pt-7\.25\:md,.py-7\.25\:md{padding-top:calc(var(--spacing)*7.25)}
+  .pt-7\.5\:md,.py-7\.5\:md{padding-top:calc(var(--spacing)*7.5)}
+  .pt-7\.75\:md,.py-7\.75\:md{padding-top:calc(var(--spacing)*7.75)}
+  .pt-8\:md,.py-8\:md{padding-top:calc(var(--spacing)*8)}
+  .pt-8\.25\:md,.py-8\.25\:md{padding-top:calc(var(--spacing)*8.25)}
+  .pt-8\.5\:md,.py-8\.5\:md{padding-top:calc(var(--spacing)*8.5)}
+  .pt-8\.75\:md,.py-8\.75\:md{padding-top:calc(var(--spacing)*8.75)}
+  .pt-9\:md,.py-9\:md{padding-top:calc(var(--spacing)*9)}
+  .pt-9\.5\:md,.py-9\.5\:md{padding-top:calc(var(--spacing)*9.5)}
+  .pt-10\:md,.py-10\:md{padding-top:calc(var(--spacing)*10)}
+  .pt-11\:md,.py-11\:md{padding-top:calc(var(--spacing)*11)}
+  .pt-12\:md,.py-12\:md{padding-top:calc(var(--spacing)*12)}
+  .pt-13\:md,.py-13\:md{padding-top:calc(var(--spacing)*13)}
+  .pt-13\.75\:md,.py-13\.75\:md{padding-top:calc(var(--spacing)*13.75)}
+  .pt-14\:md,.py-14\:md{padding-top:calc(var(--spacing)*14)}
+  .pt-15\:md,.py-15\:md{padding-top:calc(var(--spacing)*15)}
+  .pb-0\:md,.py-0\:md{padding-bottom:0}
+  .pb-0\.25\:md,.py-0\.25\:md{padding-bottom:calc(var(--spacing)*.25)}
+  .pb-0\.5\:md,.py-0\.5\:md{padding-bottom:calc(var(--spacing)*.5)}
+  .pb-0\.75\:md,.py-0\.75\:md{padding-bottom:calc(var(--spacing)*.75)}
+  .pb-1\:md,.py-1\:md{padding-bottom:var(--spacing)}
+  .pb-1\.25\:md,.py-1\.25\:md{padding-bottom:calc(var(--spacing)*1.25)}
+  .pb-1\.5\:md,.py-1\.5\:md{padding-bottom:calc(var(--spacing)*1.5)}
+  .pb-1\.75\:md,.py-1\.75\:md{padding-bottom:calc(var(--spacing)*1.75)}
+  .pb-2\:md,.py-2\:md{padding-bottom:calc(var(--spacing)*2)}
+  .pb-2\.25\:md,.py-2\.25\:md{padding-bottom:calc(var(--spacing)*2.25)}
+  .pb-2\.5\:md,.py-2\.5\:md{padding-bottom:calc(var(--spacing)*2.5)}
+  .pb-2\.75\:md,.py-2\.75\:md{padding-bottom:calc(var(--spacing)*2.75)}
+  .pb-3\:md,.py-3\:md{padding-bottom:calc(var(--spacing)*3)}
+  .pb-3\.25\:md,.py-3\.25\:md{padding-bottom:calc(var(--spacing)*3.25)}
+  .pb-3\.5\:md,.py-3\.5\:md{padding-bottom:calc(var(--spacing)*3.5)}
+  .pb-3\.75\:md,.py-3\.75\:md{padding-bottom:calc(var(--spacing)*3.75)}
+  .pb-4\:md,.py-4\:md{padding-bottom:calc(var(--spacing)*4)}
+  .pb-4\.25\:md,.py-4\.25\:md{padding-bottom:calc(var(--spacing)*4.25)}
+  .pb-4\.5\:md,.py-4\.5\:md{padding-bottom:calc(var(--spacing)*4.5)}
+  .pb-4\.75\:md,.py-4\.75\:md{padding-bottom:calc(var(--spacing)*4.75)}
+  .pb-5\:md,.py-5\:md{padding-bottom:calc(var(--spacing)*5)}
+  .pb-5\.25\:md,.py-5\.25\:md{padding-bottom:calc(var(--spacing)*5.25)}
+  .pb-5\.5\:md,.py-5\.5\:md{padding-bottom:calc(var(--spacing)*5.5)}
+  .pb-5\.75\:md,.py-5\.75\:md{padding-bottom:calc(var(--spacing)*5.75)}
+  .pb-6\:md,.py-6\:md{padding-bottom:calc(var(--spacing)*6)}
+  .pb-6\.5\:md,.py-6\.5\:md{padding-bottom:calc(var(--spacing)*6.5)}
+  .pb-7\:md,.py-7\:md{padding-bottom:calc(var(--spacing)*7)}
+  .pb-7\.25\:md,.py-7\.25\:md{padding-bottom:calc(var(--spacing)*7.25)}
+  .pb-7\.5\:md,.py-7\.5\:md{padding-bottom:calc(var(--spacing)*7.5)}
+  .pb-7\.75\:md,.py-7\.75\:md{padding-bottom:calc(var(--spacing)*7.75)}
+  .pb-8\:md,.py-8\:md{padding-bottom:calc(var(--spacing)*8)}
+  .pb-8\.25\:md,.py-8\.25\:md{padding-bottom:calc(var(--spacing)*8.25)}
+  .pb-8\.5\:md,.py-8\.5\:md{padding-bottom:calc(var(--spacing)*8.5)}
+  .pb-8\.75\:md,.py-8\.75\:md{padding-bottom:calc(var(--spacing)*8.75)}
+  .pb-9\:md,.py-9\:md{padding-bottom:calc(var(--spacing)*9)}
+  .pb-9\.5\:md,.py-9\.5\:md{padding-bottom:calc(var(--spacing)*9.5)}
+  .pb-10\:md,.py-10\:md{padding-bottom:calc(var(--spacing)*10)}
+  .pb-11\:md,.py-11\:md{padding-bottom:calc(var(--spacing)*11)}
+  .pb-12\:md,.py-12\:md{padding-bottom:calc(var(--spacing)*12)}
+  .pb-13\:md,.py-13\:md{padding-bottom:calc(var(--spacing)*13)}
+  .pb-13\.75\:md,.py-13\.75\:md{padding-bottom:calc(var(--spacing)*13.75)}
+  .pb-14\:md,.py-14\:md{padding-bottom:calc(var(--spacing)*14)}
+  .pb-15\:md,.py-15\:md{padding-bottom:calc(var(--spacing)*15)}
+  .pl-0\:md,.px-0\:md{padding-left:0}
+  .pl-0\.25\:md,.px-0\.25\:md{padding-left:calc(var(--spacing)*.25)}
+  .pl-0\.5\:md,.px-0\.5\:md{padding-left:calc(var(--spacing)*.5)}
+  .pl-0\.75\:md,.px-0\.75\:md{padding-left:calc(var(--spacing)*.75)}
+  .pl-1\:md,.px-1\:md{padding-left:var(--spacing)}
+  .pl-1\.25\:md,.px-1\.25\:md{padding-left:calc(var(--spacing)*1.25)}
+  .pl-1\.5\:md,.px-1\.5\:md{padding-left:calc(var(--spacing)*1.5)}
+  .pl-1\.75\:md,.px-1\.75\:md{padding-left:calc(var(--spacing)*1.75)}
+  .pl-2\:md,.px-2\:md{padding-left:calc(var(--spacing)*2)}
+  .pl-2\.25\:md,.px-2\.25\:md{padding-left:calc(var(--spacing)*2.25)}
+  .pl-2\.5\:md,.px-2\.5\:md{padding-left:calc(var(--spacing)*2.5)}
+  .pl-2\.75\:md,.px-2\.75\:md{padding-left:calc(var(--spacing)*2.75)}
+  .pl-3\:md,.px-3\:md{padding-left:calc(var(--spacing)*3)}
+  .pl-3\.25\:md,.px-3\.25\:md{padding-left:calc(var(--spacing)*3.25)}
+  .pl-3\.5\:md,.px-3\.5\:md{padding-left:calc(var(--spacing)*3.5)}
+  .pl-3\.75\:md,.px-3\.75\:md{padding-left:calc(var(--spacing)*3.75)}
+  .pl-4\:md,.px-4\:md{padding-left:calc(var(--spacing)*4)}
+  .pl-4\.25\:md,.px-4\.25\:md{padding-left:calc(var(--spacing)*4.25)}
+  .pl-4\.5\:md,.px-4\.5\:md{padding-left:calc(var(--spacing)*4.5)}
+  .pl-4\.75\:md,.px-4\.75\:md{padding-left:calc(var(--spacing)*4.75)}
+  .pl-5\:md,.px-5\:md{padding-left:calc(var(--spacing)*5)}
+  .pl-5\.25\:md,.px-5\.25\:md{padding-left:calc(var(--spacing)*5.25)}
+  .pl-5\.5\:md,.px-5\.5\:md{padding-left:calc(var(--spacing)*5.5)}
+  .pl-5\.75\:md,.px-5\.75\:md{padding-left:calc(var(--spacing)*5.75)}
+  .pl-6\:md,.px-6\:md{padding-left:calc(var(--spacing)*6)}
+  .pl-6\.5\:md,.px-6\.5\:md{padding-left:calc(var(--spacing)*6.5)}
+  .pl-7\:md,.px-7\:md{padding-left:calc(var(--spacing)*7)}
+  .pl-7\.25\:md,.px-7\.25\:md{padding-left:calc(var(--spacing)*7.25)}
+  .pl-7\.5\:md,.px-7\.5\:md{padding-left:calc(var(--spacing)*7.5)}
+  .pl-7\.75\:md,.px-7\.75\:md{padding-left:calc(var(--spacing)*7.75)}
+  .pl-8\:md,.px-8\:md{padding-left:calc(var(--spacing)*8)}
+  .pl-8\.25\:md,.px-8\.25\:md{padding-left:calc(var(--spacing)*8.25)}
+  .pl-8\.5\:md,.px-8\.5\:md{padding-left:calc(var(--spacing)*8.5)}
+  .pl-8\.75\:md,.px-8\.75\:md{padding-left:calc(var(--spacing)*8.75)}
+  .pl-9\:md,.px-9\:md{padding-left:calc(var(--spacing)*9)}
+  .pl-9\.5\:md,.px-9\.5\:md{padding-left:calc(var(--spacing)*9.5)}
+  .pl-10\:md,.px-10\:md{padding-left:calc(var(--spacing)*10)}
+  .pl-11\:md,.px-11\:md{padding-left:calc(var(--spacing)*11)}
+  .pl-12\:md,.px-12\:md{padding-left:calc(var(--spacing)*12)}
+  .pl-13\:md,.px-13\:md{padding-left:calc(var(--spacing)*13)}
+  .pl-13\.75\:md,.px-13\.75\:md{padding-left:calc(var(--spacing)*13.75)}
+  .pl-14\:md,.px-14\:md{padding-left:calc(var(--spacing)*14)}
+  .pl-15\:md,.px-15\:md{padding-left:calc(var(--spacing)*15)}
+  .pr-0\:md,.px-0\:md{padding-right:0}
+  .pr-0\.25\:md,.px-0\.25\:md{padding-right:calc(var(--spacing)*.25)}
+  .pr-0\.5\:md,.px-0\.5\:md{padding-right:calc(var(--spacing)*.5)}
+  .pr-0\.75\:md,.px-0\.75\:md{padding-right:calc(var(--spacing)*.75)}
+  .pr-1\:md,.px-1\:md{padding-right:var(--spacing)}
+  .pr-1\.25\:md,.px-1\.25\:md{padding-right:calc(var(--spacing)*1.25)}
+  .pr-1\.5\:md,.px-1\.5\:md{padding-right:calc(var(--spacing)*1.5)}
+  .pr-1\.75\:md,.px-1\.75\:md{padding-right:calc(var(--spacing)*1.75)}
+  .pr-2\:md,.px-2\:md{padding-right:calc(var(--spacing)*2)}
+  .pr-2\.25\:md,.px-2\.25\:md{padding-right:calc(var(--spacing)*2.25)}
+  .pr-2\.5\:md,.px-2\.5\:md{padding-right:calc(var(--spacing)*2.5)}
+  .pr-2\.75\:md,.px-2\.75\:md{padding-right:calc(var(--spacing)*2.75)}
+  .pr-3\:md,.px-3\:md{padding-right:calc(var(--spacing)*3)}
+  .pr-3\.25\:md,.px-3\.25\:md{padding-right:calc(var(--spacing)*3.25)}
+  .pr-3\.5\:md,.px-3\.5\:md{padding-right:calc(var(--spacing)*3.5)}
+  .pr-3\.75\:md,.px-3\.75\:md{padding-right:calc(var(--spacing)*3.75)}
+  .pr-4\:md,.px-4\:md{padding-right:calc(var(--spacing)*4)}
+  .pr-4\.25\:md,.px-4\.25\:md{padding-right:calc(var(--spacing)*4.25)}
+  .pr-4\.5\:md,.px-4\.5\:md{padding-right:calc(var(--spacing)*4.5)}
+  .pr-4\.75\:md,.px-4\.75\:md{padding-right:calc(var(--spacing)*4.75)}
+  .pr-5\:md,.px-5\:md{padding-right:calc(var(--spacing)*5)}
+  .pr-5\.25\:md,.px-5\.25\:md{padding-right:calc(var(--spacing)*5.25)}
+  .pr-5\.5\:md,.px-5\.5\:md{padding-right:calc(var(--spacing)*5.5)}
+  .pr-5\.75\:md,.px-5\.75\:md{padding-right:calc(var(--spacing)*5.75)}
+  .pr-6\:md,.px-6\:md{padding-right:calc(var(--spacing)*6)}
+  .pr-6\.5\:md,.px-6\.5\:md{padding-right:calc(var(--spacing)*6.5)}
+  .pr-7\:md,.px-7\:md{padding-right:calc(var(--spacing)*7)}
+  .pr-7\.25\:md,.px-7\.25\:md{padding-right:calc(var(--spacing)*7.25)}
+  .pr-7\.5\:md,.px-7\.5\:md{padding-right:calc(var(--spacing)*7.5)}
+  .pr-7\.75\:md,.px-7\.75\:md{padding-right:calc(var(--spacing)*7.75)}
+  .pr-8\:md,.px-8\:md{padding-right:calc(var(--spacing)*8)}
+  .pr-8\.25\:md,.px-8\.25\:md{padding-right:calc(var(--spacing)*8.25)}
+  .pr-8\.5\:md,.px-8\.5\:md{padding-right:calc(var(--spacing)*8.5)}
+  .pr-8\.75\:md,.px-8\.75\:md{padding-right:calc(var(--spacing)*8.75)}
+  .pr-9\:md,.px-9\:md{padding-right:calc(var(--spacing)*9)}
+  .pr-9\.5\:md,.px-9\.5\:md{padding-right:calc(var(--spacing)*9.5)}
+  .pr-10\:md,.px-10\:md{padding-right:calc(var(--spacing)*10)}
+  .pr-11\:md,.px-11\:md{padding-right:calc(var(--spacing)*11)}
+  .pr-12\:md,.px-12\:md{padding-right:calc(var(--spacing)*12)}
+  .pr-13\:md,.px-13\:md{padding-right:calc(var(--spacing)*13)}
+  .pr-13\.75\:md,.px-13\.75\:md{padding-right:calc(var(--spacing)*13.75)}
+  .pr-14\:md,.px-14\:md{padding-right:calc(var(--spacing)*14)}
+  .pr-15\:md,.px-15\:md{padding-right:calc(var(--spacing)*15)}
+  .mt-0\:md,.my-0\:md{margin-top:0}
+  .mt-0\.25\:md,.my-0\.25\:md{margin-top:calc(var(--spacing)*.25)}
+  .mt-0\.5\:md,.my-0\.5\:md{margin-top:calc(var(--spacing)*.5)}
+  .mt-0\.75\:md,.my-0\.75\:md{margin-top:calc(var(--spacing)*.75)}
+  .mt-1\:md,.my-1\:md{margin-top:var(--spacing)}
+  .mt-1\.25\:md,.my-1\.25\:md{margin-top:calc(var(--spacing)*1.25)}
+  .mt-1\.5\:md,.my-1\.5\:md{margin-top:calc(var(--spacing)*1.5)}
+  .mt-1\.75\:md,.my-1\.75\:md{margin-top:calc(var(--spacing)*1.75)}
+  .mt-2\:md,.my-2\:md{margin-top:calc(var(--spacing)*2)}
+  .mt-2\.25\:md,.my-2\.25\:md{margin-top:calc(var(--spacing)*2.25)}
+  .mt-2\.5\:md,.my-2\.5\:md{margin-top:calc(var(--spacing)*2.5)}
+  .mt-2\.75\:md,.my-2\.75\:md{margin-top:calc(var(--spacing)*2.75)}
+  .mt-3\:md,.my-3\:md{margin-top:calc(var(--spacing)*3)}
+  .mt-3\.25\:md,.my-3\.25\:md{margin-top:calc(var(--spacing)*3.25)}
+  .mt-3\.5\:md,.my-3\.5\:md{margin-top:calc(var(--spacing)*3.5)}
+  .mt-3\.75\:md,.my-3\.75\:md{margin-top:calc(var(--spacing)*3.75)}
+  .mt-4\:md,.my-4\:md{margin-top:calc(var(--spacing)*4)}
+  .mt-4\.25\:md,.my-4\.25\:md{margin-top:calc(var(--spacing)*4.25)}
+  .mt-4\.5\:md,.my-4\.5\:md{margin-top:calc(var(--spacing)*4.5)}
+  .mt-4\.75\:md,.my-4\.75\:md{margin-top:calc(var(--spacing)*4.75)}
+  .mt-5\:md,.my-5\:md{margin-top:calc(var(--spacing)*5)}
+  .mt-5\.25\:md,.my-5\.25\:md{margin-top:calc(var(--spacing)*5.25)}
+  .mt-5\.5\:md,.my-5\.5\:md{margin-top:calc(var(--spacing)*5.5)}
+  .mt-5\.75\:md,.my-5\.75\:md{margin-top:calc(var(--spacing)*5.75)}
+  .mt-6\:md,.my-6\:md{margin-top:calc(var(--spacing)*6)}
+  .mt-6\.5\:md,.my-6\.5\:md{margin-top:calc(var(--spacing)*6.5)}
+  .mt-7\:md,.my-7\:md{margin-top:calc(var(--spacing)*7)}
+  .mt-7\.25\:md,.my-7\.25\:md{margin-top:calc(var(--spacing)*7.25)}
+  .mt-7\.5\:md,.my-7\.5\:md{margin-top:calc(var(--spacing)*7.5)}
+  .mt-7\.75\:md,.my-7\.75\:md{margin-top:calc(var(--spacing)*7.75)}
+  .mt-8\:md,.my-8\:md{margin-top:calc(var(--spacing)*8)}
+  .mt-8\.25\:md,.my-8\.25\:md{margin-top:calc(var(--spacing)*8.25)}
+  .mt-8\.5\:md,.my-8\.5\:md{margin-top:calc(var(--spacing)*8.5)}
+  .mt-8\.75\:md,.my-8\.75\:md{margin-top:calc(var(--spacing)*8.75)}
+  .mt-9\:md,.my-9\:md{margin-top:calc(var(--spacing)*9)}
+  .mt-9\.5\:md,.my-9\.5\:md{margin-top:calc(var(--spacing)*9.5)}
+  .mt-10\:md,.my-10\:md{margin-top:calc(var(--spacing)*10)}
+  .mt-11\:md,.my-11\:md{margin-top:calc(var(--spacing)*11)}
+  .mt-12\:md,.my-12\:md{margin-top:calc(var(--spacing)*12)}
+  .mt-13\:md,.my-13\:md{margin-top:calc(var(--spacing)*13)}
+  .mt-13\.75\:md,.my-13\.75\:md{margin-top:calc(var(--spacing)*13.75)}
+  .mt-14\:md,.my-14\:md{margin-top:calc(var(--spacing)*14)}
+  .mt-15\:md,.my-15\:md{margin-top:calc(var(--spacing)*15)}
+  .mb-0\:md,.my-0\:md{margin-bottom:0}
+  .mb-0\.25\:md,.my-0\.25\:md{margin-bottom:calc(var(--spacing)*.25)}
+  .mb-0\.5\:md,.my-0\.5\:md{margin-bottom:calc(var(--spacing)*.5)}
+  .mb-0\.75\:md,.my-0\.75\:md{margin-bottom:calc(var(--spacing)*.75)}
+  .mb-1\:md,.my-1\:md{margin-bottom:var(--spacing)}
+  .mb-1\.25\:md,.my-1\.25\:md{margin-bottom:calc(var(--spacing)*1.25)}
+  .mb-1\.5\:md,.my-1\.5\:md{margin-bottom:calc(var(--spacing)*1.5)}
+  .mb-1\.75\:md,.my-1\.75\:md{margin-bottom:calc(var(--spacing)*1.75)}
+  .mb-2\:md,.my-2\:md{margin-bottom:calc(var(--spacing)*2)}
+  .mb-2\.25\:md,.my-2\.25\:md{margin-bottom:calc(var(--spacing)*2.25)}
+  .mb-2\.5\:md,.my-2\.5\:md{margin-bottom:calc(var(--spacing)*2.5)}
+  .mb-2\.75\:md,.my-2\.75\:md{margin-bottom:calc(var(--spacing)*2.75)}
+  .mb-3\:md,.my-3\:md{margin-bottom:calc(var(--spacing)*3)}
+  .mb-3\.25\:md,.my-3\.25\:md{margin-bottom:calc(var(--spacing)*3.25)}
+  .mb-3\.5\:md,.my-3\.5\:md{margin-bottom:calc(var(--spacing)*3.5)}
+  .mb-3\.75\:md,.my-3\.75\:md{margin-bottom:calc(var(--spacing)*3.75)}
+  .mb-4\:md,.my-4\:md{margin-bottom:calc(var(--spacing)*4)}
+  .mb-4\.25\:md,.my-4\.25\:md{margin-bottom:calc(var(--spacing)*4.25)}
+  .mb-4\.5\:md,.my-4\.5\:md{margin-bottom:calc(var(--spacing)*4.5)}
+  .mb-4\.75\:md,.my-4\.75\:md{margin-bottom:calc(var(--spacing)*4.75)}
+  .mb-5\:md,.my-5\:md{margin-bottom:calc(var(--spacing)*5)}
+  .mb-5\.25\:md,.my-5\.25\:md{margin-bottom:calc(var(--spacing)*5.25)}
+  .mb-5\.5\:md,.my-5\.5\:md{margin-bottom:calc(var(--spacing)*5.5)}
+  .mb-5\.75\:md,.my-5\.75\:md{margin-bottom:calc(var(--spacing)*5.75)}
+  .mb-6\:md,.my-6\:md{margin-bottom:calc(var(--spacing)*6)}
+  .mb-6\.5\:md,.my-6\.5\:md{margin-bottom:calc(var(--spacing)*6.5)}
+  .mb-7\:md,.my-7\:md{margin-bottom:calc(var(--spacing)*7)}
+  .mb-7\.25\:md,.my-7\.25\:md{margin-bottom:calc(var(--spacing)*7.25)}
+  .mb-7\.5\:md,.my-7\.5\:md{margin-bottom:calc(var(--spacing)*7.5)}
+  .mb-7\.75\:md,.my-7\.75\:md{margin-bottom:calc(var(--spacing)*7.75)}
+  .mb-8\:md,.my-8\:md{margin-bottom:calc(var(--spacing)*8)}
+  .mb-8\.25\:md,.my-8\.25\:md{margin-bottom:calc(var(--spacing)*8.25)}
+  .mb-8\.5\:md,.my-8\.5\:md{margin-bottom:calc(var(--spacing)*8.5)}
+  .mb-8\.75\:md,.my-8\.75\:md{margin-bottom:calc(var(--spacing)*8.75)}
+  .mb-9\:md,.my-9\:md{margin-bottom:calc(var(--spacing)*9)}
+  .mb-9\.5\:md,.my-9\.5\:md{margin-bottom:calc(var(--spacing)*9.5)}
+  .mb-10\:md,.my-10\:md{margin-bottom:calc(var(--spacing)*10)}
+  .mb-11\:md,.my-11\:md{margin-bottom:calc(var(--spacing)*11)}
+  .mb-12\:md,.my-12\:md{margin-bottom:calc(var(--spacing)*12)}
+  .mb-13\:md,.my-13\:md{margin-bottom:calc(var(--spacing)*13)}
+  .mb-13\.75\:md,.my-13\.75\:md{margin-bottom:calc(var(--spacing)*13.75)}
+  .mb-14\:md,.my-14\:md{margin-bottom:calc(var(--spacing)*14)}
+  .mb-15\:md,.my-15\:md{margin-bottom:calc(var(--spacing)*15)}
+  .ml-0\:md,.mx-0\:md{margin-left:0}
+  .ml-0\.25\:md,.mx-0\.25\:md{margin-left:calc(var(--spacing)*.25)}
+  .ml-0\.5\:md,.mx-0\.5\:md{margin-left:calc(var(--spacing)*.5)}
+  .ml-0\.75\:md,.mx-0\.75\:md{margin-left:calc(var(--spacing)*.75)}
+  .ml-1\:md,.mx-1\:md{margin-left:var(--spacing)}
+  .ml-1\.25\:md,.mx-1\.25\:md{margin-left:calc(var(--spacing)*1.25)}
+  .ml-1\.5\:md,.mx-1\.5\:md{margin-left:calc(var(--spacing)*1.5)}
+  .ml-1\.75\:md,.mx-1\.75\:md{margin-left:calc(var(--spacing)*1.75)}
+  .ml-2\:md,.mx-2\:md{margin-left:calc(var(--spacing)*2)}
+  .ml-2\.25\:md,.mx-2\.25\:md{margin-left:calc(var(--spacing)*2.25)}
+  .ml-2\.5\:md,.mx-2\.5\:md{margin-left:calc(var(--spacing)*2.5)}
+  .ml-2\.75\:md,.mx-2\.75\:md{margin-left:calc(var(--spacing)*2.75)}
+  .ml-3\:md,.mx-3\:md{margin-left:calc(var(--spacing)*3)}
+  .ml-3\.25\:md,.mx-3\.25\:md{margin-left:calc(var(--spacing)*3.25)}
+  .ml-3\.5\:md,.mx-3\.5\:md{margin-left:calc(var(--spacing)*3.5)}
+  .ml-3\.75\:md,.mx-3\.75\:md{margin-left:calc(var(--spacing)*3.75)}
+  .ml-4\:md,.mx-4\:md{margin-left:calc(var(--spacing)*4)}
+  .ml-4\.25\:md,.mx-4\.25\:md{margin-left:calc(var(--spacing)*4.25)}
+  .ml-4\.5\:md,.mx-4\.5\:md{margin-left:calc(var(--spacing)*4.5)}
+  .ml-4\.75\:md,.mx-4\.75\:md{margin-left:calc(var(--spacing)*4.75)}
+  .ml-5\:md,.mx-5\:md{margin-left:calc(var(--spacing)*5)}
+  .ml-5\.25\:md,.mx-5\.25\:md{margin-left:calc(var(--spacing)*5.25)}
+  .ml-5\.5\:md,.mx-5\.5\:md{margin-left:calc(var(--spacing)*5.5)}
+  .ml-5\.75\:md,.mx-5\.75\:md{margin-left:calc(var(--spacing)*5.75)}
+  .ml-6\:md,.mx-6\:md{margin-left:calc(var(--spacing)*6)}
+  .ml-6\.5\:md,.mx-6\.5\:md{margin-left:calc(var(--spacing)*6.5)}
+  .ml-7\:md,.mx-7\:md{margin-left:calc(var(--spacing)*7)}
+  .ml-7\.25\:md,.mx-7\.25\:md{margin-left:calc(var(--spacing)*7.25)}
+  .ml-7\.5\:md,.mx-7\.5\:md{margin-left:calc(var(--spacing)*7.5)}
+  .ml-7\.75\:md,.mx-7\.75\:md{margin-left:calc(var(--spacing)*7.75)}
+  .ml-8\:md,.mx-8\:md{margin-left:calc(var(--spacing)*8)}
+  .ml-8\.25\:md,.mx-8\.25\:md{margin-left:calc(var(--spacing)*8.25)}
+  .ml-8\.5\:md,.mx-8\.5\:md{margin-left:calc(var(--spacing)*8.5)}
+  .ml-8\.75\:md,.mx-8\.75\:md{margin-left:calc(var(--spacing)*8.75)}
+  .ml-9\:md,.mx-9\:md{margin-left:calc(var(--spacing)*9)}
+  .ml-9\.5\:md,.mx-9\.5\:md{margin-left:calc(var(--spacing)*9.5)}
+  .ml-10\:md,.mx-10\:md{margin-left:calc(var(--spacing)*10)}
+  .ml-11\:md,.mx-11\:md{margin-left:calc(var(--spacing)*11)}
+  .ml-12\:md,.mx-12\:md{margin-left:calc(var(--spacing)*12)}
+  .ml-13\:md,.mx-13\:md{margin-left:calc(var(--spacing)*13)}
+  .ml-13\.75\:md,.mx-13\.75\:md{margin-left:calc(var(--spacing)*13.75)}
+  .ml-14\:md,.mx-14\:md{margin-left:calc(var(--spacing)*14)}
+  .ml-15\:md,.mx-15\:md{margin-left:calc(var(--spacing)*15)}
+  .mr-0\:md,.mx-0\:md{margin-right:0}
+  .mr-0\.25\:md,.mx-0\.25\:md{margin-right:calc(var(--spacing)*.25)}
+  .mr-0\.5\:md,.mx-0\.5\:md{margin-right:calc(var(--spacing)*.5)}
+  .mr-0\.75\:md,.mx-0\.75\:md{margin-right:calc(var(--spacing)*.75)}
+  .mr-1\:md,.mx-1\:md{margin-right:var(--spacing)}
+  .mr-1\.25\:md,.mx-1\.25\:md{margin-right:calc(var(--spacing)*1.25)}
+  .mr-1\.5\:md,.mx-1\.5\:md{margin-right:calc(var(--spacing)*1.5)}
+  .mr-1\.75\:md,.mx-1\.75\:md{margin-right:calc(var(--spacing)*1.75)}
+  .mr-2\:md,.mx-2\:md{margin-right:calc(var(--spacing)*2)}
+  .mr-2\.25\:md,.mx-2\.25\:md{margin-right:calc(var(--spacing)*2.25)}
+  .mr-2\.5\:md,.mx-2\.5\:md{margin-right:calc(var(--spacing)*2.5)}
+  .mr-2\.75\:md,.mx-2\.75\:md{margin-right:calc(var(--spacing)*2.75)}
+  .mr-3\:md,.mx-3\:md{margin-right:calc(var(--spacing)*3)}
+  .mr-3\.25\:md,.mx-3\.25\:md{margin-right:calc(var(--spacing)*3.25)}
+  .mr-3\.5\:md,.mx-3\.5\:md{margin-right:calc(var(--spacing)*3.5)}
+  .mr-3\.75\:md,.mx-3\.75\:md{margin-right:calc(var(--spacing)*3.75)}
+  .mr-4\:md,.mx-4\:md{margin-right:calc(var(--spacing)*4)}
+  .mr-4\.25\:md,.mx-4\.25\:md{margin-right:calc(var(--spacing)*4.25)}
+  .mr-4\.5\:md,.mx-4\.5\:md{margin-right:calc(var(--spacing)*4.5)}
+  .mr-4\.75\:md,.mx-4\.75\:md{margin-right:calc(var(--spacing)*4.75)}
+  .mr-5\:md,.mx-5\:md{margin-right:calc(var(--spacing)*5)}
+  .mr-5\.25\:md,.mx-5\.25\:md{margin-right:calc(var(--spacing)*5.25)}
+  .mr-5\.5\:md,.mx-5\.5\:md{margin-right:calc(var(--spacing)*5.5)}
+  .mr-5\.75\:md,.mx-5\.75\:md{margin-right:calc(var(--spacing)*5.75)}
+  .mr-6\:md,.mx-6\:md{margin-right:calc(var(--spacing)*6)}
+  .mr-6\.5\:md,.mx-6\.5\:md{margin-right:calc(var(--spacing)*6.5)}
+  .mr-7\:md,.mx-7\:md{margin-right:calc(var(--spacing)*7)}
+  .mr-7\.25\:md,.mx-7\.25\:md{margin-right:calc(var(--spacing)*7.25)}
+  .mr-7\.5\:md,.mx-7\.5\:md{margin-right:calc(var(--spacing)*7.5)}
+  .mr-7\.75\:md,.mx-7\.75\:md{margin-right:calc(var(--spacing)*7.75)}
+  .mr-8\:md,.mx-8\:md{margin-right:calc(var(--spacing)*8)}
+  .mr-8\.25\:md,.mx-8\.25\:md{margin-right:calc(var(--spacing)*8.25)}
+  .mr-8\.5\:md,.mx-8\.5\:md{margin-right:calc(var(--spacing)*8.5)}
+  .mr-8\.75\:md,.mx-8\.75\:md{margin-right:calc(var(--spacing)*8.75)}
+  .mr-9\:md,.mx-9\:md{margin-right:calc(var(--spacing)*9)}
+  .mr-9\.5\:md,.mx-9\.5\:md{margin-right:calc(var(--spacing)*9.5)}
+  .mr-10\:md,.mx-10\:md{margin-right:calc(var(--spacing)*10)}
+  .mr-11\:md,.mx-11\:md{margin-right:calc(var(--spacing)*11)}
+  .mr-12\:md,.mx-12\:md{margin-right:calc(var(--spacing)*12)}
+  .mr-13\:md,.mx-13\:md{margin-right:calc(var(--spacing)*13)}
+  .mr-13\.75\:md,.mx-13\.75\:md{margin-right:calc(var(--spacing)*13.75)}
+  .mr-14\:md,.mx-14\:md{margin-right:calc(var(--spacing)*14)}
+  .mr-15\:md,.mx-15\:md{margin-right:calc(var(--spacing)*15)}
+}
+}
+
+/* --------------------------------------------------------------------------
+   5. FIXED / OVERLAY CHROME that participates in layout
+   -------------------------------------------------------------------------- */
+@layer components-base {
+  .modal{top:0;right:0;bottom:0;left:0;overflow:hidden;position:fixed;z-index:3}
+  .modal__wrapper-header{left:0;position:fixed;top:0;width:100%;z-index:1}
+}
+
+@layer components {
+  .promo-header{left:0;position:fixed;top:0;width:100%;z-index:10}
+  .promo-header__row{height:var(--promo-header-height);padding:var(--md,var(--spacing) 0) var(--n-md,calc(var(--scale-px)*10) 0);position:relative;transition:transform 1.5s cubic-bezier(.55,0,.1,1)}
+}
+
+/* .group - the flex gap helper sections use. Gaps are multiples of
+   --scale-px, not of --spacing. */
+@layer utilities {
+  .group{align-items:flex-start;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-start}
+  .group--tiny{gap:calc(var(--scale-px)*5)}
+  .group--smaller{gap:calc(var(--scale-px)*10)}
+  .group--progress{gap:calc(var(--scale-px)*14)}
+  .group--small{gap:var(--md,calc(var(--scale-px)*20)) var(--n-md,calc(var(--scale-px)*10))}
+  .group--medium{gap:calc(var(--scale-px)*20)}
+  .group--spacing{gap:var(--spacing)}
+  .group--v-start,.group--v-start\:xs{align-items:flex-start}
+  .group--v-center,.group--v-center\:xs{align-items:center}
+  .group--v-end,.group--v-end\:xs{align-items:flex-end}
+  .group--h-start,.group--h-start\:xs{justify-content:flex-start}
+  .group--h-center,.group--h-center\:xs{justify-content:center}
+  .group--h-end,.group--h-end\:xs{justify-content:flex-end}
+  .group--h-between,.group--h-between\:xs{justify-content:space-between}
+  .group--wrap,.group--wrap\:xs{flex-wrap:wrap}
+  .group--nowrap,.group--nowrap\:xs{flex-wrap:nowrap}
+  .group--column,.group--column\:xs{flex-direction:column}
+}
+
+/* group alignment variants at md-and-up */
+@media (min-width:568px) and (max-width:667px) and (max-aspect-ratio:13/9),(min-width:668px) and (max-aspect-ratio:10/11),(min-width:668px) and (min-height:416px),(min-width:980px) {
+@layer utilities {
+  .group--v-start\:md{align-items:flex-start}
+  .group--v-center\:md{align-items:center}
+  .group--v-end\:md{align-items:flex-end}
+  .group--h-start\:md{justify-content:flex-start}
+  .group--h-center\:md{justify-content:center}
+  .group--h-end\:md{justify-content:flex-end}
+  .group--h-between\:md{justify-content:space-between}
+  .group--wrap\:md{flex-wrap:wrap}
+  .group--nowrap\:md{flex-wrap:nowrap}
+  .group--column\:md{flex-direction:column}
+}
+}
+
+/* group alignment variants at xxxxl (>=2400px, min-height 700px) */
+@media (min-width:2400px) and (min-height:700px) {
+@layer utilities {
+  .group--v-start\:xxxxl{align-items:flex-start}
+  .group--v-center\:xxxxl{align-items:center}
+  .group--v-end\:xxxxl{align-items:flex-end}
+  .group--h-start\:xxxxl{justify-content:flex-start}
+  .group--h-center\:xxxxl{justify-content:center}
+  .group--h-end\:xxxxl{justify-content:flex-end}
+  .group--h-between\:xxxxl{justify-content:space-between}
+  .group--wrap\:xxxxl{flex-wrap:wrap}
+  .group--nowrap\:xxxxl{flex-wrap:nowrap}
+  .group--column\:xxxxl{flex-direction:column}
+}
+}
+
+/* social-networks row - SocialNetworks.CXqD_S4s.css is UNLAYERED in the source */
+.social-networks{display:flex;flex-direction:row;gap:calc(var(--scale-px)*10)}
+.social-networks--tiny{gap:calc(var(--scale-px)*5)}

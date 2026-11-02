@@ -1,0 +1,45 @@
+{
+  "verifiedAt": "2026-10-08T17:16:15.873Z",
+  "checks": [
+    {
+      "category": "数码影音 5",
+      "rows": 5
+    },
+    {
+      "category": "居家生活 2",
+      "rows": 2
+    },
+    {
+      "category": "运动户外 1",
+      "rows": 1
+    },
+    {
+      "category": "旅行出行 1",
+      "rows": 1
+    },
+    {
+      "mobile": {
+        "clientWidth": 375,
+        "scrollWidth": 375
+      }
+    },
+    {
+      "futureSession": {
+        "allDisabled": true,
+        "count": 9
+      }
+    }
+  ],
+  "images": [
+    {
+      "alt": "晨光意式咖啡机",
+      "loaded": true,
+      "src": "/assets/products/coffee-machine.png"
+    },
+    {
+      "alt": "光序桌面台灯",
+      "loaded": true,
+      "src": "/assets/products/desk-lamp.png"
+    }
+  ]
+}

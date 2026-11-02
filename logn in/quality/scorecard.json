@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-01T13:49:22.414Z",
+  "candidateBuild": "unversioned working tree (not a git repository)",
+  "referenceLock": "evidence/reference-lock.json (nuxt 63c1e131-150b-472a-8fd2-ea1d2a3b59fb, site tag v_1790676598601)",
+  "total": null,
+  "totalReason": "1/6 categories scored from real evidence; total withheld per plan §1579 (\"no data -> null with a reason, never a guessed value\"). Unscored: TypographyTextColour, webglGeometryPerspectiveAssets, scrollPointerTransitionTiming, pageCoverageFunctionStates, stabilityAccessibilityMaintenance",
+  "independentReview": false,
+  "independentReviewNote": "Internal evaluation only, and incomplete. Not an algorithmically derived 'clone accuracy'.",
+  "hardGates": {
+    "referenceVersionTraceable": {
+      "state": "PASS",
+      "evidence": "evidence/reference/asset-manifest.json — 156 entries with real URL, bytes, content-type and sha256; scripts/validate-evidence.mjs re-hashes 12 of them and passes"
+    },
+    "allFrozenTemplatesReachable": {
+      "state": "PARTIAL",
+      "evidence": "12 routes resolve in the local build; 5 of them are honest skeletons — see evidence/reference/pending.json PENDING-05"
+    },
+    "heroNotReplacedByGenericObject": {
+      "state": "PASS",
+      "evidence": "DIFF-009 + GAP-002 closed by direct measurement. The hero ring reproduces the reference construction: spineLength 94.24718821101328, radius-15 circle decoded texel-for-texel, 9 PlaneGeometry(9,12.6,10,1) cards on two depth layers (#B05A2E behind, Card-i.png in front). check-hero-cards.mjs envelope deltas +0.9/-0.1/+1.7/+0.1 px on a fresh capture."
+    },
+    "noWrongGlyphsOrMissingSections": {
+      "state": "PARTIAL",
+      "evidence": "DIFF-002 fixed (inline SVG word-groups with an sr-only 1x1 h1). DIFF-008 still open: the second display line is a SEPARATE SVG set (scripts/_sheet.html entry #4, section-5__title--desktop) that is not mounted yet."
+    },
+    "threeViewportsStaticPass": {
+      "state": "UNVERIFIED",
+      "evidence": "no reference baseline exists (PENDING-01)"
+    },
+    "tenDynamicTrajectoriesRecorded": {
+      "state": "UNVERIFIED",
+      "evidence": "PENDING-02"
+    },
+    "typecheckLintUnitE2eBuild": {
+      "state": "PARTIAL",
+      "evidence": "typecheck PASS, lint PASS (0 errors, 0 warnings), build PASS with 0 warnings, unit 47/47 PASS, verify:assets 107/107 PASS, verify:evidence PASS. Only test:e2e is not runnable (tests/e2e empty)."
+    },
+    "p0P1Clear": {
+      "state": "FAIL",
+      "evidence": "3 open P1 in quality/backlog.json: GAP-006 (measured scene values not yet bound), GAP-004 (/pricing benefit state), GAP-001 (pixel baseline, blocked). 8 previously open items closed this round."
+    }
+  },
+  "categories": {
+    "layoutCompositionRhythm": {
+      "weight": 20,
+      "score": 15.07,
+      "checked": [
+        "8 sections present with correct reference classes",
+        "section heights 1544/1544/2123/1544/1544/1544/2316/808 reproduced from DOM_CONTRACT"
+      ],
+      "defects": [
+        "DIFF-001 root background white instead of rgb(244,121,58)",
+        "DIFF-003 brush decorations overflow their owners"
+      ],
+      "evidence": "26 checkpoints, mean pixel diff 24.67%",
+      "source": "evidence/diffs/compare-report.json"
+    },
+    "TypographyTextColour": {
+      "weight": 20,
+      "score": null,
+      "checked": [
+        "HeadingNow 400 + Hardbop 700 self-hosted and loading",
+        "base 25.3068px / nav 12.6534px / letter-spacing -3% of size recorded from the live site"
+      ],
+      "defects": [
+        "DIFF-002 display words are text, not the reference SVG glyph sets"
+      ],
+      "evidence": [
+        "evidence/reference/hero-geometry.json",
+        "evidence/reference/raw/_nuxt/entry.D4FdtiYZ.css"
+      ],
+      "reason": "A whole-frame pixel diff cannot separate type rendering from layout. Needs per-region masks (header band / prose column / word-mark), which exist only for V01 from the 2026-09-30 round."
+    },
+    "webglGeometryPerspectiveAssets": {
+      "weight": 25,
+      "score": null,
+      "checked": [
+        "hero spine uniforms read from the live materials: spineLength 94.24718821101328, spineOffset 161, pathSegment 1, flow 1",
+        "spineTexture decoded from texture.image.data: 1024x4 RGBA HalfFloat, a flat radius-15 XZ circle, chord-based Frenet tangent",
+        "all 6 home scene roots inventoried: plane params, radii, offsets, progressScale, textures, mesh transforms, visibility pools",
+        "hero display box measured: CSS 1376x772 / buffer 2752x1544 (pixel ratio 2), canvas:first-child z-index -1",
+        "fov corroborated independently by inverting the captured projection matrix",
+        "4 cameras with fov/near/far/position/rotation measured",
+        "9 hero card textures at native 700x1080 downloaded"
+      ],
+      "defects": [
+        "GAP-006 the four non-hero scenes are measured but createCurvedPanel/createPointerPanel are not yet bound to those numbers",
+        "progress->uniform mapping for get-seen/nexus/connectory/testimonials still unmeasured (values known, easing not)"
+      ],
+      "evidence": [
+        "evidence/reference/scenes-measured.json",
+        "evidence/reference/hero-ring-measured.md",
+        "evidence/reference/shaders/"
+      ],
+      "reason": "Hero ring is measured and asserted (spineLength 94.24718821101328, radius-15 circle texel-for-texel, check-hero-cards envelope deltas within 1.7px) and all five home scenes are verified drawing GL draw calls — but per-scene pixel agreement is not separable from a whole-frame diff, and the non-hero scenes have no numeric oracle yet. Scoring 25% of the rubric on partial evidence would inflate the total.",
+      "partialEvidence": "evidence/reference/webgl-scenes-corrected.md, scripts/check-hero-cards.mjs"
+    },
+    "scrollPointerTransitionTiming": {
+      "weight": 20,
+      "score": null,
+      "checked": [
+        "Lenis 1.3.3 bound to the same container the reference uses",
+        "single-clock runtime implemented; GSAP/ScrollTrigger confirmed absent from the reference",
+        "D01 idle rotation DERIVED from source and confirmed by a measured offset: -0.05 turns/s, 20 s period",
+        "hero camera roll identified as pointer-driven, not scroll-driven (DIFF-011 fixed + regression test)"
+      ],
+      "defects": [
+        "no pin ranges measured",
+        "D02-D10 trajectories still need continuous frames (GAP-005)"
+      ],
+      "evidence": [
+        "src/motion/createMotionRuntime.ts",
+        "evidence/reference-lock.json"
+      ],
+      "reason": "Requires the D01-D10 continuous-frame trajectories. evidence/motion has no D0x files. Blocked on the in-app Browser being a visible surface (PENDING-02)."
+    },
+    "pageCoverageFunctionStates": {
+      "weight": 10,
+      "score": null,
+      "checked": [
+        "12 internal routes mapped from live a[href]",
+        "pricing cycles, FAQ group structure and plan feature rows extracted from server HTML",
+        "/signin fully measured structurally and stylistically via hidden same-origin iframe"
+      ],
+      "defects": [
+        "DIFF-010: /signin and /signup still demo skeletons until bound (signin is now bindable)",
+        "PENDING-06 benefit inclusion state unmeasured — no longer pixel-blocked, just not run",
+        "GAP-007 /signup UI and auth validation states unobserved"
+      ],
+      "evidence": [
+        "docs/DOM_CONTRACT.md",
+        "evidence/reference/signin-measured.md",
+        "evidence/reference/pending.json"
+      ],
+      "reason": "7 backlog items still open/blocked (GAP-004, GAP-005, DIFF-008, DIFF-010, DIFF-014, DIFF-015, DIFF-016); auth focus/invalid/post-submit states and /pricing entitlement binding are unimplemented, so coverage is not yet a scoreable 12/12",
+      "partialEvidence": "0/26 checkpoints render non-blank"
+    },
+    "stabilityAccessibilityMaintenance": {
+      "weight": 5,
+      "score": null,
+      "checked": [
+        "strict typecheck clean",
+        "production build passes with 0 warnings",
+        "47 unit tests incl. texel-level regression locks"
+      ],
+      "defects": [
+        "no lifecycle/leak test",
+        "no reduced-motion or WebGL-failure test",
+        "no e2e suite"
+      ],
+      "evidence": [
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "reason": "no machine-readable gate result file; verify:release reports pass/fail as text, so this is not yet derivable without inventing a mapping"
+    }
+  },
+  "commands": {
+    "typecheck": "PASS",
+    "build": "PASS",
+    "lint": "PASS (0 problems) — cleared the 6 dead-code errors in scripts/*.mjs and 8 fixable warnings",
+    "test:unit": "PASS (47 tests, 5 files)",
+    "test:e2e": "NOT RUN — no specs yet",
+    "verify:assets": "PASS (107/107 traced)",
+    "verify:evidence": "PASS — the only failure was a backlog entry citing a non-existent file; it now declares none",
+    "compare:reference": "BLOCKED (PENDING-01)",
+    "verify:release": "FAIL by design — 8 gates now (was 9): pixel baseline, trajectories, e2e, scorecard total, open P1, blocked evidence"
+  },
+  "scoredBy": "scripts/score-clone.mjs"
+}

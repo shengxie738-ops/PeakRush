@@ -1,0 +1,8 @@
+displayHeadings.json: created EMPTY — display words fall back to text (P1 gap, needs SVG-glyph extraction from Cc-BjTZB.js)
+routeManifest: headerTheme widened to the 6 ui-* themes
+CookieConsent: removed duplicate mid-file watch import + duplicate watcher
+SiteFooter: defined VideinfraIcon (placeholder artwork, class contract kept — asset gap recorded)
+HomeGetSeen: displaySvg now imported from @/content/home
+sub-pages: bound to the real content keys (heading / tagline / joinDescription)
+LegalPage: typed document lookup
+vite.config: test block moved to vitest.config.ts

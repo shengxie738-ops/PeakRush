@@ -5,6 +5,10 @@ import { ArrowRight, Refresh, Clock } from "@element-plus/icons-vue";
 import { api, errorMessage } from "../api";
 import type { Activity, Item, ListResponse } from "../types";
 import { money, timeOnly, productImage } from "../format";
+import {
+  activityPhase, activityCountdown, sortActivities, chooseActivity,
+  catalogRows, catalogCategories, productCategory, productKicker, isCurrentOrFuture,
+} from "../storefront";
 import PurchaseDialog from "../components/PurchaseDialog.vue";
 const route = useRoute(),
   router = useRouter();
@@ -16,70 +20,42 @@ const activities = ref<Activity[]>([]),
 const purchase = ref<{ activity: Activity; item: Item } | null>(null),
   purchaseOpen = ref(false);
 let timer: number;
+let refreshTimer: number;
 let loadGeneration = 0;
+let fetching = false;
+let manualHistory = false;
 const browseAll = ref(true);
+const category = ref("全部好物"), refreshError = ref("");
+const sortedActivities = computed(() => sortActivities(activities.value, now.value));
 const selected = computed(
-  () =>
-    activities.value.find((a) => a.id === selectedId.value) ||
-    activities.value[0],
+  () => activities.value.find((a) => a.id === selectedId.value),
 );
 function phase(a: Activity): string {
-  if (a.status === "OFFLINE" || a.status === "DRAFT") return "已下线";
-  if (now.value > new Date(a.endTime).getTime() || a.status === "ENDED")
-    return "已结束";
-  if (now.value < new Date(a.startTime).getTime()) return "即将开始";
-  if (a.status === "PREHEATED") return "即将开始";
-  if (a.status === "SOLD_OUT") return "暂时售罄";
-  return "正在进行";
+  return activityPhase(a, now.value);
 }
-const displayRows = computed(() => {
-  const current = selected.value;
-  if (!current) return [];
-  const show = [current];
-  if (!route.params.id && browseAll.value) {
-    const upcoming = activities.value
-      .filter((a) => a.id !== current.id && phase(a) === "即将开始")
-      .sort(
-        (a, b) =>
-          new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-      );
-    show.push(...upcoming);
-  }
-  const rows = show.flatMap((activity) =>
-    (activity.items || []).map((item) => ({ activity, item })),
-  );
-  if (route.params.id || !browseAll.value) return rows;
-  const seen = new Set<number>();
-  return rows
-    .filter(({ item }) => {
-      if (seen.has(item.productId)) return false;
-      seen.add(item.productId);
-      return true;
-    })
-    .slice(0, 6);
-});
-const remaining = computed(() => {
-  const a = selected.value;
-  if (!a) return ["00", "00", "00"];
-  const target = phase(a) === "即将开始" ? a.startTime : a.endTime;
-  const seconds = Math.max(
-    0,
-    Math.floor((new Date(target).getTime() - now.value) / 1000),
-  );
-  return [
-    Math.floor(seconds / 3600),
-    Math.floor(seconds / 60) % 60,
-    seconds % 60,
-  ].map((n) => String(n).padStart(2, "0"));
+const rows = computed(() => catalogRows(activities.value, selectedId.value, !route.params.id && browseAll.value, now.value));
+const categories = computed(() => catalogCategories(rows.value));
+const displayRows = computed(() => rows.value.filter(({ item }) => category.value === "全部好物" || productCategory(item) === category.value));
+const remaining = computed(() => selected.value ? activityCountdown(selected.value, now.value) : null);
+const noLiveActivities = computed(() => activities.value.length > 0 && !activities.value.some(a => isCurrentOrFuture(a, now.value)));
+const sessionMessage = computed(() => {
+  if (!selected.value) return loading.value ? "活动正在加载" : "下一场好物正在准备";
+  const currentPhase = phase(selected.value);
+  if (currentPhase === "已结束") return "本场活动已结束";
+  if (currentPhase === "已下线") return "本场活动已下线";
+  return "本场已预热，等待启用";
 });
 const dateLabel = computed(() => {
-  const d = selected.value ? new Date(selected.value.startTime) : new Date();
+  return dateFor(selected.value?.startTime || new Date(now.value).toISOString());
+});
+function dateFor(value: string) {
+  const d = new Date(value);
   return (
     String(d.getMonth() + 1).padStart(2, "0") +
     "." +
     String(d.getDate()).padStart(2, "0")
   );
-});
+}
 function label(a: Activity, item: Item) {
   const p = phase(a);
   if (p === "即将开始") return timeOnly(a.startTime) + " 开抢";
@@ -90,11 +66,25 @@ function label(a: Activity, item: Item) {
 function canBuy(a: Activity, item: Item) {
   return phase(a) === "正在进行" && item.availableStock !== 0;
 }
-async function load() {
+function syncSelection() {
+  if (route.params.id) return;
+  const next = chooseActivity(activities.value, selectedId.value, now.value, manualHistory);
+  if (selectedId.value !== (next?.id ?? null)) {
+    selectedId.value = next?.id ?? null;
+    browseAll.value = true;
+    manualHistory = false;
+  }
+}
+async function load(quiet = false) {
+  if (quiet && fetching) return;
   const run = ++loadGeneration,
     routeId = route.params.id;
-  loading.value = true;
-  error.value = "";
+  fetching = true;
+  if (!quiet) {
+    loading.value = true;
+    error.value = "";
+  }
+  refreshError.value = "";
   try {
     if (routeId) {
       const a = await api<Activity>("/api/seckill/activities/" + routeId);
@@ -105,21 +95,21 @@ async function load() {
       const data = await api<ListResponse<Activity>>("/api/seckill/activities");
       if (run !== loadGeneration) return;
       activities.value = data.items;
-      const current = data.items.find((a) => phase(a) === "正在进行");
-      const upcoming = data.items
-        .filter((a) => phase(a) === "即将开始")
-        .sort(
-          (a, b) =>
-            new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-        )[0];
-      if (!data.items.some((a) => a.id === selectedId.value))
-        selectedId.value =
-          current?.id || upcoming?.id || data.items[0]?.id || null;
+      now.value = Date.now();
+      syncSelection();
     }
+    // A successful quiet refresh also recovers an earlier initial-load failure.
+    error.value = "";
   } catch (e) {
-    if (run === loadGeneration) error.value = errorMessage(e);
+    if (run === loadGeneration) {
+      if (quiet) refreshError.value = "活动更新未完成：" + errorMessage(e);
+      else error.value = errorMessage(e);
+    }
   } finally {
-    if (run === loadGeneration) loading.value = false;
+    if (run === loadGeneration) {
+      loading.value = false;
+      fetching = false;
+    }
   }
 }
 function buy(a: Activity, item: Item) {
@@ -129,16 +119,57 @@ function buy(a: Activity, item: Item) {
 function select(a: Activity) {
   selectedId.value = a.id;
   browseAll.value = false;
+  manualHistory = !isCurrentOrFuture(a, now.value);
+  category.value = "全部好物";
+}
+function showAll() {
+  if (route.params.id) {
+    router.push("/");
+    return;
+  }
+  manualHistory = false;
+  browseAll.value = true;
+  category.value = "全部好物";
+  syncSelection();
+}
+function refreshVisible() {
+  if (document.visibilityState === "visible") {
+    now.value = Date.now();
+    syncSelection();
+    void load(true);
+  }
 }
 onMounted(() => {
   load();
-  timer = window.setInterval(() => (now.value = Date.now()), 1000);
+  timer = window.setInterval(() => {
+    const previousPhases = activities.value.map(phase).join();
+    now.value = Date.now();
+    if (previousPhases !== activities.value.map(phase).join()) {
+      syncSelection();
+      void load(true);
+    }
+  }, 1000);
+  refreshTimer = window.setInterval(refreshVisible, 15000);
+  window.addEventListener("focus", refreshVisible);
+  document.addEventListener("visibilitychange", refreshVisible);
 });
-onUnmounted(() => window.clearInterval(timer));
+onUnmounted(() => {
+  loadGeneration++;
+  window.clearInterval(timer);
+  window.clearInterval(refreshTimer);
+  window.removeEventListener("focus", refreshVisible);
+  document.removeEventListener("visibilitychange", refreshVisible);
+});
+watch(categories, choices => {
+  if (!choices.some(choice => choice.name === category.value)) category.value = "全部好物";
+});
 watch(
   () => route.params.id,
   () => {
     browseAll.value = true;
+    manualHistory = false;
+    selectedId.value = null;
+    category.value = "全部好物";
     load();
   },
 );
@@ -153,7 +184,7 @@ watch(
       <p class="hero-description">
         优质好物，限时限量。用更好的产品，点亮每一个日常。
       </p>
-      <div class="countdown" aria-label="活动倒计时">
+      <div v-if="remaining" class="countdown" aria-label="活动倒计时">
         <span class="countdown-intro">{{
           selected && phase(selected) === "即将开始"
             ? "距离本场开始"
@@ -164,12 +195,17 @@ watch(
           ><small>{{ ["小时", "分钟", "秒"][index] }}</small>
         </div>
       </div>
-      <div class="session-tabs" aria-label="抢购场次" role="tablist">
+      <div v-else class="session-state" role="status">
+        <strong>{{ sessionMessage }}</strong>
+        <p>{{ noLiveActivities ? "当前没有可参与的场次，敬请期待下一场。" : "查看其他场次，发现下一件心动好物。" }}</p>
+        <button class="text-button" @click="load()">刷新活动 <el-icon><Refresh /></el-icon></button>
+      </div>
+      <div class="session-tabs" aria-label="抢购场次">
         <button
-          v-for="a in activities.slice(0, 4)"
+          v-for="a in sortedActivities"
           :key="a.id"
-          role="tab"
-          :aria-selected="selected?.id === a.id"
+          :aria-pressed="selected?.id === a.id"
+          :title="a.name"
           :class="{ selected: selected?.id === a.id }"
           @click="select(a)"
         >
@@ -195,18 +231,38 @@ watch(
     aria-label="本场限量好物"
     :aria-busy="loading"
   >
+    <div v-if="!loading && !error" class="catalog-toolbar">
+      <div>
+        <p class="catalog-eyebrow">{{ route.params.id || !browseAll ? selected?.name : '当前及即将开始的场次' }}</p>
+        <h2>{{ category === '全部好物' ? '限时好物' : category }} <small>{{ displayRows.length }} 款</small></h2>
+      </div>
+      <div class="catalog-actions">
+        <button v-if="route.params.id || !browseAll" class="text-button" @click="showAll">全部好物</button>
+        <button class="text-button" @click="load()">刷新活动 <el-icon><Refresh /></el-icon></button>
+      </div>
+      <nav v-if="rows.length" class="category-filters" aria-label="商品分类">
+        <button
+          v-for="choice in categories"
+          :key="choice.name"
+          :aria-pressed="category === choice.name"
+          :class="{ selected: category === choice.name }"
+          @click="category = choice.name"
+        >{{ choice.name }} <span>{{ choice.count }}</span></button>
+      </nav>
+      <p v-if="refreshError" class="catalog-refresh-error" role="status">{{ refreshError }}</p>
+    </div>
     <div v-if="error" class="state-panel">
       <h2>好物暂时没有加载出来</h2>
       <p>{{ error }}</p>
-      <el-button :icon="Refresh" @click="load">重新加载</el-button>
+      <el-button :icon="Refresh" @click="load()">重新加载</el-button>
     </div>
     <div v-else-if="loading" class="loading-products">
       <el-skeleton :rows="5" animated />
     </div>
     <div v-else-if="!displayRows.length" class="state-panel">
-      <h2>下一场好物，正在准备</h2>
-      <p>暂时没有可展示的商品，稍后回来看看。</p>
-      <el-button :icon="Refresh" @click="load">刷新活动</el-button>
+      <h2>{{ noLiveActivities && browseAll ? '本轮活动已结束' : category !== '全部好物' ? '这个类别暂时没有商品' : '下一场好物，正在准备' }}</h2>
+      <p>{{ noLiveActivities && browseAll ? '历史场次仍可查看，新的场次准备好后将在这里展示。' : '暂时没有可展示的商品，稍后回来看看。' }}</p>
+      <el-button :icon="Refresh" @click="load()">刷新活动</el-button>
     </div>
     <template v-else
       ><article
@@ -227,13 +283,7 @@ watch(
         </button>
         <div class="product-copy">
           <p class="product-kicker">
-            {{
-              index === 0
-                ? "好音质 · 轻量化 · 长续航"
-                : index === 1
-                  ? "记录热爱 · 留住每一个瞬间"
-                  : "自在生活 · 每一天都有新发现"
-            }}
+            {{ productKicker(item) }}
           </p>
           <button class="product-name" @click="buy(activity, item)">
             {{ item.name }}
@@ -241,6 +291,7 @@ watch(
           <p class="product-description">
             {{ item.description || "让心动如期而至，为日常添一份喜欢。" }}
           </p>
+          <p v-if="browseAll && !route.params.id" class="product-session">{{ activity.name }} · {{ dateFor(activity.startTime) }} {{ timeOnly(activity.startTime) }} · {{ phase(activity) }}</p>
         </div>
         <div class="product-offer">
           <div class="price-line" :class="{ featured: index === 0 }">
@@ -276,7 +327,7 @@ watch(
         ><button
           v-else-if="!browseAll"
           class="text-button"
-          @click="browseAll = true"
+          @click="showAll"
         >
           全部好物</button
         ><button
@@ -293,6 +344,6 @@ watch(
     v-model="purchaseOpen"
     :activity="purchase.activity"
     :item="purchase.item"
-    @changed="load"
+    @changed="load()"
   />
 </template>

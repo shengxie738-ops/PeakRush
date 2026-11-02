@@ -1,0 +1,82 @@
+{
+  "api": {
+    "passed": true,
+    "checks": 57
+  },
+  "invariants": {
+    "checkedAt": "2026-10-09T01:21:22.167074+08:00",
+    "database": "127.0.0.1:3306/peakrush",
+    "violations": {
+      "stock_conservation": 0,
+      "duplicate_user_orders": 0,
+      "paid_without_payment": 0,
+      "payment_for_unpaid_order": 0,
+      "success_without_order": 0,
+      "failed_request_has_live_order": 0,
+      "closed_without_release_log": 0
+    },
+    "passed": true
+  },
+  "catalog": {
+    "passed": true,
+    "checks": 21
+  },
+  "backend": [
+    {
+      "failures": 0,
+      "skipped": 0,
+      "suite": "com.peakrush.CatalogProductsIntegrationTest",
+      "errors": 0,
+      "tests": 2
+    },
+    {
+      "failures": 0,
+      "skipped": 0,
+      "suite": "com.peakrush.InputRulesTest",
+      "errors": 0,
+      "tests": 2
+    },
+    {
+      "failures": 0,
+      "skipped": 0,
+      "suite": "com.peakrush.MySqlTransactionsTest",
+      "errors": 0,
+      "tests": 5
+    },
+    {
+      "failures": 0,
+      "skipped": 0,
+      "suite": "com.peakrush.ProductCategoryTest",
+      "errors": 0,
+      "tests": 4
+    },
+    {
+      "failures": 0,
+      "skipped": 0,
+      "suite": "com.peakrush.RedisReliabilityTest",
+      "errors": 0,
+      "tests": 8
+    },
+    {
+      "failures": 0,
+      "skipped": 1,
+      "suite": "com.peakrush.StreamBridgeIntegrationTest",
+      "errors": 0,
+      "tests": 1
+    }
+  ],
+  "frontend": {
+    "viteBuild": "passed",
+    "tests": 69,
+    "failures": 0,
+    "typecheck": "passed"
+  },
+  "seedTests": {
+    "failures": 0,
+    "tests": 14
+  },
+  "courseReports": [
+    "course-labs-jdk-17.0.2-20261008T171228050Z.json",
+    "course-labs-openjdk-23.0.2-20261008T171232053Z.json"
+  ]
+}

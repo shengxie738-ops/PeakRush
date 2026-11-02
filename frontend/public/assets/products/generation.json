@@ -1,0 +1,37 @@
+{
+  "generatedOn": "2026-10-09",
+  "tool": "built-in image_gen",
+  "usage": "PeakRush demo product advertising photographs",
+  "images": [
+    {
+      "file": "coffee-machine.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A cream white compact espresso machine with brushed metal controls and a clear cup of espresso on a warm travertine kitchen pedestal, subtle coffee beans and linen in background. Main product centered and fully visible, occupies central 65% so it works for both wide hero and catalog thumbnail. Warm peach and terracotta studio background matching an orange and white flash-sale store. Morning sunlight, soft realistic shadows, tasteful editorial styling, photorealistic high detail. No text, no logos, no brand marks, no watermark, no price, no collage. The machine is physically plausible.",
+      "generationFile": "exec-a181a262-78ef-47b5-9aff-12371d2f384b.png"
+    },
+    {
+      "file": "portable-speaker.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A single forest green compact cylindrical portable bluetooth speaker, woven textile grille, small wrist cord, neatly designed rubber controls. On warm sandstone beside a sunlit pale apricot wall, a blurred leaf shadow provides natural outdoor mood. Product centered fully visible, central 65% footprint with negative space, suitable for catalog thumbnail and hero. Distinct from headphones. Photorealistic commercial studio lighting, precise textures, polished art direction for orange-white flash-sale store. No text, logos, brand marks, watermark, price or collage.",
+      "generationFile": "exec-d1e0a69c-6d02-4fba-b9b9-15b3df928eac.png"
+    },
+    {
+      "file": "mechanical-keyboard.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A single premium 75 percent mechanical keyboard with ivory and warm gray keycaps and a few subtle burnt orange accent keys, brushed aluminum casing, photographed at 3/4 angle on a smooth warm beige desk with minimal stylized shadows. Entire keyboard fully visible, central 65% footprint, soft peach background. Detailed physically credible keys, no visible lettering on keycaps, no screen or other competing main product. High-end editorial commercial photograph, warm orange-white store aesthetic. No text, logos, watermark, prices or collage.",
+      "generationFile": "exec-bfa1e631-e476-4954-aeb7-e2104950c3f9.png"
+    },
+    {
+      "file": "desk-lamp.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A single sculptural mushroom shaped cordless table lamp, sand beige powder-coated metal with soft warm light glowing under the cap, set on a terracotta side table against a muted apricot plaster wall. A subtle book in far background, calm cozy twilight scene, realistic soft shadows and premium material detail. Entire lamp fully visible centered, central 65% footprint so thumbnail crops preserve it. Orange and white ecommerce editorial design, photorealistic. No text, brand marks, logos, watermark, price or collage.",
+      "generationFile": "exec-4de0f621-23d0-4d49-b5a8-197f97d6384d.png"
+    },
+    {
+      "file": "trail-shoes.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A pair of technical trail running shoes, muted sage green breathable mesh, sand colored midsoles and dark grippy rubber tread, one shoe slightly behind the other. On a natural warm sandstone slab with a soft sunlit rust-orange desert background. Both complete shoes centered, fully visible, central 65% footprint with generous margins. Credible proportions, lacing and technical stitching; premium outdoor commercial art direction, photorealistic high detail. No text, logos, trademarks, watermark, prices or collage.",
+      "generationFile": "exec-dd254eeb-8ea7-4383-82cd-ebafaf5ab5e2.png"
+    },
+    {
+      "file": "carry-on.png",
+      "prompt": "Professional premium ecommerce advertising photograph, wide landscape 3:2 image. A single refined champagne beige hard-shell carry-on suitcase with shallow vertical ribs, four black spinner wheels and extended telescopic handle, standing on a terracotta architectural platform before an apricot wall. Gentle sunlight makes long soft shadows, travel editorial luxury mood. Entire suitcase and handle fully visible centered in central 65% footprint, generous frame margins, suitable for hero and product thumbnail, realistic high detail. Orange-white flash-sale store palette. No text, logos, trademarks, watermark, price or collage.",
+      "generationFile": "exec-6087c42a-418d-4ad7-8bb6-10b8d347f8c6.png"
+    }
+  ]
+}

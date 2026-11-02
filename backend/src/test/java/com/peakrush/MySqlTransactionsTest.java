@@ -12,7 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MySqlTransactionsTest {
  Store db;Orders orders;long aid,iid,pid;String generation;
  @BeforeEach void create(){
-  var ds=new DriverManagerDataSource("jdbc:mysql://127.0.0.1:13306/peakrush?serverTimezone=UTC&forceConnectionTimeZoneToSession=true","peakrush",Objects.requireNonNull(System.getenv("DB_PASSWORD"),"Set DB_PASSWORD for integration tests"));
+  String url=System.getenv().getOrDefault("DB_URL","jdbc:mysql://127.0.0.1:13306/peakrush?serverTimezone=UTC");
+  if(!url.contains("forceConnectionTimeZoneToSession="))url+=(url.contains("?")?"&":"?")+"forceConnectionTimeZoneToSession=true";
+  var ds=new DriverManagerDataSource(url,System.getenv().getOrDefault("DB_USER","peakrush"),Objects.requireNonNull(System.getenv("DB_PASSWORD"),"Set DB_PASSWORD for integration tests"));
   var jdbc=new JdbcTemplate(ds);var json=new Json(new ObjectMapper().findAndRegisterModules());db=new Store(jdbc,new DataSourceTransactionManager(ds),json);orders=new Orders(db,json,900);
   pid=Json.number(db.saveProduct(null,Json.map("name","Integration stock test","description","isolated test","imageUrl","","originalPrice",10)).get("id"));
   aid=Json.number(db.saveActivity(null,Json.map("name","Integration transaction "+System.nanoTime(),"description","test","startTime",Instant.now().minusSeconds(60).toString(),"endTime",Instant.now().plusSeconds(3600).toString(),"architectureVersion","V1","items",List.of(Json.map("productId",pid,"seckillPrice",1,"totalStock",10,"limitPerUser",1)))).get("id"));

@@ -1,0 +1,22 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-09",
+  "assets": [
+    {
+      "name": "espresso.png",
+      "prompt": "Use case: ads-marketing.\nAsset type: final square product advertising photograph for a premium desktop ecommerce editorial gallery.\nPrimary request: a beautiful compact sculptural brushed stainless steel espresso machine with plausible unbranded simple controls. One ivory espresso cup directly beneath the grouphead. Entire machine and cup fully visible. The machine rests on a folded deep ultramarine-blue plinth resembling one wide sculptural ribbon, in a saturated cobalt seamless cyclorama. Gallery-grade product campaign from a world-class creative agency and conceptual design studio, sophisticated restrained surreal set design.\nComposition: 1:1 square image, front three-quarter viewpoint, readable large hero product entirely inside central 80 percent square. Deliberate elegant negative space, product dominates but no tight cropping. Professional high-end still life product photography with believable precise manufacturing details.\nLighting: warm strong directional sunlight, crisp geometric shadows, subtle metal highlights and exquisite brushed steel texture, rich blue studio atmosphere. Physical light and shadow, refined editorial color.\nConstraints: one espresso machine, one cup, one folded blue ribbon plinth. No people, text, brand names, logos, watermark, UI, typographic elements, collage, grids, borders, futuristic effects, neon, repeated pattern or repeated machines.",
+      "width": 1254,
+      "height": 1254,
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-828a-76e0-8cad-9d1a3879bd06\\exec-9dbcd3ae-3491-4966-9b9d-5ff1be4ed690.png",
+      "qa": "Viewed: plausible brushed steel machine and cup, cobalt folded-ribbon plinth, entire hero visible, no text/logo/UI."
+    },
+    {
+      "name": "lamp.png",
+      "prompt": "Use case: ads-marketing.\nAsset type: final square product advertising photograph for a premium desktop ecommerce editorial gallery.\nPrimary request: sculptural orange-red mushroom shaped portable table lamp with a glowing cream underside, standing at the opening between two large chalk-white curved architectural surfaces. Muted sage-green seamless backdrop. Poetic circular pool of warm illumination around the lamp and a sculptural complementary shadow. Sparse elegant conceptual design photography created by a top global creative agency / avant-garde concept studio.\nComposition: 1:1 square frame, large singular hero lamp, fully visible and entirely inside central 80 percent square crop. A front three-quarter still life, the chalk-white curved forms frame but do not block lamp. Strong silhouette, plenty of deliberate negative space, simple extraordinary visual idea.\nStyle: photorealistic premium product photography, soft satin orange-red painted metal dome and pedestal, fine believable material texture, beautifully illuminated cream diffuser underneath. Quiet warm editorial atmosphere; disciplined color, crisp curved forms.\nConstraints: exactly one lamp, two large white curved architectural sculptural surfaces, sage background. No people, text, branding, logos, watermark, UI, typography, multiple products, grids, collage, repeated background, neon, space or sci-fi effects.",
+      "width": 1254,
+      "height": 1254,
+      "source": "C:\\Users\\17894\\.codex\\generated_images\\01a11c4f-828a-76e0-8cad-9d1a3879bd06\\exec-1f02113c-8d8c-4ef4-a993-2eaf9d03a14e.png",
+      "qa": "Viewed: one orange-red lamp, cream underside, sage backdrop and white curves, warm pool of light, full hero visible, no text/logo/UI."
+    }
+  ]
+}
