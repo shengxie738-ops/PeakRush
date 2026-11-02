@@ -1,0 +1,710 @@
+{
+  "version": "V4",
+  "activityId": 53,
+  "generatedAt": "2026-11-02T08:35:14.059834+00:00",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3",
+    "entrypoint": "http://127.0.0.1:8080",
+    "topology": "single host: gateway, backend, MySQL, Redis, Kafka, load generator"
+  },
+  "workload": {
+    "configuredVirtualUsers": 2000,
+    "peakObservedInflight": 113,
+    "requestedRps": 1100,
+    "durationSeconds": 30,
+    "stock": 1000,
+    "requests": 33000,
+    "model": "open-loop, one quantity per POST, new key per attempt, prepared bearer/path per user"
+  },
+  "http": {
+    "completed": 33000,
+    "elapsedSeconds": 30.049,
+    "qps": 1098.2,
+    "p50Ms": 22.033,
+    "p95Ms": 40.76,
+    "p99Ms": 53.885,
+    "scheduledP95Ms": 53.774,
+    "scheduleDelayP95Ms": 20.696,
+    "statuses": {
+      "200": 19448,
+      "409": 13552
+    },
+    "businessResponses": {
+      "PENDING": 1000,
+      "SOLD_OUT": 18448,
+      "ALREADY_PURCHASED": 13552
+    },
+    "serverOrNetworkErrorRatio": 0.0
+  },
+  "orders": {
+    "success": 1000,
+    "uniqueAcceptedRequests": 1000,
+    "terminalStates": {
+      "SUCCESS": 1000
+    },
+    "settledSeconds": 35.865,
+    "orderTps": 27.88
+  },
+  "inventory": [
+    {
+      "id": 69,
+      "activityId": 53,
+      "architectureVersion": "V4",
+      "totalStock": 1000,
+      "availableStock": 0,
+      "redisAvailableStock": 0,
+      "occupiedQuantity": 1000,
+      "pendingReservations": 0
+    }
+  ],
+  "metricsAfter": {
+    "requests": 12711,
+    "successes": 12347,
+    "failures": 364,
+    "pending": 0,
+    "orders": 12347,
+    "paidOrders": 12,
+    "dbAvailableStock": 11385,
+    "redisAvailableStock": 10529,
+    "v4StreamPending": 0,
+    "v4StreamEvents": 0,
+    "outboxPending": 0,
+    "deadLetters": 0,
+    "latencyP95Ms": 37.732352,
+    "kafkaLag": 0,
+    "versions": [
+      {
+        "version": "V3",
+        "activities": 10
+      },
+      {
+        "version": "V0",
+        "activities": 5
+      },
+      {
+        "version": "V1",
+        "activities": 5
+      },
+      {
+        "version": "V2",
+        "activities": 5
+      },
+      {
+        "version": "V4",
+        "activities": 16
+      }
+    ],
+    "inventory": [
+      {
+        "id": 1,
+        "activityId": 1,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 2,
+        "activityId": 2,
+        "architectureVersion": "V3",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": 200,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 3,
+        "activityId": 3,
+        "architectureVersion": "V3",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": 200,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 4,
+        "activityId": 4,
+        "architectureVersion": "V0",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 5,
+        "activityId": 5,
+        "architectureVersion": "V1",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 6,
+        "activityId": 6,
+        "architectureVersion": "V2",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 7,
+        "activityId": 7,
+        "architectureVersion": "V3",
+        "totalStock": 200,
+        "availableStock": 200,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 14,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 15,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 50,
+        "availableStock": 50,
+        "redisAvailableStock": 50,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 16,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 17,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 80,
+        "availableStock": 78,
+        "redisAvailableStock": 78,
+        "occupiedQuantity": 2,
+        "pendingReservations": 0
+      },
+      {
+        "id": 18,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 150,
+        "availableStock": 150,
+        "redisAvailableStock": 150,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 19,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 120,
+        "availableStock": 119,
+        "redisAvailableStock": 119,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 20,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 150,
+        "availableStock": 150,
+        "redisAvailableStock": 150,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 21,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 120,
+        "availableStock": 120,
+        "redisAvailableStock": 120,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 22,
+        "activityId": 14,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 23,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 24,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 50,
+        "availableStock": 50,
+        "redisAvailableStock": 50,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 25,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 26,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 80,
+        "availableStock": 80,
+        "redisAvailableStock": 80,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 27,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 150,
+        "availableStock": 150,
+        "redisAvailableStock": 150,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 28,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 120,
+        "availableStock": 120,
+        "redisAvailableStock": 120,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 29,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 150,
+        "availableStock": 150,
+        "redisAvailableStock": 150,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 30,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 120,
+        "availableStock": 120,
+        "redisAvailableStock": 120,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 31,
+        "activityId": 15,
+        "architectureVersion": "V3",
+        "totalStock": 100,
+        "availableStock": 100,
+        "redisAvailableStock": 100,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 32,
+        "activityId": 16,
+        "architectureVersion": "V0",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 33,
+        "activityId": 17,
+        "architectureVersion": "V0",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 34,
+        "activityId": 18,
+        "architectureVersion": "V1",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 35,
+        "activityId": 19,
+        "architectureVersion": "V1",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 36,
+        "activityId": 20,
+        "architectureVersion": "V2",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": 9,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 37,
+        "activityId": 21,
+        "architectureVersion": "V2",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": 5,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 38,
+        "activityId": 22,
+        "architectureVersion": "V3",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": 9,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 39,
+        "activityId": 23,
+        "architectureVersion": "V3",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": 5,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 46,
+        "activityId": 30,
+        "architectureVersion": "V4",
+        "totalStock": 2,
+        "availableStock": 2,
+        "redisAvailableStock": 2,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 47,
+        "activityId": 31,
+        "architectureVersion": "V4",
+        "totalStock": 3000,
+        "availableStock": 3000,
+        "redisAvailableStock": 3000,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 48,
+        "activityId": 32,
+        "architectureVersion": "V4",
+        "totalStock": 3000,
+        "availableStock": 3000,
+        "redisAvailableStock": 3000,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 49,
+        "activityId": 33,
+        "architectureVersion": "V0",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 50,
+        "activityId": 34,
+        "architectureVersion": "V0",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 51,
+        "activityId": 35,
+        "architectureVersion": "V1",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 52,
+        "activityId": 36,
+        "architectureVersion": "V1",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": null,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 53,
+        "activityId": 37,
+        "architectureVersion": "V2",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": 9,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 54,
+        "activityId": 38,
+        "architectureVersion": "V2",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": 5,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 55,
+        "activityId": 39,
+        "architectureVersion": "V3",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": 9,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 56,
+        "activityId": 40,
+        "architectureVersion": "V3",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": 5,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 57,
+        "activityId": 41,
+        "architectureVersion": "V4",
+        "totalStock": 10,
+        "availableStock": 9,
+        "redisAvailableStock": 9,
+        "occupiedQuantity": 1,
+        "pendingReservations": 0
+      },
+      {
+        "id": 58,
+        "activityId": 42,
+        "architectureVersion": "V4",
+        "totalStock": 5,
+        "availableStock": 5,
+        "redisAvailableStock": 5,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 59,
+        "activityId": 43,
+        "architectureVersion": "V4",
+        "totalStock": 10,
+        "availableStock": 10,
+        "redisAvailableStock": 10,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 60,
+        "activityId": 44,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 1000,
+        "redisAvailableStock": 1000,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 61,
+        "activityId": 45,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 1000,
+        "redisAvailableStock": 1000,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 62,
+        "activityId": 46,
+        "architectureVersion": "V4",
+        "totalStock": 10,
+        "availableStock": 10,
+        "redisAvailableStock": 10,
+        "occupiedQuantity": 0,
+        "pendingReservations": 0
+      },
+      {
+        "id": 63,
+        "activityId": 47,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 64,
+        "activityId": 48,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 65,
+        "activityId": 49,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 66,
+        "activityId": 50,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 67,
+        "activityId": 51,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 68,
+        "activityId": 52,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      },
+      {
+        "id": 69,
+        "activityId": 53,
+        "architectureVersion": "V4",
+        "totalStock": 1000,
+        "availableStock": 0,
+        "redisAvailableStock": 0,
+        "occupiedQuantity": 1000,
+        "pendingReservations": 0
+      }
+    ],
+    "requestStates": [
+      {
+        "status": "SUCCESS",
+        "count": 7012
+      },
+      {
+        "status": "CANCELLED",
+        "count": 12
+      },
+      {
+        "status": "CLOSED",
+        "count": 5323
+      },
+      {
+        "status": "SOLD_OUT",
+        "count": 360
+      },
+      {
+        "status": "FAILED",
+        "count": 4
+      }
+    ]
+  },
+  "errors": [],
+  "convergence": {
+    "converged": true,
+    "waitedSeconds": 0.433,
+    "pendingReservations": 0
+  },
+  "targets": {
+    "qpsAtLeast1000": true,
+    "p95Below500ms": true,
+    "errorRatioBelow1Percent": true,
+    "virtualUsers2000": true
+  },
+  "limitations": [
+    "Single-host resource contention includes load generator.",
+    "HTTP throughput includes business rejections; order TPS is separate.",
+    "Configured virtual users is not a claim of 2000 simultaneous requests; observed in-flight is reported."
+  ]
+}

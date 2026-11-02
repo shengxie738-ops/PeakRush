@@ -775,7 +775,7 @@ onUnmounted(() => window.clearInterval(timer));
                   <dd>{{ val(metrics.v4StreamPending) }}</dd>
                 </div>
                 <div>
-                  <dt>V4 Stream 事件总量</dt>
+                  <dt>V4 Stream 当前事件数</dt>
                   <dd>{{ val(metrics.v4StreamEvents) }}</dd>
                 </div>
                 <div>

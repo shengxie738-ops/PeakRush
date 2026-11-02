@@ -37,6 +37,21 @@ test('App mounts late homepage DOM once and releases route, preference and unmou
   assert.equal(env.browser.listeners.get('resize')?.size ?? 0, 0)
 })
 
+test('route changes reset the shared scroll container for every page pair', async t => {
+  const env = await welcomeHarness(); t.after(env.clean)
+  const app = await env.mountApp()
+  env.container.scrollTop = 6000
+  env.route.name = 'terms-and-conditions'; await env.flush()
+  assert.equal(env.container.scrollTop, 0)
+  env.container.scrollTop = 800
+  env.route.name = 'privacy-policy'; await env.flush()
+  assert.equal(env.container.scrollTop, 0)
+  env.container.scrollTop = 4000
+  env.route.name = 'home'; await env.flush(); env.frame()
+  assert.equal(env.container.scrollTop, 0)
+  app.unmount()
+})
+
 test('leaving home before the runtime import resolves invalidates that pending mount', async t => {
   const env = await welcomeHarness({ delayImport: true }); t.after(env.clean)
   env.addSection(); const app = await env.mountApp()

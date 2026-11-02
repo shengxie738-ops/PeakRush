@@ -56,8 +56,10 @@ const scrollTo: EditorialScroll = (target, offset = 0) => {
 };
 provide(EDITORIAL_SCROLL, scrollTo);
 
-watch(() => route.name, async (name, previous) => {
-  if (!editorialNames.has(String(name)) && !editorialNames.has(String(previous))) return;
+/* Every route change is a new document view, not a position restore: the shared
+   container must start at the top or the previous page's scrollTop can clamp the
+   new page to its bottom. */
+watch(() => route.name, async () => {
   await nextTick();
   scrollTo(0);
   syncScrollbar();
@@ -151,8 +153,8 @@ function syncScrollbar(): void {
       </div>
     </div>
     <div class="scrollable__scrollbar scrollbar" aria-hidden="true">
-      <div class="scrollbar__position">
-        <div class="scrollbar__thumb" />
+      <div class="scrollbar__position" :style="positionStyle">
+        <div class="scrollbar__thumb" :style="thumbStyle" />
       </div>
     </div>
   </div>

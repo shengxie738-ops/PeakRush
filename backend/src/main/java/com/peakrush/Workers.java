@@ -25,10 +25,10 @@ public class Workers {
    var pending=operations.pending(stream,"bridge",Range.unbounded(),256);
    if(pending!=null&&!pending.isEmpty()){
     List<RecordId> ids=new ArrayList<>();for(var record:pending)if(record.getElapsedTimeSinceLastDelivery().toMillis()>=6000)ids.add(record.getId());
-    if(!ids.isEmpty()&&!sendRecords(stream,operations.claim(stream,"bridge",consumer,Duration.ofSeconds(6),ids.toArray(RecordId[]::new))))return;
+    if(!ids.isEmpty()&&!sendRecords(stream,operations.claim(stream,"bridge",consumer,Duration.ofSeconds(6),ids.toArray(RecordId[]::new))))continue;
    }
    var records=operations.read(Consumer.from("bridge",consumer),StreamReadOptions.empty().count(256),StreamOffset.create(stream,ReadOffset.lastConsumed()));
-   if(records!=null&&!sendRecords(stream,records))return;
+   if(records!=null&&!sendRecords(stream,records))continue;
   }}catch(Exception e){log.warn("Stream bridge deferred; unacknowledged events remain recoverable: {}",e.toString());}
  }
  private boolean sendRecords(String stream,List<MapRecord<String,String,String>> records){
@@ -39,9 +39,28 @@ public class Workers {
    if(payload==null)throw new IllegalStateException("Missing journal payload for "+record.getId());
    sends.add(Map.entry(record.getId().getValue(),purchases.enqueue(PurchaseEvent.from(json.read(payload)))));
   }
-  boolean complete=true;
-  for(var send:sends)try{send.getValue().get(12,java.util.concurrent.TimeUnit.SECONDS);redis.streams().acknowledge(stream,"bridge",send.getKey());}
-   catch(Exception e){complete=false;log.warn("Kafka send uncertain; Stream entry {} remains pending: {}",send.getKey(),e.toString());}
+  // Await bounded chunks together: a Kafka outage costs one timeout per chunk, not
+  // one per entry, while a burst of 256 concurrent sends cannot flood the producer
+  // and slow down the HTTP request threads on a single-host deployment.
+  int chunkSize=32;boolean complete=true;
+  List<String> acknowledged=new ArrayList<>();
+  for(int start=0;start<sends.size();start+=chunkSize){
+   var chunk=sends.subList(start,Math.min(sends.size(),start+chunkSize));
+   try{java.util.concurrent.CompletableFuture.allOf(chunk.stream().map(Map.Entry::getValue).toArray(java.util.concurrent.CompletableFuture[]::new)).get(12,java.util.concurrent.TimeUnit.SECONDS);}
+   catch(Exception e){log.warn("Kafka batch send uncertain; unacknowledged Stream entries stay pending: {}",e.toString());}
+   for(var send:chunk){
+    var future=send.getValue();
+    if(!future.isDone()||future.isCompletedExceptionally()){
+     complete=false;log.warn("Kafka send uncertain; Stream entry {} remains pending",send.getKey());continue;
+    }
+    try{redis.streams().acknowledge(stream,"bridge",send.getKey());acknowledged.add(send.getKey());}
+    catch(Exception e){complete=false;log.warn("Stream acknowledgement failed; entry {} stays pending: {}",send.getKey(),e.toString());}
+   }
+  }
+  // XDEL only entries that are already acknowledged, so every unprocessed or
+  // unacknowledged event keeps its payload and stays recoverable via the PEL.
+  if(!acknowledged.isEmpty())try{redis.streams().delete(stream,acknowledged.toArray(String[]::new));}
+   catch(Exception e){log.warn("Compacted Stream entries stay until the next successful delete: {}",e.toString());}
   return complete;
  }
  @Scheduled(fixedDelay=500,initialDelay=4000)

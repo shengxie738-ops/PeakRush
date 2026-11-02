@@ -41,9 +41,18 @@ const errors = ref<FieldErrors>({});
 const busy = ref(false);
 const serverError = ref('');
 const guidance = ref('');
+/** Spec §7.5: an already signed-in visitor must go straight back to the app. */
+const alreadySignedIn = ref(false);
+try {
+  alreadySignedIn.value = Boolean(localStorage.getItem('peakrush.token'));
+} catch { /* Storage may be disabled; the form is still usable. */ }
 let disposed = false;
 onBeforeUnmount(() => { disposed = true; });
 onMounted(() => {
+  if (alreadySignedIn.value) {
+    window.location.assign(redirectTarget.value);
+    return;
+  }
   try {
     guidance.value = sessionStorage.getItem('peakrush.authMessage') || '';
     sessionStorage.removeItem('peakrush.authMessage');
@@ -78,7 +87,7 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <section class="auth-page layout-split-page" :data-section-id="props.mode" :data-page-header-theme="headerTheme">
+  <section v-if="!alreadySignedIn" class="auth-page layout-split-page" :data-section-id="props.mode" :data-page-header-theme="headerTheme">
     <div class="layout-split row layout-split--mobile-background">
       <div class="layout-split__bg col col--6:md" :class="[panelTheme, 'ui-background']">
         <DisplayHeading is="h1" :title="AUTH_SPLIT.heading" :svg-key="props.mode === 'signin' ? 'signin-wordmark' : 'signup-wordmark'" visual-class="layout-split__word" />

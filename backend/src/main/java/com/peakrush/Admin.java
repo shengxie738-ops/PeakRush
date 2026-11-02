@@ -48,6 +48,10 @@ public class Admin {
   return deadLetterView(id);
  }
  private Map<String,Object> deadLetterView(long id){return db.one("SELECT id,request_id AS requestId,reason,status,attempts,created_at AS createdAt FROM dead_letter_record WHERE id=?",id);}
+ private static boolean noGroup(Exception e){
+  String message=Objects.toString(e.getMessage(),""),cause=Objects.toString(e.getCause(),"");
+  return message.contains("NOGROUP")||cause.contains("NOGROUP");
+ }
  public Map<String,Object> experiments(){return db.list(db.jdbc.queryForList("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt FROM experiment ORDER BY id DESC"));}
  public Map<String,Object> experiment(long id){
   var r=db.one("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt,results_json FROM experiment WHERE id=?",id);
@@ -69,10 +73,15 @@ public class Admin {
   for(var i:db.allItems()){
    long iid=Json.number(i.get("id")),aid=Json.number(i.get("activity_id"));
    Long stock=null,count=0L;try{if(Json.number(i.get("architecture_version"))>=2){String p=redis.prefix(aid,iid);String raw=redis.redis.opsForValue().get(p+"stock");stock=raw==null?null:Long.valueOf(raw);count=redis.redis.opsForZSet().zCard(p+"pending");if(stock!=null)redisStock+=stock;if(count!=null)pending+=count;}}catch(Exception e){available=false;}
-   if(Json.number(i.get("architecture_version"))>=4)try{
-    var streams=redis.streams();String stream=redis.prefix(aid,iid)+"events";Long length=streams.size(stream);
-    if(length!=null){streamEvents+=length;if(length>0){var summary=streams.pending(stream,"bridge");if(summary!=null)streamPending+=summary.getTotalPendingMessages();}}
-   }catch(Exception e){available=false;}
+   if(Json.number(i.get("architecture_version"))>=4){
+    var streams=redis.streams();String stream=redis.prefix(aid,iid)+"events";
+    Long length=null;
+    try{length=streams.size(stream);}catch(Exception e){available=false;}
+    if(length!=null){streamEvents+=length;
+     if(length>0)try{var summary=streams.pending(stream,"bridge");if(summary!=null)streamPending+=summary.getTotalPendingMessages();}
+     catch(Exception e){if(!noGroup(e))available=false;}
+    }
+   }
    long occupied=db.jdbc.queryForObject("SELECT COALESCE(SUM(quantity),0) FROM seckill_order WHERE item_id=? AND status IN ('CREATED','PAID')",Long.class,iid);
    inventory.add(Json.map("id",iid,"activityId",aid,"architectureVersion","V"+i.get("architecture_version"),"totalStock",i.get("total_stock"),"availableStock",i.get("available_stock"),"redisAvailableStock",stock,"occupiedQuantity",occupied,"pendingReservations",count));
   }

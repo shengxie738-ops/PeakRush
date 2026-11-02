@@ -59,10 +59,20 @@ export async function welcomeHarness({ reduced = false, failRenderer = false, de
   setGlobal('MutationObserver', class { constructor(fn) { this.fn = fn } observe() { observers.add(this) } disconnect() { observers.delete(this) } })
   setGlobal('IntersectionObserver', class { observe() {} disconnect() {} })
   if (!globalThis.CustomEvent) setGlobal('CustomEvent', class extends Event { constructor(type, options = {}) { super(type, options); this.detail = options.detail } })
-  let releaseImport
-  const gate = delayImport ? new Promise(resolve => { releaseImport = resolve }) : Promise.resolve()
+  let releaseGate
+  let gateReleased = !delayImport
+  const gate = delayImport ? new Promise(resolve => { releaseGate = resolve }) : Promise.resolve()
+  // Dynamic imports initiated by the application are tracked so tests can wait for
+  // the real import promise instead of guessing with a fixed number of ticks.
+  const trackedImports = new Set()
+  const mountedApps = new Set()
+  const trackImport = promise => {
+    const tracked = Promise.resolve(promise).finally(() => trackedImports.delete(tracked))
+    trackedImports.add(tracked)
+    return tracked
+  }
   const boundary = {
-    THREE, route, gate,
+    THREE, route, gate, trackImport,
     Renderer: class {
       constructor({ canvas }) { if (failRenderer) throw new Error('WebGL unavailable'); this.canvas = canvas; this.width = 0; this.height = 0; this.frames = 0; renderers.add(this) }
       setClearColor() {} setPixelRatio() {} setViewport() {} setScissorTest() {} setScissor() {}
@@ -89,10 +99,14 @@ export async function welcomeHarness({ reduced = false, failRenderer = false, de
   await fs.writeFile(path.join(dir, 'lenis.mjs'), `export default globalThis[${JSON.stringify(boundaryKey)}].Lenis;`)
   await fs.writeFile(path.join(dir, 'router.mjs'), `export { RouterLink } from ${JSON.stringify(import.meta.resolve('vue-router'))}; export const useRoute = () => globalThis[${JSON.stringify(boundaryKey)}].route;`)
   await fs.writeFile(path.join(dir, 'motionGate.mjs'), `await globalThis[${JSON.stringify(boundaryKey)}].gate; export { createMotionRuntime } from './motion/createMotionRuntime.mjs';`)
-  const pending = new Set()
-  async function compile(rel) {
-    if (pending.has(rel)) return
-    pending.add(rel)
+  const compiled = new Map()
+  function compile(rel) {
+    if (compiled.has(rel)) return compiled.get(rel)
+    const task = compileFile(rel)
+    compiled.set(rel, task)
+    return task
+  }
+  async function compileFile(rel) {
     let text = await fs.readFile(new URL(rel, sourceRoot), 'utf8')
     if (rel.endsWith('.vue')) {
       const descriptor = parse(text).descriptor
@@ -124,6 +138,7 @@ export async function welcomeHarness({ reduced = false, failRenderer = false, de
       js = js.replaceAll(JSON.stringify(spec), JSON.stringify(target.startsWith('file:') || target.startsWith('data:') ? target : pathToFileURL(target).href))
       js = js.replaceAll("'" + spec + "'", JSON.stringify(target.startsWith('file:') || target.startsWith('data:') ? target : pathToFileURL(target).href))
     }
+    if (rel === 'app/App.vue') js = js.replace(/\bimport\(([^()]*)\)/g, (_, specifier) => `globalThis[${JSON.stringify(boundaryKey)}].trackImport(import(${specifier}))`)
     await fs.mkdir(path.dirname(output(rel)), { recursive: true }); await fs.writeFile(output(rel), js)
   }
   const load = async rel => { await compile(rel); return import(pathToFileURL(output(rel)).href) }
@@ -136,12 +151,20 @@ export async function welcomeHarness({ reduced = false, failRenderer = false, de
     return { section, host, canvas: host.children[0], poster: host.posters[0] }
   }
   const frame = () => { now += 16; const work = [...rafs.values()]; rafs.clear(); for (const fn of work) fn(now) }
-  const flush = async () => { for (let i = 0; i < 10; i++) { await nextTick(); await new Promise(resolve => setImmediate(resolve)) } }
+  const flush = async () => {
+    await nextTick()
+    await new Promise(resolve => setImmediate(resolve))
+    while (gateReleased && trackedImports.size) {
+      await Promise.allSettled([...trackedImports])
+      await nextTick()
+      await new Promise(resolve => setImmediate(resolve))
+    }
+  }
   const mountApp = async () => {
     const { default: App } = await load('app/App.vue')
     App.render = function () { return h('div', { ref: 'scrollArea' }) }
     const renderer = createRenderer({ createElement: () => container, insert() {}, remove() {}, createText: () => new Element(), createComment: () => new Element(), setText() {}, setElementText() {}, parentNode: () => null, nextSibling: () => null, patchProp() {} })
-    const app = renderer.createApp(App); app.mount(new Element()); await flush(); return app
+    const app = renderer.createApp(App); mountedApps.add(app); app.mount(new Element()); await flush(); return app
   }
   const mountTestimonials = async () => {
     const { default: Component } = await load('features/home/HomeTestimonials.vue')
@@ -157,15 +180,24 @@ export async function welcomeHarness({ reduced = false, failRenderer = false, de
         else el.setAttribute(key, next)
       },
     })
-    const app = renderer.createApp(Component); app.config.warnHandler = () => {}; const root = new Element(); app.mount(root); await flush()
+    const app = renderer.createApp(Component); app.config.warnHandler = () => {}; mountedApps.add(app); const root = new Element(); app.mount(root); await flush()
     const host = root.querySelector('.landing-9-testimonials-webgl')
     return { app, host, canvas: host.querySelector('canvas'), buttons: host.querySelectorAll('button') }
   }
   const clean = async () => {
-    if (pending.has('webgl/mountScenes.ts')) (await load('webgl/mountScenes.ts')).disposeWebGLScenes()
-    if (pending.has('webgl/textureRegistry.ts')) (await load('webgl/textureRegistry.ts')).textureRegistry.disposeAll()
+    for (const app of mountedApps) { try { app.unmount() } catch { /* already unmounted by the test */ } }
+    mountedApps.clear()
+    // Open the gate and let every started import finish reading the temporary
+    // files before the directory is deleted; otherwise a late module import
+    // rejects with ENOENT after the test has finished.
+    gateReleased = true
+    releaseGate?.()
+    await Promise.allSettled([...compiled.values()])
+    while (trackedImports.size) await Promise.allSettled([...trackedImports])
+    if (compiled.has('webgl/mountScenes.ts')) (await load('webgl/mountScenes.ts')).disposeWebGLScenes()
+    if (compiled.has('webgl/textureRegistry.ts')) (await load('webgl/textureRegistry.ts')).textureRegistry.disposeAll()
     for (const [key, descriptor] of originals) { if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key] }
     await fs.rm(dir, { recursive: true, force: true })
   }
-  return { load, addSection, sections, container, route, browser, doc, media, renderers, requests, lenisInstances, rafs, timers, observers, Element, frame, flush, mountApp, mountTestimonials, releaseImport: () => releaseImport?.(), clean }
+  return { load, addSection, sections, container, route, browser, doc, media, renderers, requests, lenisInstances, rafs, timers, observers, Element, frame, flush, mountApp, mountTestimonials, releaseImport: () => { gateReleased = true; releaseGate?.() }, clean }
 }

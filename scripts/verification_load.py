@@ -79,9 +79,20 @@ async def run(args):
       terminal=await asyncio.gather(*(settle(pair) for pair in pending.values()))
       settled_elapsed=time.perf_counter()-start
       accepted=sum(r.get("status")=="SUCCESS" for r in terminal)
-      await asyncio.sleep(1)
-      _,metrics=await api.call("GET","/api/admin/metrics/summary",token=admin)
-      inventory=[row for row in metrics.get("inventory",[]) if row.get("activityId")==aid]
+      # Redis finalisation is asynchronous: poll until the fixture has no pending
+      # reservation and the durable outbox has drained, otherwise a burst report can
+      # show DB-successful orders next to a transient pending/outbox backlog.
+      convergence_start=time.perf_counter()
+      deadline=time.monotonic()+45
+      converged=False
+      while True:
+        _,metrics=await api.call("GET","/api/admin/metrics/summary",token=admin)
+        inventory=[row for row in metrics.get("inventory",[]) if row.get("activityId")==aid]
+        pending_reservations=sum(int(row.get("pendingReservations") or 0) for row in inventory)
+        if pending_reservations==0 and not metrics.get("outboxPending"):converged=True;break
+        if time.monotonic()>=deadline:break
+        await asyncio.sleep(.5)
+      convergence_seconds=time.perf_counter()-convergence_start
       http5xx=sum(v for k,v in statuses.items() if k.startswith("5"))+statuses.get("network_error",0)
       error_ratio=http5xx/len(latencies) if latencies else 1
       report={
@@ -98,6 +109,7 @@ async def run(args):
        "orders":{"success":accepted,"uniqueAcceptedRequests":len(pending),"terminalStates":dict(collections.Counter(r.get("status") for r in terminal)),
           "settledSeconds":round(settled_elapsed,3),"orderTps":round(accepted/settled_elapsed,2)},
        "inventory":inventory,"metricsAfter":metrics,"errors":errors,
+       "convergence":{"converged":converged,"waitedSeconds":round(convergence_seconds,3),"pendingReservations":pending_reservations},
        "targets":{"qpsAtLeast1000":len(latencies)/elapsed>=1000,"p95Below500ms":(percentile(latencies,.95) or 0)<500,
                   "errorRatioBelow1Percent":error_ratio<.01,"virtualUsers2000":args.users>=2000},
        "limitations":["Single-host resource contention includes load generator.",

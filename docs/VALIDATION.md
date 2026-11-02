@@ -1,6 +1,8 @@
-# V0–V3 验收报告
+# V0–V5 验收报告
 
-日期：2026-09-28。按用户“先把 V3 做完”的要求，本轮交付范围为 V0–V3。功能正确性通过；持续场景性能达标，2000 请求突发场景延迟未达目标。V4 高级故障实验不在本轮验收内。
+**V5 增补（2026-11-02）**：V4 Stream 主链路与 V5 审查整改已完成实测。V4 持续场景（2000 用户、1100 RPS、30 秒、1000 库存）33000 请求，1098.2 QPS、P95 40.76 ms、0 个 5xx/网络错误、0 次限流，1000/1000 订单 SUCCESS；突发场景 2000 请求 P95 1899.70 ms、0 个 5xx/网络错误、788 次 429，1000/1000 订单 SUCCESS。两项均在 Redis 投影与 outbox 收敛后取数（分别 0.433 秒、19.349 秒）；库存 1000 = 数据库可用 0 + 订单占用 1000，Stream XLEN/XPENDING、Kafka lag、死信均为 0。证据：[持续](../artifacts/load-V4-1793608514.json)、[突发](../artifacts/load-V4-1793608594.json)。前端 88/88、后端与网关构建通过。以下 V0–V3 章节为 2026-09-28 历史记录，保留原始口径。
+
+日期：2026-09-28（V0–V3 历史记录）。按用户“先把 V3 做完”的要求，该轮交付范围为 V0–V3。功能正确性通过；持续场景性能达标，2000 请求突发场景延迟未达目标。V4 高级故障实验不在该轮验收内。
 
 ## 环境与测量口径
 
@@ -58,7 +60,7 @@ load-V3-1790571344.json 是屏障修复前的探索记录，任务边创建边�
 
 原生 Windows Kafka 曾在删除测试 topic 时遭遇映射文件目录重命名拒绝，代理退出；仅隔离已删除的测试分区后恢复，并真实验证发布/消费。业务 topic 和数据库未重置。自动测试已不再自动删除 Kafka topic；Windows 原生运行属于开发环境限制。
 
-V4 崩溃/断点故障脚本没有执行，不声称完成 V4。Compose 方案未在本机运行，不将 Redis5 实测冒充 Redis7 认证。未采集长时间 CPU/数据库连接/Redis 时延曲线，也未验证多机水平扩容。后续性能调优应使用独立压测机、稳定运行更久并补充这些指标。
+V4 业务链路、V5 整改与持续/突发负载已经实测；V4 崩溃/断点故障注入脚本仍未执行，不声称完成故障注入验收。Compose 方案未在本机运行，不将 Redis5 实测冒充 Redis7 认证。未采集长时间 CPU/数据库连接/Redis 时延曲线，也未验证多机水平扩容。后续性能调优应使用独立压测机、稳定运行更久并补充这些指标。
 
 ## 复现
 
@@ -71,6 +73,9 @@ python scripts/verification_gateway.py
 python scripts/verification_invariants.py
 python scripts/verification_load.py --versions V0,V1,V2,V3 --users 2000 --rps 1100 --seconds 30 --stock 1000
 python scripts/verification_load.py --versions V3 --users 2000 --burst --stock 1000
+# V5：V4 主链路持续与突发
+python scripts/verification_load.py --versions V4 --users 2000 --rps 1100 --seconds 30 --stock 1000
+python scripts/verification_load.py --versions V4 --users 2000 --burst --stock 1000
 ~~~
 
 脚本会新增隔离活动和测试账号、保留报告，并下线完成的压测活动，不覆盖演示活动。
