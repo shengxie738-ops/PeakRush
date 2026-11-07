@@ -58,10 +58,28 @@ jobs:
           --health-interval=5s
           --health-timeout=3s
           --health-retries=20
+      kafka:
+        image: apache/kafka:4.3.0
+        ports:
+          - 19092:9092
+        env:
+          CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+          KAFKA_NODE_ID: 1
+          KAFKA_PROCESS_ROLES: broker,controller
+          KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:19092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+          KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+          KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+          KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     env:
       PEAKRUSH_INTEGRATION_TESTS: 'true'
       PEAKRUSH_MIGRATION_TESTS: 'true'
-      PEAKRUSH_V4_TESTS: 'false'
+      PEAKRUSH_V4_TESTS: 'true'
+      KAFKA_BOOTSTRAP_SERVERS: 127.0.0.1:19092
       DB_URL: jdbc:mysql://127.0.0.1:13306/peakrush_ci?serverTimezone=UTC
       DB_USER: root
       DB_PASSWORD: peakrush_ci_disposable_password
@@ -83,11 +101,65 @@ jobs:
           docker exec -i "$MYSQL_CONTAINER"
           mysql --default-character-set=utf8mb4 -uroot -p"$DB_PASSWORD" peakrush_ci
           < backend/src/main/resources/schema.sql
+      - name: Wait for Kafka
+        # 服务容器没有容器内健康探针（每次探针都要起 JVM），改在 runner 上探端口，
+        # 失败时打印 broker 日志便于定位 advertised listener 配置问题。
+        run: |
+          for attempt in $(seq 1 60); do
+            if (exec 3<>/dev/tcp/127.0.0.1/19092) 2>/dev/null; then
+              echo "Kafka is accepting connections on 19092 after ${attempt} attempt(s)"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Kafka did not become ready within 120s"
+          docker logs "${{ job.services.kafka.id }}" 2>&1 | tail -50
+          exit 1
       - run: mvn --batch-mode --no-transfer-progress -f backend/pom.xml verify
+      - name: Slow bridge capacity regression
+        # 真实等待 12s 的保容量用例单独执行，不拖慢主测试集。
+        env:
+          PEAKRUSH_SLOW_TESTS: 'true'
+        run: >-
+          mvn --batch-mode --no-transfer-progress -f backend/pom.xml test
+          -Dtest=StreamBridgeFaultIsolationTest -Dgroups=slow -Dpeakrush.excluded.groups=none
+      - name: Collect service logs
+        if: always()
+        run: |
+          mkdir -p service-logs
+          docker logs "${{ job.services.mysql.id }}" > service-logs/mysql.log 2>&1 || true
+          docker logs "${{ job.services.redis.id }}" > service-logs/redis.log 2>&1 || true
+          docker logs "${{ job.services.kafka.id }}" > service-logs/kafka.log 2>&1 || true
+      - name: Upload test evidence
+        # 失败时也上传，便于定位 PEL / Kafka / MySQL 现场。
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-evidence
+          if-no-files-found: warn
+          path: |
+            backend/target/surefire-reports/**
+            backend/target/**/*.json
+            service-logs/**
+            artifacts/**/*.json
 
   gateway:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      redis:
+        image: redis:7.4.2
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+    env:
+      PEAKRUSH_INTEGRATION_TESTS: 'true'
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: '16379'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -99,6 +171,18 @@ jobs:
           cache: maven
           cache-dependency-path: gateway/pom.xml
       - run: mvn --batch-mode --no-transfer-progress -f gateway/pom.xml verify
+      - name: Collect gateway service logs
+        if: always()
+        run: docker logs "${{ job.services.redis.id }}" > gateway-redis.log 2>&1 || true
+      - name: Upload gateway test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateway-test-evidence
+          if-no-files-found: warn
+          path: |
+            gateway/target/surefire-reports/**
+            gateway-redis.log
 
   catalog-scripts:
     runs-on: ubuntu-latest
