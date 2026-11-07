@@ -72,7 +72,7 @@ public class Admin {
   List<Map<String,Object>> inventory=new ArrayList<>();long pending=0,redisStock=0,streamPending=0,streamEvents=0;boolean available=true;
   for(var i:db.allItems()){
    long iid=Json.number(i.get("id")),aid=Json.number(i.get("activity_id"));
-   Long stock=null,count=0L;try{if(Json.number(i.get("architecture_version"))>=2){String p=redis.prefix(aid,iid);String raw=redis.redis.opsForValue().get(p+"stock");stock=raw==null?null:Long.valueOf(raw);count=redis.redis.opsForZSet().zCard(p+"pending");if(stock!=null)redisStock+=stock;if(count!=null)pending+=count;}}catch(Exception e){available=false;}
+   Long stock=null,count=0L;try{if(Json.number(i.get("architecture_version"))>=2){String p=redis.prefix(aid,iid);String raw=redis.redis.opsForValue().get(p+"stock");stock=raw==null?null:Long.valueOf(raw);count=redis.redis.opsForZSet().zCard(p+"pending");if(stock!=null)redisStock+=stock;if(count!=null)pending+=count;}}catch(Exception e){available=false;count=null;}
    if(Json.number(i.get("architecture_version"))>=4){
     var streams=redis.streams();String stream=redis.prefix(aid,iid)+"events";
     Long length=null;
