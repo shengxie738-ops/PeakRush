@@ -2,6 +2,8 @@
 
 V5 是 2026-11-02 的交付版本：在 V4 的 Redis Stream 异步落单与实时指标之上，完成 V4 审查整改、Stream 条目压缩、bridge 故障恢复优化和压测快照收敛。V0–V4 仍是可创建的活动架构版本；**V5 是项目整体发布版本，不新增 V5 活动协议**。
 
+2026-11-07 完成 PR #3 评审整改收尾：补齐 bridge 故障隔离回归、压测门禁默认强制、CI 证据上传、网关限流测试和四类故障演练 RUNBOOK。
+
 ## V5 更新
 
 | 领域 | 本次完成 |
@@ -13,6 +15,20 @@ V5 是 2026-11-02 的交付版本：在 V4 的 Redis Stream 异步落单与实�
 | 监控 | V4 消费组尚未创建时只忽略 `NOGROUP`，不再让 Redis 指标整体不可用；事件量统计改为当前 Stream 条目数 |
 | 压测脚本 | 订单终态后等待 `pendingReservations` 与 `outbox` 收敛（最多 45 秒）再取最终指标，报告新增 `convergence` 字段 |
 | 启动脚本 | 修复 PowerShell 5.1 下 `app-stop.ps1` 对 JSON 数组的嵌套解析，停止服务不再静默失败 |
+
+## 2026-11-07 收尾整改
+
+| 领域 | 现状与边界 |
+| --- | --- |
+| bridge 故障隔离 | 按活动、按记录分别隔离：单条坏记录、同步 producer 异常、单个 Stream 读写异常都不会让其他活动整轮跳过；未确认条目保留在 PEL 中等待恢复 |
+| 发送并发上限 | 每个 Workers 实例用 Semaphore 限制为 32 个未完成发送；单轮读取上限 256 条，但不会一次性全部提交。等待 12 秒超时后不归还名额，只有 Kafka 发送真正完成才释放，避免超时后继续追加发送 |
+| ACK/DEL 原子化 | `ack_delete.lua` 先对 `0-0` 执行空操作 `XDEL` 预校验命令/键/类型，再在同一脚本内 `XACK` + `XDEL`；XACK 或 XDEL 失败时条目仍留在 PEL，可再次恢复 |
+| claim 阈值 | `peakrush.bridge.claim-idle-seconds` 默认 12 秒，必须大于 Kafka `delivery.timeout.ms`（10000），否则原实例仍在重试时条目会被其他实例 claim，造成重复发布 |
+| XPENDING 轮转 | 单次只取 256 条 PEL，并按每个流的游标轮转扫描，避免第 256 条之后的陈旧条目永远得不到处理 |
+| 指标缺失 | `Admin.metrics` 在 Redis 读取失败时把 `pendingReservations` 置为 `null`，不再默认 0；收敛校验把 `null` 判为“未知/未收敛”，不允许误报收敛 |
+| 压测门禁 | `verification_load.py` 默认启用 `--require-targets`，未达标即 exit 1；targets 覆盖 QPS、P95、错误率、收敛、数据库库存守恒、Redis 投影一致和订单终态 `ordersTerminal`；`gate_report.py` 可对已有报告单独执行门禁 |
+| 网关降级 | Redis 不可用时购买入口快速返回 503 `ADMISSION_UNAVAILABLE`，不把下游请求误判为成功；Lua 限流与 503 路径均有测试覆盖 |
+| CI 与演练 | CI 增加 Redis/Kafka 服务、慢用例独立步骤和失败也上传的证据；四类故障演练写入 [RUNBOOK.md](RUNBOOK.md) |
 
 ## 已实现的阶段
 
@@ -45,12 +61,14 @@ python scripts/verification_catalog.py
 在 PowerShell 中进入项目根执行：
 
 ```powershell
-. .\依赖环境\env.ps1
+. .\依赖环境\env.ps1                     # 仅当前会话；JDK17、Maven、Redis、Kafka 均在 G 盘
 .\依赖环境\start-runtime.ps1             # Redis 16379 + Kafka 19092
-.\scripts\app-start.ps1 -SkipBuild -SkipInfra
+.\scripts\app-start.ps1 -SkipInfra       # backend 8081 + gateway 8080 + frontend 5400
 ```
 
 首次启动或修改代码后去掉 `-SkipBuild`（会执行 Maven、`npm ci` 与前端构建）。打开 [本地页面](http://127.0.0.1:5400/)；业务页为 http://127.0.0.1:5400/app/。
+
+收尾验收使用显式端口：backend 18081、gateway 18080，backend 额外启用 `local,lab` 故障开关。用 `.\scripts\app-start.ps1 -BackendPort 18081 -GatewayPort 18080 -Lab -SkipInfra` 启动，压测脚本加 `--base http://127.0.0.1:18080`；`app-start.ps1` 的默认端口仍是 8080/8081。
 
 | 角色 | 账号 | 密码 |
 | --- | --- | --- |
@@ -63,15 +81,15 @@ python scripts/verification_catalog.py
 
 ```powershell
 .\scripts\app-stop.ps1
-# 同时停止本项目依赖服务：
-.\scripts\app-stop.ps1 -IncludeInfra
+# 停止应用与本项目启动的 Redis/Kafka（带归属校验，不触碰系统 MySQL 服务）：
+.\依赖环境\stop-all.ps1
 ```
 
-所有服务面向本机开发，绑定回环地址。应用端口为 5400 / 8080 / 8081，独立依赖端口为 MySQL 13306（本机复用时为 3306）、Redis 16379、Kafka 19092/19093。数据和日志位于 `.runtime/`；不使用现有系统 MySQL 的 3306 库实例以外的数据，也不复用既有 Kafka 数据目录。更完整的本机口径见 [启动指导](docs/STARTUP_GUIDE.md)。
+所有服务面向本机开发，绑定回环地址。默认应用端口为 5400 / 8080 / 8081；依赖端口为 MySQL 3306（复用本机 MySQL81 服务）、Redis 16379、Kafka 19092/19093。数据和日志位于 `.runtime/`；不使用系统 MySQL 3306 实例以外的数据，也不复用既有 Kafka 数据目录。更完整的本机口径见 [启动指导](docs/STARTUP_GUIDE.md)。
 
 ## 验证与实测
 
-2026-11-02 V5 本机验证结果：
+2026-11-02 V5 本机验证结果（历史基线，保留）：
 
 | 验证 | 结果 |
 | --- | --- |
@@ -86,7 +104,39 @@ python scripts/verification_catalog.py
 
 证据：[V4 持续压测](artifacts/load-V4-1793608514.json)、[V4 突发压测](artifacts/load-V4-1793608594.json)。
 
-**验证边界**：测试运行在单台 Windows 主机，压测器、网关、后端、MySQL、Redis、Kafka 共享 CPU 与磁盘；这不是生产容量承诺。突发场景 P95 1899.70 ms，未达到 500 ms 目标，与 V3 基线一致；持续场景达到 1000 QPS、P95 < 500 ms、错误率 < 1% 的目标。未执行 V4 崩溃/断点故障注入，也未验证多机水平扩容、真实支付和 Compose Redis7 方案。V5 不新增活动协议，活动创建仍使用 V0–V4。
+### 2026-11-07 收尾验证（本地）
+
+| 范围 | 结果 |
+| --- | --- |
+| backend 单元（不启用集成开关） | 37 项，执行 6、跳过 31，BUILD SUCCESS |
+| backend Redis 集成 | `RedisReliabilityTest` 8 + `StreamBridgeFaultIsolationTest` 11 = 19/19 通过 |
+| 慢用例 | 跨 12 秒发送超时保容量 1/1 通过，约 14.15 秒；用 `@Tag("slow")` 隔离，常规测试集默认排除 |
+| gateway | `GatewayPolicyTest` 3 + `PurchaseLimitFilterTest` 2 = 5/5 通过（含真实 Lettuce Redis 下的 Lua 限流与 Redis 故障 503） |
+| Python 脚本 | `python -m unittest discover -s scripts/tests` 共 45 项全部通过 |
+| frontend | `npm test` 88/88；`npm run build` 通过（`vue-tsc` + Vite） |
+| backend `mvn verify` | 跳过 repackage 时 BUILD SUCCESS；本机 plain `verify` 因主栈 backend 正锁定 `peakrush-backend-1.0.0.jar` 无法重命名 `.original`，属文件锁而非代码失败 |
+
+**只能由 CI 覆盖**：依赖真实 Kafka + MySQL 的 `StreamBridgeIntegrationTest`（V4 端到端）、三个 service 容器的启动与健康检查、slow 标签步骤。本地已用隔离 Redis 覆盖其余 bridge 与限流路径。
+
+### 2026-11-07 多进程突发复验（新口径）
+
+口径先说明：旧基线是单进程 aiohttp、全部请求同源 127.0.0.1、无连接预热，2000 个 barrier 任务在同一事件循环内创建，P95 含 429。新口径用 4–8 个独立压测进程绑定不同源 IP，按同一 epoch 绝对时刻触发 barrier；barrier 前用 `GET /api/seckill/activities/{id}` 预热 keep-alive 连接，barrier 时刻只发 POST。`admitted` 只统计 HTTP 200（含业务 PENDING/SOLD_OUT），`all` 含 429/500，客户端调度延迟单列。
+
+| 场景 | 请求 | 200 准入 | 429 | 500 | QPS | admitted P95 | all P95 | 错误率 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 稳态 1000 RPS×30s | 30000 | 16400 | 0 | 0 | 999.43 | 23.79ms | 23.30ms | 0% |
+| 稳态 1100 RPS×30s | 33000 | 19042 | 0 | 0 | 1099.49 | 25.03ms | 24.85ms | 0% |
+| 突发 2000 / 8 IP 第 1 轮（冷 JVM） | 2000 | 1500 | 500 | 0 | 3007.52 | 490.14ms | 549.12ms | 0% |
+| 突发 2000 / 8 IP 第 2 轮 | 2000 | 1500 | 500 | 0 | 4672.90 | 304.63ms | 303.85ms | 0% |
+| 突发 2000 / 8 IP 第 3 轮 | 2000 | 1448 | 500 | 52 | 4608.29 | 344.39ms | 340.79ms | 2.6% |
+| 突发 2000 / 直连后端（无网关） | 2000 | 2000 | — | 0 | 5899.71 | 261.26ms | 261.26ms | 0% |
+| 突发 2000 / 关闭网关限流 | 2000 | 1891 | — | 109 | 2159.83 | 802.82ms | 801.31ms | 5.45% |
+
+每轮均在收敛后取值：`pendingReservations=0`、`v4StreamEvents/v4StreamPending=0`、`outboxPending=0`、Kafka lag 0；库存 1000 = 可用 0 + 订单占用 1000，订单恰好 1000 条 SUCCESS 且 `request_id` 无重复。稳态表中的 409 是“重复购买”业务拒绝，不计入订单。
+
+按 RUNBOOK 6.1 的结论表述：**业务准入 P95 为 490.14 / 304.63 / 344.39ms（3 轮），三次都低于 500ms，但贴边且不稳定；冷 JVM 下含 429 的全量口径 P95 为 549.12ms 超阈值，第 3 轮错误率 2.6% 也超过 1%。因此不能笼统写“已达标”，旧的单进程 `p95Below500ms=false` 结论保留。** 瓶颈在网关限流整形（单 IP 1200/s、全局 1500/s）与压测端调度/连接建立：直连后端 2000 并发全部准入、P95 257.82–261.26ms，关闭限流反而升到 716–803ms。详见 [RUNBOOK](RUNBOOK.md) 6.1 与 `G:\高并发大作业项目\临时数据文件目录\PeakRush-20261107\mp\` 下的原始报告。
+
+**验证边界**：测试运行在单台 Windows 主机，压测器、网关、后端、MySQL、Redis、Kafka 共享 CPU 与磁盘；这不是生产容量承诺。旧口径突发场景 P95 1899.70 ms，未达到 500 ms 目标，与 V3 基线一致；持续场景达到 1000 QPS、P95 < 500 ms、错误率 < 1% 的目标。2026-11-07 已在隔离栈完成 Kafka 停机、Redis 中断、消费者崩溃、DB 提交断点四类演练（见 [RUNBOOK](RUNBOOK.md)），但未在主栈执行破坏性注入；也未验证多机水平扩容、真实支付和 Compose Redis7 方案。V5 不新增活动协议，活动创建仍使用 V0–V4。
 
 ## 复现
 
@@ -99,9 +149,40 @@ python scripts/verification_gateway.py
 python scripts/verification_invariants.py
 python scripts/verification_load.py --versions V4 --users 2000 --rps 1100 --seconds 30 --stock 1000
 python scripts/verification_load.py --versions V4 --users 2000 --burst --stock 1000
+# 对已有报告单独跑验收门禁；全部 targets.passed=true 才 exit 0
+python scripts/gate_report.py artifacts/load-V4-*.json
 ```
 
+`verification_load.py` 默认就是验收门禁：QPS、P95、错误率、收敛、订单终态、数据库库存守恒和 Redis 投影任一不达标都会 exit 1。只写报告、不因未达标中断的探索性运行加 `--report-only`。脚本默认访问 `http://127.0.0.1:8080`，收尾验收栈用 `--base http://127.0.0.1:18080`。
+
 脚本使用独立测试用户和新活动，保留原有业务数据；压测结束后只下线本次创建的活动，不重置历史库存。
+
+## 运维与故障演练
+
+四类演练（Kafka 停机、Redis 中断、消费者崩溃、DB 提交断点）的注入方式、预期表现、观察命令、恢复判据和实测记录见 [故障演练 RUNBOOK](RUNBOOK.md)。演练使用隔离端口 18082/16380/19095 与 `peakrush_drill` 库，不触碰主栈。
+
+历史遗留的“已 ACK 但未 XDEL”条目用定向清理脚本处理。脚本只删除 `ID <= last-delivered-id` 且不在 PEL 的条目，未投递和仍在 PEL 的条目一律保留：
+
+```powershell
+# 停机窗口内执行：先停 backend，或把 faults.pauseBridge 置为 true
+python scripts/cleanup_stream_residue.py --host 127.0.0.1 --port 16379 --dry-run
+python scripts/cleanup_stream_residue.py --host 127.0.0.1 --port 16379 --apply
+```
+
+脚本可重复执行；`remaining=0` 表示该流已清理干净。整改后 bridge 已用 Lua 原子完成 XACK + XDEL，不再产生新的孤儿条目。
+
+## CI 门禁
+
+工作流 [ci.yml](.github/workflows/ci.yml) 在 `pull_request`、`push` 和手动触发时运行：
+
+| Job | 服务与步骤 |
+| --- | --- |
+| frontend | Node 22；`npm ci --ignore-scripts`、`npm test`、`npm run build` |
+| backend | MySQL 8.0.30（13306）、Redis 7.4.2（16379）、Kafka 4.3.0 KRaft（19092）；导入 `schema.sql`、等待 Kafka 端口、`mvn verify`；slow 标签用例单独执行 |
+| gateway | Redis 7.4.2（16379）；`mvn verify`（含真实 Lua 限流与 Redis 故障 503） |
+| catalog-scripts | Python 3.13；`pip install -r scripts/requirements.txt`、`unittest discover` |
+
+失败时也会上传证据：backend 的 Surefire XML、`backend/target/**/*.json`、MySQL/Redis/Kafka 容器日志和 `artifacts/**/*.json`；gateway 的 Surefire XML 与 Redis 日志。V4 端到端 `StreamBridgeIntegrationTest` 只在 CI 的真实 Kafka + MySQL 组合下执行。
 
 ## 文件索引
 
@@ -109,9 +190,11 @@ python scripts/verification_load.py --versions V4 --users 2000 --burst --stock 1
 - [接口约定](docs/API_CONTRACT.md)
 - [实现计划与验收映射](docs/IMPLEMENTATION_PLAN.md)
 - [V5 验收报告](docs/VALIDATION.md)
+- [故障演练 RUNBOOK](RUNBOOK.md)
 - [界面验收](design-qa.md)
 - [GitHub 项目选型](docs/GITHUB_SELECTION.md)
 - backend/、gateway/、frontend/：Java17 / Spring Boot3 / MySQL / Redis Lua / Kafka / Vue3 / Element Plus
+- scripts/：压测（`verification_load.py`）、门禁（`gate_report.py`）、Stream 残留清理（`cleanup_stream_residue.py`）与各层验证脚本
 - artifacts/：原始接口报告、分阶段压测数据、环境与界面截图
 
 ## 来源
