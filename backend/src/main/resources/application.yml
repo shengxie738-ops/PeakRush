@@ -60,3 +60,7 @@ peakrush:
   jwt-secret: ${JWT_SECRET:}
   order-ttl-seconds: ${ORDER_TTL_SECONDS:900}
   pending-timeout-seconds: ${PENDING_TIMEOUT_SECONDS:1800}
+  bridge:
+    # 必须大于 spring.kafka.producer.properties.delivery.timeout.ms（10000），
+    # 否则原实例仍在重试时条目会被其他实例 claim，导致重复发布。
+    claim-idle-seconds: ${BRIDGE_CLAIM_IDLE_SECONDS:12}

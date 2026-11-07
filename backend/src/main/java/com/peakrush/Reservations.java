@@ -10,10 +10,12 @@ public class Reservations {
  final StringRedisTemplate redis; final Json json;final StockHints hints;
  private final DefaultRedisScript<List> reserve;
  private final DefaultRedisScript<String> finalize;
+ private final DefaultRedisScript<Long> acknowledgeDelete;
  public Reservations(StringRedisTemplate redis,Json json,StockHints hints){
   this.redis=redis;this.json=json;this.hints=hints;
   reserve=new DefaultRedisScript<>();reserve.setLocation(new ClassPathResource("reserve.lua"));reserve.setResultType(List.class);
   finalize=new DefaultRedisScript<>();finalize.setLocation(new ClassPathResource("finalize.lua"));finalize.setResultType(String.class);
+  acknowledgeDelete=new DefaultRedisScript<>();acknowledgeDelete.setLocation(new ClassPathResource("ack_delete.lua"));acknowledgeDelete.setResultType(Long.class);
  }
  public String prefix(long aid,long iid){return "pr:{"+aid+":"+iid+"}:";}
  public String prefix(String rid){String[] p=rid.split("\\.");if(p.length!=3||!p[0].matches("[0-9]+")||!p[1].matches("[0-9]+")||!p[2].matches("[a-f0-9]{32}"))throw new ApiException(404,"NOT_FOUND","请求不存在");return prefix(Long.parseLong(p[0]),Long.parseLong(p[1]));}
@@ -42,5 +44,17 @@ public class Reservations {
   if(List.of("FAILED","CANCELLED","CLOSED").contains(Json.string(task,"status")))hints.clear(rid);
  }
  public StreamOperations<String,String,String> streams(){return redis.<String,String>opsForStream();}
+ /**
+  * 原子确认并删除已经得到 Kafka 成功结果的 Stream 条目。
+  * XACK 后条目不会再被 ReadOffset.lastConsumed 读到，若不删除会永久占用 Stream 内存；
+  * 两条命令合并进脚本可避免客户端在中间中断后留下无法自动清理的孤儿条目。
+  */
+ public long acknowledgeAndDelete(String stream,List<String> ids){
+  if(ids==null||ids.isEmpty())return 0;
+  List<String> args=new ArrayList<>(ids.size()+1);args.add("bridge");args.addAll(ids);
+  Long result=redis.execute(acknowledgeDelete,List.of(stream),args.toArray());
+  if(result==null)throw new IllegalStateException("Redis returned no acknowledgement result");
+  return result;
+ }
  public void createGroup(String stream){try{streams().createGroup(stream,org.springframework.data.redis.connection.stream.ReadOffset.from("0-0"),"bridge");}catch(Exception e){if(!Objects.toString(e.getMessage(),"").contains("BUSYGROUP")&&!Objects.toString(e.getCause(),"").contains("BUSYGROUP"))throw e;}}
 }

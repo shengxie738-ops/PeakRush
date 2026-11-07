@@ -36,7 +36,9 @@ class StreamBridgeIntegrationTest {
    var purchases=new Purchases(db,fixture.orders,reservations,kafka,json,hints){
     @Override public CompletableFuture<org.springframework.kafka.support.SendResult<String,String>> enqueue(PurchaseEvent e){return kafka.send(topic,String.valueOf(e.itemId()),json.write(e));}
    };
-   var faults=new Faults(new MockEnvironment(),new KafkaListenerEndpointRegistry());var worker=new Workers(db,reservations,purchases,fixture.orders,faults,json,1800);var messaging=new Messaging(json,fixture.orders,db,faults);
+   var faults=new Faults(new MockEnvironment(),new KafkaListenerEndpointRegistry());
+   // 测试固定用 3 秒 claim 阈值配合 6.1 秒等待，避免依赖线上默认阈值而让用例变慢或抖动。
+   var worker=new Workers(db,reservations,purchases,fixture.orders,faults,json,1800,3);var messaging=new Messaging(json,fixture.orders,db,faults);
    PurchaseEvent first=event(fixture,1),second=event(fixture,2);reservations.reserve(first);reservations.createGroup(stream);
    var abandoned=reservations.streams().read(org.springframework.data.redis.connection.stream.Consumer.from("bridge","crashed-process"),StreamReadOptions.empty().count(1),StreamOffset.create(stream,ReadOffset.lastConsumed()));
    assertNotNull(abandoned);assertEquals(1,abandoned.size());
