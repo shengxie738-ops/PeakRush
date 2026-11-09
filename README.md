@@ -21,12 +21,15 @@ V5 是 2026-11-02 的交付版本：在 V4 的 Redis Stream 异步落单与实�
 | 领域 | 现状与边界 |
 | --- | --- |
 | bridge 故障隔离 | 按活动、按记录分别隔离：单条坏记录、同步 producer 异常、单个 Stream 读写异常都不会让其他活动整轮跳过；未确认条目保留在 PEL 中等待恢复 |
-| 发送并发上限 | 每个 Workers 实例用 Semaphore 限制为 32 个未完成发送；单轮读取上限 256 条，但不会一次性全部提交。等待 12 秒超时后不归还名额，只有 Kafka 发送真正完成才释放，避免超时后继续追加发送 |
+| 发送并发上限 | 每个 Workers 实例用 Semaphore 限制为 32 个未完成发送；claim 与 XREADGROUP 都以当前可用名额为上限，名额为 0 时既不 claim 也不读取。单轮软预算 256 条 / 5 秒（按批检查，单批可能超出），同时 inFlight 跟踪达到 64 条时本轮暂停 claim/read 形成背压；失败记录不阻塞同轮新消息读取。等待 12 秒超时后不归还名额，只有 Kafka 发送真正完成才释放；成功结果按 32 条分批进入 Lua 确认，超时后完成的 Future 只补确认、不重发 |
+| 接管保护 | 未完成发送按 `(stream, recordId)` 跟踪，在每轮开始、每条 `enqueue` 前后以及 `awaitSends` 分段等待期间按 1 秒间隔续租；续租前逐条 `XPENDING` 精确校验条目仍归本消费者所有，已被接管的条目不再抢回。`claim-idle-seconds` 默认 20 秒只用于覆盖“单次同步阻塞 3 秒 + 确认”，不覆盖整批等待；Kafka ACK 后的故障暂停被钳制在 `claim-idle-seconds - 12s`（默认 8 秒）以内。`pauseBridge` 暂停交付时仍保留续租，暂停不等于安全 drain |
+| 至少一次窗口 | 进程停顿（如长 GC）超过 `claim-idle-seconds`，或 Redis 确认持续失败导致条目被其他实例接管时，同一 `requestId` 可能被重复投递；业务侧以稳定 `requestId` 幂等约束订单与库存唯一性 |
 | ACK/DEL 原子化 | `ack_delete.lua` 先对 `0-0` 执行空操作 `XDEL` 预校验命令/键/类型，再在同一脚本内 `XACK` + `XDEL`；XACK 或 XDEL 失败时条目仍留在 PEL，可再次恢复 |
-| claim 阈值 | `peakrush.bridge.claim-idle-seconds` 默认 12 秒，必须大于 Kafka `delivery.timeout.ms`（10000），否则原实例仍在重试时条目会被其他实例 claim，造成重复发布 |
+| claim 阈值 | `peakrush.bridge.claim-idle-seconds` 默认 20 秒，用于覆盖逐条同步发送最长阻塞（`max.block.ms=3000`）与 Redis 确认，而不是覆盖整批 12 秒等待（等待期间已分段续租）。故障暂停必须小于 `claim-idle-seconds - 12s`，否则条目会在确认前被接管；仅大于 `delivery.timeout.ms`（10000）不足以避免存活实例被提前接管 |
+| 接管演练判据 | 实例可用 `BRIDGE_INSTANCE_NAME` 设置稳定名（consumer 为 `bridge-<name>`，未设置为随机 UUID）。接管时输出 `Stream ... claimed ... consumer=bridge-<name> firstId=...`；演练只认该 consumer 名与演练前记录的“另一实例”稳定名一致，同名重启不算接管 |
 | XPENDING 轮转 | 单次只取 256 条 PEL，并按每个流的游标轮转扫描，避免第 256 条之后的陈旧条目永远得不到处理 |
 | 指标缺失 | `Admin.metrics` 在 Redis 读取失败时把 `pendingReservations` 置为 `null`，不再默认 0；收敛校验把 `null` 判为“未知/未收敛”，不允许误报收敛 |
-| 压测门禁 | `verification_load.py` 默认启用 `--require-targets`，未达标即 exit 1；targets 覆盖 QPS、P95、错误率、收敛、数据库库存守恒、Redis 投影一致和订单终态 `ordersTerminal`；`gate_report.py` 可对已有报告单独执行门禁 |
+| 压测门禁 | `verification_load.py` 默认启用 `--require-targets`，未达标即 exit 1；targets 覆盖 QPS、P95、错误率、收敛、数据库库存守恒、Redis 投影一致和订单终态 `ordersTerminal`；`gate_report.py` 只对当前脚本新生成、带 `targets` 的报告生效，`artifacts/` 下 V4 历史报告不参与门禁 |
 | 网关降级 | Redis 不可用时购买入口快速返回 503 `ADMISSION_UNAVAILABLE`，不把下游请求误判为成功；Lua 限流与 503 路径均有测试覆盖 |
 | CI 与演练 | CI 增加 Redis/Kafka 服务、慢用例独立步骤和失败也上传的证据；四类故障演练写入 [RUNBOOK.md](RUNBOOK.md) |
 
@@ -62,9 +65,11 @@ python scripts/verification_catalog.py
 
 ```powershell
 . .\依赖环境\env.ps1                     # 仅当前会话；JDK17、Maven、Redis、Kafka 均在 G 盘
-.\依赖环境\start-runtime.ps1             # Redis 16379 + Kafka 19092
+.\scripts\runtime-start.ps1              # MySQL 13306 + Redis 16379 + Kafka 19092
 .\scripts\app-start.ps1 -SkipInfra       # backend 8081 + gateway 8080 + frontend 5400
 ```
+
+> `依赖环境/` 是本开发机的私有包装目录（JDK/Maven/Redis/Kafka 二进制与 `env.ps1`），**未纳入仓库且无法从仓库获取**。fresh clone 请跳过上面第 1 步，直接设置 `PEAKRUSH_JAVA_HOME`、`PEAKRUSH_MYSQL_BIN`、`PEAKRUSH_REDIS_BIN`、`PEAKRUSH_KAFKA_HOME` 等变量（变量名见 `scripts/runtime-start.ps1` 顶部），或改用本机已运行的服务并通过 `DB_URL` / `REDIS_HOST` / `KAFKA_BOOTSTRAP_SERVERS` 覆盖。`scripts/runtime-start.ps1`、`scripts/app-start.ps1`、`scripts/app-stop.ps1` 本身都在仓库内，不依赖 `依赖环境/`。
 
 首次启动或修改代码后去掉 `-SkipBuild`（会执行 Maven、`npm ci` 与前端构建）。打开 [本地页面](http://127.0.0.1:5400/)；业务页为 http://127.0.0.1:5400/app/。
 
@@ -85,7 +90,7 @@ python scripts/verification_catalog.py
 .\依赖环境\stop-all.ps1
 ```
 
-所有服务面向本机开发，绑定回环地址。默认应用端口为 5400 / 8080 / 8081；依赖端口为 MySQL 3306（复用本机 MySQL81 服务）、Redis 16379、Kafka 19092/19093。数据和日志位于 `.runtime/`；不使用系统 MySQL 3306 实例以外的数据，也不复用既有 Kafka 数据目录。更完整的本机口径见 [启动指导](docs/STARTUP_GUIDE.md)。
+所有服务面向本机开发，绑定回环地址。默认应用端口为 5400 / 8080 / 8081；依赖端口为 MySQL **13306**、Redis 16379、Kafka 19092/19093（由 `scripts/runtime-start.ps1` 启动，应用默认 `DB_URL` 即指向 127.0.0.1:13306）。本机系统 MySQL 8.1 仍占用 3306，只有显式覆盖 `DB_URL` 时应用才会连 3306，默认口径不依赖它。数据和日志位于 `.runtime/`；不复用既有 Kafka 数据目录。端口口径以本节为准；[启动指导](docs/STARTUP_GUIDE.md) 里 MySQL 3306 / `依赖环境/start-runtime.ps1` 的描述是早期本机口径，属历史说明。
 
 ## 验证与实测
 
@@ -104,6 +109,8 @@ python scripts/verification_catalog.py
 
 证据：[V4 持续压测](artifacts/load-V4-1793608514.json)、[V4 突发压测](artifacts/load-V4-1793608594.json)。
 
+> 这两份是 V4 历史基线报告，只用于对照，**不参与验收门禁**：它们没有当前脚本的 `targets` 字段，`gate_report.py` 对它们实跑会 exit 1（持续报告缺 `targets.passed`，突发报告 qps/p95 不达标）。门禁只对 `verification_load.py` 新生成、带完整 `targets` 的报告生效。
+
 ### 2026-11-07 收尾验证（本地）
 
 | 范围 | 结果 |
@@ -117,6 +124,16 @@ python scripts/verification_catalog.py
 | backend `mvn verify` | 跳过 repackage 时 BUILD SUCCESS；本机 plain `verify` 因主栈 backend 正锁定 `peakrush-backend-1.0.0.jar` 无法重命名 `.original`，属文件锁而非代码失败 |
 
 **只能由 CI 覆盖**：依赖真实 Kafka + MySQL 的 `StreamBridgeIntegrationTest`（V4 端到端）、三个 service 容器的启动与健康检查、slow 标签步骤。本地已用隔离 Redis 覆盖其余 bridge 与限流路径。
+
+### 2026-11-09 PR3 增量修复验证（本地隔离依赖）
+
+| 范围 | 结果 |
+| --- | --- |
+| `StreamBridgeFaultIsolationTest` 常规 | 15/15 通过（含容量为 0 不 claim、坏记录不阻塞同轮新读、已被接管的条目不续租抢回、ACK 后暂停超上限被拒绝） |
+| `StreamBridgeFaultIsolationTest` slow | 2/2 通过，28.38 秒（含超时后成功 Future 只补确认不重发、默认 20 秒下 B 不接管） |
+| backend 全量（跳过 slow） | 41 项全部通过，0 失败、0 跳过（启用 Kafka/MySQL/迁移/Redis 开关） |
+| 真实 Kafka 4.3.0 + MySQL 8.1（本机 3306）+ Redis 7.4.2 | `StreamBridgeIntegrationTest` 1/1、`CatalogLegacyMigrationTest` 2/2 通过 |
+| Python 脚本（真实 Redis 7.4.2） | 51/51 通过，0 跳过 |
 
 ### 2026-11-07 多进程突发复验（新口径）
 
@@ -149,8 +166,12 @@ python scripts/verification_gateway.py
 python scripts/verification_invariants.py
 python scripts/verification_load.py --versions V4 --users 2000 --rps 1100 --seconds 30 --stock 1000
 python scripts/verification_load.py --versions V4 --users 2000 --burst --stock 1000
-# 对已有报告单独跑验收门禁；全部 targets.passed=true 才 exit 0
-python scripts/gate_report.py artifacts/load-V4-*.json
+# 对本次新生成的报告单独跑验收门禁；全部 targets.passed=true 才 exit 0
+# PowerShell 不展开 glob：显式列文件名，或用 Get-ChildItem 取最新两份
+$reports = Get-ChildItem artifacts\load-V4-*.json | Sort-Object LastWriteTime |
+  Select-Object -Last 2 | ForEach-Object { $_.FullName }
+python scripts/gate_report.py @reports
+# 等价显式写法：python scripts/gate_report.py artifacts\load-<新报告>.json
 ```
 
 `verification_load.py` 默认就是验收门禁：QPS、P95、错误率、收敛、订单终态、数据库库存守恒和 Redis 投影任一不达标都会 exit 1。只写报告、不因未达标中断的探索性运行加 `--report-only`。脚本默认访问 `http://127.0.0.1:8080`，收尾验收栈用 `--base http://127.0.0.1:18080`。

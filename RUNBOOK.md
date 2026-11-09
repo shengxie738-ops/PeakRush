@@ -1,7 +1,7 @@
 # PeakRush 故障演练 RUNBOOK
 
 本文档用于复现和验收四条可靠性链路：Kafka 停机、Redis 中断、消费者进程崩溃、DB 提交断点。
-演练必须使用隔离实例，不得直接操作主栈（18080/18081/16379）或生产库。
+除第 5.1 节的双实例接管演练外，演练应使用隔离实例，不得直接操作主栈（18080/18081/16379）。5.1 需要两个实例共享同一 Redis/Kafka，是受控例外。
 
 ## 1. 环境与隔离
 
@@ -12,8 +12,12 @@
 | Redis | 16380 | 独立实例，开启 AOF |
 | Kafka | 19095 | 独立单节点 broker（controller 19096） |
 
+> 上表是历史演练口径。当前仓库脚本只支持 MySQL 13306 / Redis 16379 / Kafka 19092（`scripts/runtime-start.ps1` 固定端口），16380/19095 需要复制脚本改端口与 RuntimeRoot，**未实测**。第 5.1 节因此改用共享依赖栈 + 18081/18082，并在该节明确标注。
+
 观察口径统一使用 `requestId`：HTTP 响应、`seckill_request`、`seckill_order`、Kafka 消息和 Redis Stream 必须能按同一个 `requestId` 对上。
 禁止用“HTTP 200”单独判定成功；必须同时满足订单唯一、库存守恒、PEL/outbox 归零。
+
+**验收前提（多实例 PEL 接管）**：多实例部署时默认 `claim-idle-seconds=20s`；某实例的 PEL 只有在其它实例的 claim 空闲阈值到点后才会被接管。容量为 0 时不会 claim（避免无容量实例空转抢占）。`pauseBridge` 只暂停交付，已有 inFlight 仍会续租，**不能把 pause 当成安全 drain**。因此演练判据中的“PEL 归零”允许最长约 20s 的接管延迟，超出该窗口仍不收敛才算失败。进程停顿超过阈值或确认长期失败时按至少一次交付验收，以 `requestId` 幂等为准。
 
 ## 2. Kafka 停机
 
@@ -158,6 +162,76 @@ mysql -uroot -p peakrush_drill -e "SELECT COUNT(*) FROM recovery_outbox WHERE st
 
 - `requestId=22.22.895e5949875c01626d80c3a8cd53988d`。
 - 订单在崩溃前已持久化；重投未重复下单/扣库存；故障开关复位。四项检查全部通过。
+
+### 5.1 Kafka ACK 后、Redis XACK+XDEL 前的崩溃窗口
+
+第 5 节复现的是“DB 已提交、Kafka 未 ACK”；本小节复现另一半：**broker 已 ACK、Redis 仍 pending**。此时 `kill -9` 会让
+条目留在 PEL 而 Kafka 不会重投，只能依赖其它实例 claim 接管。
+
+**前提与端口**
+
+- 至少需要**两个独立后端进程**，且必须连接**同一个 Redis 和同一个 Kafka**（共享 PEL 与订阅关系，否则接管无从发生）；MySQL 可共用同一个库。
+- `scripts/runtime-start.ps1` / `依赖环境/start-runtime.ps1` 固定 Redis 16379、Kafka 19092、MySQL 13306；`scripts/app-start.ps1` 一次只管理一套 backend/gateway/frontend。因此第二实例必须直接 `java -jar` 启动，不能再走 app-start。
+- 隔离端口版（16380/19095）当前脚本不支持，需要复制 runtime 脚本并修改端口与 RuntimeRoot；本文不提供未经验证的命令。以下步骤使用共享依赖栈 + 18081/18082，**本机未实测**（只验证了代码与自动化测试），执行时以日志为准。
+- `依赖环境\env.ps1` 不在仓库内（fresh clone 没有）：没有该目录时跳过这一行，按 README「当前机器启动」的说明设置 `PEAKRUSH_JAVA_HOME` / `PEAKRUSH_REDIS_BIN` / `PEAKRUSH_KAFKA_HOME` 等变量，或改用本机已运行且端口一致的依赖服务。
+- 第二实例使用已构建的后端 jar：若 `backend\target\peakrush-backend-1.0.0.jar` 不存在，先执行 `mvn --batch-mode -f backend\pom.xml package -DskipTests`。
+
+**注入**
+
+1. 准备两个**独立终端**（不能在同一 shell 连续设置，`$env` 会互相覆盖）。
+
+   终端 A（主实例，18081，稳定名 a）：
+   ```powershell
+   . .\依赖环境\env.ps1
+   $env:BRIDGE_INSTANCE_NAME='a'
+   .\scripts\app-start.ps1 -BackendPort 18081 -GatewayPort 18080 -Lab -SkipInfra
+   ```
+
+   终端 B（第二实例，18082，稳定名 b，只起后端）：
+   ```powershell
+   . .\依赖环境\env.ps1
+   $env:BRIDGE_INSTANCE_NAME='b'
+   java -jar backend\target\peakrush-backend-1.0.0.jar `
+     --spring.profiles.active=local,lab --server.port=18082
+   ```
+
+   分别确认启动日志出现 `Stream bridge started consumer=bridge-a ...` 与 `consumer=bridge-b ...`，演练前记录这两个名字。未设置 `BRIDGE_INSTANCE_NAME` 时会打 WARN，`bridge-<uuid>` 不能作为演练判据。
+2. 确认两个实例的 `/api/health` 都是 UP。
+3. 向实例 A 打开故障钩子。`GET /api/admin/faults` 返回 `maxAckPauseMs`（= `claim-idle-seconds*1000-12000`，默认 8000）；超过上限直接返回 400：
+   ```powershell
+   Invoke-RestMethod -Method Post -Uri http://127.0.0.1:18081/api/admin/faults `
+     -ContentType 'application/json' -Body '{"afterKafkaAckPauseMs":8000}'
+   ```
+4. 提交 1 次 V4 购买请求，记录 `requestId`。
+5. 在实例 A 日志出现 `FAULT_AFTER_KAFKA_ACK ... pauseMs=8000` 后、**暂停结束前**强制终止 A（等价 `kill -9`）：
+   ```powershell
+   $pidA = (Get-NetTCPConnection -LocalPort 18081 -State Listen).OwningProcess
+   Stop-Process -Id $pidA -Force
+   ```
+6. **保持 A 停止，不要重启**。`afterKafkaAckPauseMs` 是纯内存态，A 重启后天然为 0；提前重启只会让“接管是否由 B 完成”不可判定。
+7. 在终端 B 等待 `claim-idle-seconds`（默认 20s）后的接管，或轮询 PEL：
+   ```powershell
+   redis-cli -p 16379 XPENDING pr:<activity>:<item>:events bridge
+   ```
+   PEL 归零即完成接管。
+8. 演练结束后再启动 A（保持 `BRIDGE_INSTANCE_NAME=a`），确认 A 不会重复处理 B 已接管的条目。
+
+钩子语义：暂停插在 **Kafka 发送成功之后、Redis Lua 的 `XACK`+`XDEL` 之前**，日志前缀 `FAULT_AFTER_KAFKA_ACK`，
+因此窗口内崩溃会同时满足“broker 认为已投递”和“Redis 认为仍在 PEL”。
+
+**预期表现**
+
+- 崩溃后 Kafka 不再重投该消息（offset 已确认）。
+- 该 `requestId` 对应条目留在该实例 PEL 中，直到其它实例 claim。
+- 订单/库存崩溃前已持久化，不会二次扣减。
+
+**恢复判据**
+
+- 同一 `requestId` 可观测到重投（日志/`seckill_request` 可见重复处理），但 `seckill_order` 与 SQL 库存分配各只有一次。
+- 实例 B 日志出现 `Stream <key> claimed <n> stale entries consumer=bridge-b firstId=<id>`，且该行时间戳晚于实例 A 的 `FAULT_AFTER_KAFKA_ACK` 行。A 被 kill 后不再续租，B 在 `claim-idle-seconds`（默认 20s）后才接管，因此“晚于暂停”是正常且必需的现象。
+- **判据只认 consumer 名**：B 的 claim 日志里 consumer 必须等于演练前记录的实例 B 稳定名（如 `bridge-b`）；若是 `bridge-a`，说明是实例 A 重启后自处理，不能判定演练通过。没有 `claimed` info 日志时同样判为不通过。
+- 接管后 `XPENDING` 归零、`XLEN` 归零。
+- 库存守恒式成立，`recovery_outbox` 无 `PENDING`。
 
 ## 6. 突发 P95 的已知瓶颈
 
