@@ -43,10 +43,10 @@ class StreamBridgeFaultIsolationTest {
  private PurchaseEvent event(long aid,int n){return new PurchaseEvent(aid+".1."+String.format("%032x",n),n,aid,iid,1,"hash-"+n,"gen",4,System.currentTimeMillis(),true);}
  private RecordId append(long aid,PurchaseEvent e){return reservations.streams().add(stream(aid),Map.of("payload",json.write(e)));}
  private Map<String,Object> item(long aid){return Json.map("activity_id",aid,"id",iid,"architecture_version",4);}
- private Workers worker(List<Map<String,Object>> items,Purchases purchases){return worker(items,purchases,12);}
+ private Workers worker(List<Map<String,Object>> items,Purchases purchases){return worker(items,purchases,20);}
  private Workers worker(List<Map<String,Object>> items,Purchases purchases,long claimIdleSeconds){
   Store store=mock(Store.class);when(store.allItems()).thenReturn(items);
-  return new Workers(store,reservations,purchases,mock(Orders.class),faults,json,1800,claimIdleSeconds);
+  return new Workers(store,reservations,purchases,mock(Orders.class),faults,json,1800,claimIdleSeconds,"");
  }
  private static void waitFor(java.util.function.BooleanSupplier condition,long millis){
   long deadline=System.nanoTime()+TimeUnit.MILLISECONDS.toNanos(millis);
@@ -113,7 +113,7 @@ class StreamBridgeFaultIsolationTest {
   assertEquals(32,reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),100).size(),"未确认的失败发送必须留在 PEL 中");
  }
  @Test void entryYoungerThanClaimThresholdIsNotStealed()throws Exception{
-  // 阈值 12 秒 > delivery.timeout.ms(10000)：刚失败 6.1 秒的条目仍可能被原实例重试，不能被 claim。
+  // 默认阈值 20 秒：刚失败 6.1 秒的条目不能被 claim。
   append(aidA,event(aidA,1));
   reservations.createGroup(stream(aidA));
   reservations.streams().read(Consumer.from("bridge","crashed"),StreamReadOptions.empty().count(10),StreamOffset.create(stream(aidA),ReadOffset.lastConsumed()));
@@ -122,6 +122,40 @@ class StreamBridgeFaultIsolationTest {
   worker(List.of(item(aidA)),purchases).bridge();
   verify(purchases,never()).enqueue(any());
   assertEquals(1,reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).size());
+ }
+ @Test void renewalDoesNotStealEntryTakenOverByAnotherConsumer()throws Exception{
+  // 归属校验必须逐条精确：条目已被另一实例合法接管时，原实例即使仍有未完成 Future 也不能 XCLAIM 抢回。
+  RecordId id=append(aidA,event(aidA,1));
+  // 先建组，避免轮询 XPENDING 时消费组尚未创建（NOGROUP）导致断言线程异常。
+  reservations.createGroup(stream(aidA));
+  var send=new CompletableFuture<SendResult<String,String>>();
+  Purchases purchases=mock(Purchases.class);
+  when(purchases.enqueue(any())).thenReturn(send);
+  var worker=worker(List.of(item(aidA)),purchases);
+  ExecutorService executor=Executors.newSingleThreadExecutor();
+  try{
+   var running=executor.submit(()->worker.bridge());
+   waitFor(()->!reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).isEmpty(),5000);
+   var before=reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10);
+   assertEquals(1,before.size(),"条目应已进入本实例的 PEL");
+   // 模拟另一实例接管。
+   reservations.streams().claim(stream(aidA),"bridge","bridge-other",Duration.ZERO,id);
+   Thread.sleep(2500);
+   var after=reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10);
+   assertEquals("bridge-other",after.get(0).getConsumerName(),"已被接管的条目不能被原实例续租抢回");
+   send.complete(null);
+   running.get(20,TimeUnit.SECONDS);
+  }finally{executor.shutdownNow();}
+ }
+ @Test void ackPauseHookRejectsValuesBeyondRenewalWindow(){
+  // 暂停上限 = claim-idle-seconds - 12s，默认 8000ms；超过必须拒绝，不能静默接受后让条目被接管。
+  var lab=new MockEnvironment();lab.setActiveProfiles("lab");
+  var hooks=new Faults(lab,new KafkaListenerEndpointRegistry());
+  assertEquals(8000L,hooks.maxAckPauseMs);
+  assertThrows(ApiException.class,()->hooks.set(Map.of("afterKafkaAckPauseMs",9000)));
+  assertEquals(0L,hooks.afterKafkaAckPauseMs.get(),"被拒绝的请求不能修改当前值");
+  assertEquals(8000L,Json.number(hooks.set(Map.of("afterKafkaAckPauseMs",8000)).get("afterKafkaAckPauseMs")));
+  assertEquals(0L,Json.number(hooks.set(Map.of("afterKafkaAckPauseMs",0)).get("afterKafkaAckPauseMs")));
  }
  @Test void staleEntriesBeyondFirstPendingPageAreEventuallyClaimed(){
   // 首屏 256 条被 claim 后空闲时间被重置；若每轮都从头读 PEL，第 257 条之后会永久饿死。
@@ -136,8 +170,9 @@ class StreamBridgeFaultIsolationTest {
    var future=new CompletableFuture<SendResult<String,String>>();future.completeExceptionally(new IllegalStateException("broker down"));return future;
   });
   var worker=worker(List.of(item(aidA)),purchases,0);
-  worker.bridge();worker.bridge();
-  assertTrue(attempted.contains(event(aidA,257).requestId()),"第二轮必须从游标处继续扫描到第 257 条之后，而不是重复扫描首屏");
+  // 每轮 PEL 恢复最多 4 批（128 条），剩余预算留给同流新消息；300 条积压需要 3 轮覆盖到 257。
+  worker.bridge();worker.bridge();worker.bridge();
+  assertTrue(attempted.contains(event(aidA,257).requestId()),"后续轮次必须从游标处继续扫描到第 257 条之后，而不是重复扫描首屏");
  }
  @Test void acknowledgeAndDeleteRemovesPendingAndEntriesAtomically(){
   String stream=stream(aidA);reservations.createGroup(stream);
@@ -176,7 +211,7 @@ class StreamBridgeFaultIsolationTest {
   var failing=spy(reservations);
   doThrow(new IllegalStateException("XDEL denied")).when(failing).acknowledgeAndDelete(anyString(),anyList());
   Store store=mock(Store.class);when(store.allItems()).thenReturn(List.of(item(aidA),item(aidB)));
-  assertDoesNotThrow(()->new Workers(store,failing,purchases,mock(Orders.class),faults,json,1800,12).bridge());
+  assertDoesNotThrow(()->new Workers(store,failing,purchases,mock(Orders.class),faults,json,1800,20,"").bridge());
   assertEquals(1,reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).size(),"XACK/XDEL 失败必须保留 PEL");
   assertEquals(1,reservations.streams().pending(stream(aidB),"bridge",Range.unbounded(),10).size(),"一个活动的确认失败不能阻止另一个活动");
   assertEquals(2L,reservations.streams().size(stream(aidA))+reservations.streams().size(stream(aidB)));
@@ -201,6 +236,76 @@ class StreamBridgeFaultIsolationTest {
   verify(purchases,times(1)).enqueue(any());
   assertEquals(0,reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).size(),"新实例必须接管并确认崩溃消费者的 PEL");
   assertEquals(0L,reservations.streams().size(stream(aidA)));
+ }
+ @Test void noSendCapacityDoesNotClaimOrResetPendingDelivery()throws Exception{
+  // 没有发送名额时不得 claim/读取：否则会重置 PEL 空闲时间与投递次数，拖慢有容量实例的接管。
+  for(int n=1;n<=5;n++)append(aidA,event(aidA,n));
+  reservations.createGroup(stream(aidA));
+  reservations.streams().read(Consumer.from("bridge","crashed"),StreamReadOptions.empty().count(10),StreamOffset.create(stream(aidA),ReadOffset.lastConsumed()));
+  var delivered=reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10);
+  assertEquals(5,delivered.size());
+  for(var message:delivered)assertEquals(1L,message.getTotalDeliveryCount(),"准备阶段每条只能被投递一次");
+  Purchases purchases=mock(Purchases.class);
+  var worker=worker(List.of(item(aidA)),purchases,0);
+  var field=Workers.class.getDeclaredField("producerCapacity");field.setAccessible(true);
+  var capacity=(java.util.concurrent.Semaphore)field.get(worker);
+  capacity.acquireUninterruptibly(32);
+  try{worker.bridge();}finally{capacity.release(32);}
+  verify(purchases,never()).enqueue(any());
+  var pending=reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10);
+  assertEquals(5,pending.size(),"没有发送名额时 PEL 必须保持原样");
+  for(var message:pending)assertEquals(1L,message.getTotalDeliveryCount(),"缺名额时不得 claim 重置投递次数");
+ }
+ @Test void failedStaleRecordDoesNotBlockNewMessageInSameRound(){
+  // 恢复分支（陈旧坏记录）失败时，同轮仍必须给同流新消息一次机会。
+  RecordId firstId=append(aidA,event(aidA,1));
+  RecordId badId=reservations.streams().add(stream(aidA),Map.of("bad","no-payload-field"));
+  reservations.createGroup(stream(aidA));
+  reservations.streams().read(Consumer.from("bridge","crashed"),StreamReadOptions.empty().count(10),StreamOffset.create(stream(aidA),ReadOffset.lastConsumed()));
+  // 模拟健康记录已被上一轮确认清理，崩溃实例只留下这条无法解析的陈旧坏记录。
+  reservations.acknowledgeAndDelete(stream(aidA),List.of(firstId.getValue()));
+  assertEquals(badId.getValue(),reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).get(0).getId().getValue());
+  var good=event(aidA,2);append(aidA,good);
+  Purchases purchases=mock(Purchases.class);
+  when(purchases.enqueue(any())).thenReturn(CompletableFuture.completedFuture(null));
+  worker(List.of(item(aidA)),purchases,0).bridge();
+  var captor=org.mockito.ArgumentCaptor.forClass(PurchaseEvent.class);
+  verify(purchases,times(1)).enqueue(captor.capture());
+  assertEquals(good.requestId(),captor.getValue().requestId(),"陈旧坏记录失败后，同轮仍必须发送同流新消息");
+  var pending=reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10);
+  assertEquals(1,pending.size(),"只有无法解析的坏记录留在 PEL");
+  assertEquals(badId.getValue(),pending.get(0).getId().getValue());
+  assertEquals(1L,reservations.streams().size(stream(aidA)),"健康新消息必须已 XACK+XDEL");
+ }
+ @Test @Tag("slow") @EnabledIfEnvironmentVariable(named="PEAKRUSH_SLOW_TESTS",matches="true")
+ void successfulSendAfterWaitTimeoutIsAcknowledgedWithoutResending()throws Exception{
+  // 等待超时后完成的 Future 只补 XACK/XDEL，不得重发。
+  append(aidA,event(aidA,1));
+  var submitted=new AtomicInteger();
+  Queue<CompletableFuture<SendResult<String,String>>> outstanding=new ConcurrentLinkedQueue<>();
+  Purchases purchases=mock(Purchases.class);
+  when(purchases.enqueue(any())).thenAnswer(inv->{
+   var future=new CompletableFuture<SendResult<String,String>>();outstanding.add(future);submitted.incrementAndGet();return future;
+  });
+  var worker=worker(List.of(item(aidA)),purchases,0);
+  ExecutorService executor=Executors.newSingleThreadExecutor();
+  try{
+   var bridge=executor.submit(()->worker.bridge());
+   waitFor(()->submitted.get()>=1,5000);
+   bridge.get(30,TimeUnit.SECONDS);
+   assertEquals(1,submitted.get());
+   // 默认阈值 20 秒下，A 的发送仍挂起时 B 不得接管并重复发送。
+   Purchases otherPurchases=mock(Purchases.class);
+   worker(List.of(item(aidA)),otherPurchases).bridge();
+   verify(otherPurchases,never()).enqueue(any());
+   var future=outstanding.poll();
+   assertNotNull(future,"必须拿到不会自动完成的发送 Future");
+   future.complete(null);
+   worker.bridge();
+   verify(purchases,times(1)).enqueue(any());
+   assertEquals(0,reservations.streams().pending(stream(aidA),"bridge",Range.unbounded(),10).size(),"超时后完成的 Future 只补确认，不得重发");
+   assertEquals(0L,reservations.streams().size(stream(aidA)));
+  }finally{executor.shutdownNow();}
  }
  @Test @Tag("slow") @EnabledIfEnvironmentVariable(named="PEAKRUSH_SLOW_TESTS",matches="true")
  void capacityIsNotReleasedWhenSendWaitTimesOut()throws Exception{

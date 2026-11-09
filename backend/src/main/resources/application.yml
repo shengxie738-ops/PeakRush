@@ -61,6 +61,10 @@ peakrush:
   order-ttl-seconds: ${ORDER_TTL_SECONDS:900}
   pending-timeout-seconds: ${PENDING_TIMEOUT_SECONDS:1800}
   bridge:
-    # 必须大于 spring.kafka.producer.properties.delivery.timeout.ms（10000），
-    # 否则原实例仍在重试时条目会被其他实例 claim，导致重复发布。
-    claim-idle-seconds: ${BRIDGE_CLAIM_IDLE_SECONDS:12}
+    # 续租在每轮开始、每条 enqueue 前后以及 awaitSends 分段等待期间执行（默认 1 秒间隔），
+    # 单次 enqueue 最长同步阻塞 max.block.ms=3 秒。20 秒只覆盖“单条阻塞 + 确认”，
+    # 不覆盖整批等待：因此 Kafka ACK 后的故障暂停被钳制在 20-12=8 秒以内。
+    # 进程停顿超过该阈值时按至少一次交付，由稳定 requestId 约束下游幂等。
+    claim-idle-seconds: ${BRIDGE_CLAIM_IDLE_SECONDS:20}
+    # 实例稳定名（接管演练用）：同名重启仍是原实例，不同名才是另一实例。留空则使用随机 UUID。
+    instance-name: ${BRIDGE_INSTANCE_NAME:}
