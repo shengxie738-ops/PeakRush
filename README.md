@@ -64,12 +64,18 @@ python scripts/verification_catalog.py
 在 PowerShell 中进入项目根执行：
 
 ```powershell
-. .\依赖环境\env.ps1                     # 仅当前会话；JDK17、Maven、Redis、Kafka 均在 G 盘
-.\scripts\runtime-start.ps1              # MySQL 13306 + Redis 16379 + Kafka 19092
+. .\依赖环境\env.ps1                     # 仅当前会话；本机口径 DB_URL=127.0.0.1:3306/peakrush
+.\依赖环境\start-runtime.ps1             # 只起 Redis 16379 + Kafka 19092；MySQL 继续用系统 3306
 .\scripts\app-start.ps1 -SkipInfra       # backend 8081 + gateway 8080 + frontend 5400
 ```
 
-> `依赖环境/` 是本开发机的私有包装目录（JDK/Maven/Redis/Kafka 二进制与 `env.ps1`），**未纳入仓库且无法从仓库获取**。fresh clone 请跳过上面第 1 步，直接设置 `PEAKRUSH_JAVA_HOME`、`PEAKRUSH_MYSQL_BIN`、`PEAKRUSH_REDIS_BIN`、`PEAKRUSH_KAFKA_HOME` 等变量（变量名见 `scripts/runtime-start.ps1` 顶部），或改用本机已运行的服务并通过 `DB_URL` / `REDIS_HOST` / `KAFKA_BOOTSTRAP_SERVERS` 覆盖。`scripts/runtime-start.ps1`、`scripts/app-start.ps1`、`scripts/app-stop.ps1` 本身都在仓库内，不依赖 `依赖环境/`。
+> 上面第 2 步用的是私有包装脚本：`依赖环境\env.ps1` 把 `DB_URL` 指向系统 MySQL 3306/peakrush，并**故意不设置** `PEAKRUSH_MYSQL_BIN`，因此不能改跑仓库版 `scripts\runtime-start.ps1`（它在缺该变量时会立即报错，以免另建一套 MySQL 数据目录）。仓库版 `scripts\runtime-start.ps1` 会另起隔离 MySQL **13306**，前置条件是设置 `PEAKRUSH_MYSQL_BIN` 以及 `PEAKRUSH_DB_PASSWORD` / `PEAKRUSH_RUNTIME_PASSWORD` / `PEAKRUSH_ROOT_PASSWORD`（均 16 位以上）；要使用隔离库时，还需在启动前显式覆盖连接串：
+>
+> ```powershell
+> $env:DB_URL = 'jdbc:mysql://127.0.0.1:13306/peakrush?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false'
+> ```
+>
+> `依赖环境/` 是本开发机的私有包装目录（JDK/Maven/Redis/Kafka 二进制与 `env.ps1`），**未纳入仓库且无法从仓库获取**。fresh clone 请跳过上面的 `依赖环境\` 步骤，直接设置 `PEAKRUSH_JAVA_HOME`、`PEAKRUSH_MYSQL_BIN`、`PEAKRUSH_REDIS_BIN`、`PEAKRUSH_KAFKA_HOME` 等变量（变量名见 `scripts/runtime-start.ps1` 顶部），或改用本机已运行的服务并通过 `DB_URL` / `REDIS_HOST` / `KAFKA_BOOTSTRAP_SERVERS` 覆盖。`scripts/runtime-start.ps1`、`scripts/app-start.ps1`、`scripts/app-stop.ps1` 本身都在仓库内，不依赖 `依赖环境/`。
 
 首次启动或修改代码后去掉 `-SkipBuild`（会执行 Maven、`npm ci` 与前端构建）。打开 [本地页面](http://127.0.0.1:5400/)；业务页为 http://127.0.0.1:5400/app/。
 
@@ -90,7 +96,7 @@ python scripts/verification_catalog.py
 .\依赖环境\stop-all.ps1
 ```
 
-所有服务面向本机开发，绑定回环地址。默认应用端口为 5400 / 8080 / 8081；依赖端口为 MySQL **13306**、Redis 16379、Kafka 19092/19093（由 `scripts/runtime-start.ps1` 启动，应用默认 `DB_URL` 即指向 127.0.0.1:13306）。本机系统 MySQL 8.1 仍占用 3306，只有显式覆盖 `DB_URL` 时应用才会连 3306，默认口径不依赖它。数据和日志位于 `.runtime/`；不复用既有 Kafka 数据目录。端口口径以本节为准；[启动指导](docs/STARTUP_GUIDE.md) 里 MySQL 3306 / `依赖环境/start-runtime.ps1` 的描述是早期本机口径，属历史说明。
+所有服务面向本机开发，绑定回环地址。默认应用端口为 5400 / 8080 / 8081。`application.yml` 的默认 `DB_URL` 指向 **127.0.0.1:13306/peakrush**（配套 `scripts/runtime-start.ps1` 启动的隔离 MySQL），默认 Redis 16379、Kafka 19092/19093。**本机三步启动走的是 `依赖环境\env.ps1`，它把 `DB_URL` 覆写为系统 MySQL 3306/peakrush**；只有不经过该脚本、直接使用仓库版 `scripts\runtime-start.ps1` 时应用才连 13306。系统 MySQL 服务（3306）不归本项目托管，停止项目栈不会影响它。数据和日志位于 `.runtime/`；不复用既有 Kafka 数据目录。端口口径以本节为准；[启动指导](docs/STARTUP_GUIDE.md) 里 MySQL 3306 / `依赖环境/start-runtime.ps1` 的描述是早期本机口径，属历史说明。
 
 ## 验证与实测
 
@@ -180,7 +186,7 @@ python scripts/gate_report.py @reports
 
 ## 运维与故障演练
 
-四类演练（Kafka 停机、Redis 中断、消费者崩溃、DB 提交断点）的注入方式、预期表现、观察命令、恢复判据和实测记录见 [故障演练 RUNBOOK](RUNBOOK.md)。演练使用隔离端口 18082/16380/19095 与 `peakrush_drill` 库，不触碰主栈。
+四类演练（Kafka 停机、Redis 中断、消费者崩溃、DB 提交断点）的注入方式、预期表现、观察命令、恢复判据和实测记录见 [故障演练 RUNBOOK](RUNBOOK.md)。注意 RUNBOOK §1 的 `18082/16380/19095 + peakrush_drill` 是**历史隔离口径**：当前脚本只支持 13306/16379/19092，16380/19095 需要复制脚本改端口且**未实测**；双实例接管演练（§5.1）因此改用共享依赖栈上的 18081/18082 两个后端进程。演练前请以 RUNBOOK 各节标注的实际命令为准。
 
 历史遗留的“已 ACK 但未 XDEL”条目用定向清理脚本处理。脚本只删除 `ID <= last-delivered-id` 且不在 PEL 的条目，未投递和仍在 PEL 的条目一律保留：
 
