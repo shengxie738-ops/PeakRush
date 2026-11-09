@@ -46,6 +46,8 @@ interface Faults {
   pauseOutbox: boolean;
   afterDbCommitPauseMs: number;
   afterRedisApplyPauseMs: number;
+  afterKafkaAckPauseMs: number;
+  maxAckPauseMs: number;
 }
 const tab = ref<Tab>("activities"),
   loading = ref(false),
@@ -104,6 +106,8 @@ const faults = reactive<Faults>({
     pauseOutbox: false,
     afterDbCommitPauseMs: 0,
     afterRedisApplyPauseMs: 0,
+    afterKafkaAckPauseMs: 0,
+    maxAckPauseMs: 8000,
   }),
   faultsAvailable = ref(false);
 let timer: number;
@@ -513,6 +517,9 @@ async function letterAction(d: DeadLetter, action: "retry" | "abort") {
 async function saveFaults(reset = false) {
   busy.value = true;
   try {
+    // maxAckPauseMs 由服务端计算并返回，只用于限制输入，不能回传（服务端会拒绝未知字段）。
+    const settings: Record<string, unknown> = { ...faults };
+    delete settings.maxAckPauseMs;
     const value = reset
       ? {
           consumerPaused: false,
@@ -522,8 +529,9 @@ async function saveFaults(reset = false) {
           pauseOutbox: false,
           afterDbCommitPauseMs: 0,
           afterRedisApplyPauseMs: 0,
+          afterKafkaAckPauseMs: 0,
         }
-      : { ...faults };
+      : settings;
     Object.assign(faults, await post<Faults>("/api/admin/faults", value));
     ElMessage.success(reset ? "已恢复正常处理" : "实验故障配置已应用");
   } catch (e) {
@@ -1003,6 +1011,15 @@ onUnmounted(() => window.clearInterval(timer));
                     :max="30000"
                     :step="1000"
                     aria-label="Redis回补后暂停毫秒"
+                /></label
+                ><label
+                  ><span>Kafka ACK 后暂停（毫秒）</span
+                  ><el-input-number
+                    v-model="faults.afterKafkaAckPauseMs"
+                    :min="0"
+                    :max="faults.maxAckPauseMs"
+                    :step="1000"
+                    aria-label="Kafka ACK 后暂停毫秒"
                 /></label>
               </div>
             </details>
