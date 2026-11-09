@@ -29,7 +29,7 @@ async def run(args):
   async def deadletters():
    return (await api.call("GET","/api/admin/dead-letters",token=admin))[1]["items"]
   try:
-   await faults(consumerPaused=False,failConsumer=False,pauseBridge=False,pauseOutbox=False,consumerDelayMs=0,afterDbCommitPauseMs=0,afterRedisApplyPauseMs=0)
+   await faults(consumerPaused=False,failConsumer=False,pauseBridge=False,pauseOutbox=False,consumerDelayMs=0,afterDbCommitPauseMs=0,afterRedisApplyPauseMs=0,afterKafkaAckPauseMs=0)
    _,products=await api.call("GET","/api/admin/products",token=admin);api.product=products["items"][0]["id"]
    aid,iid,t=await fixture()
    await faults(pauseBridge=True)
@@ -89,7 +89,7 @@ async def run(args):
   except Exception as exc:
    report["passed"]=False;report["error"]=str(exc);raise
   finally:
-   try:await faults(consumerPaused=False,failConsumer=False,pauseBridge=False,pauseOutbox=False,consumerDelayMs=0,afterDbCommitPauseMs=0,afterRedisApplyPauseMs=0)
+   try:await faults(consumerPaused=False,failConsumer=False,pauseBridge=False,pauseOutbox=False,consumerDelayMs=0,afterDbCommitPauseMs=0,afterRedisApplyPauseMs=0,afterKafkaAckPauseMs=0)
    finally:
     for aid in fixture_ids:
      await api.call("POST",f"/api/admin/activities/{aid}/offline",{},admin)

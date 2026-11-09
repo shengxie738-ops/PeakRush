@@ -20,7 +20,7 @@ from verification_api import Api, ROOT
 
 RESET = dict(consumerPaused=False, failConsumer=False, pauseBridge=False,
              pauseOutbox=False, consumerDelayMs=0, afterDbCommitPauseMs=0,
-             afterRedisApplyPauseMs=0)
+             afterRedisApplyPauseMs=0, afterKafkaAckPauseMs=0)
 LOG = ROOT / ".runtime" / "backend.out.log"
 PROCESS_SCRIPT = ROOT / "scripts" / "verification_backend_process.ps1"
 RID_RE = re.compile(r"^[0-9]+\.[0-9]+\.[a-f0-9]{32}$")
