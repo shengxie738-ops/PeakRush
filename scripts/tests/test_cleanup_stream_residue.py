@@ -5,6 +5,7 @@ import pathlib
 import sys
 import unittest
 import uuid
+from unittest import mock
 
 SCRIPTS = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
@@ -57,6 +58,29 @@ class CleanupResidueTest(unittest.TestCase):
         result = cleanup.clean_stream(self.client, self.stream, "absent", 2, apply=True)
         self.assertIn("skipped", result)
         self.assertEqual(5, self.client.xlen(self.stream))
+
+
+@unittest.skipUnless(redis, "redis package required")
+class BatchArgumentTest(unittest.TestCase):
+    """--batch 校验不依赖 Redis：闭区间续页要求每页至少 2 条。"""
+
+    def test_batch_one_is_rejected_before_connecting(self):
+        with self.assertRaises(SystemExit):
+            cleanup.main(["--batch", "1"])
+
+    def test_batch_two_passes_validation(self):
+        class FakeClient:
+            def __init__(self, **kwargs):
+                self.kwargs = kwargs
+
+            def ping(self):
+                return True
+
+            def scan_iter(self, match=None, count=None):
+                return []
+
+        with mock.patch.object(cleanup.redis, "Redis", FakeClient):
+            self.assertEqual(0, cleanup.main(["--batch", "2"]))
 
 
 if __name__ == "__main__":

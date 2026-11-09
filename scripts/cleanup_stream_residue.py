@@ -17,6 +17,10 @@ ReadOffset.lastConsumed 读到或 claim 的条目，这些条目只能人工清�
   4. 记录输出中的 removed / remaining，再恢复 backend。
   5. 脚本可重复执行；已删除的条目不会再次出现，remaining 为 0 即表示该流已清理干净。
 
+--batch 必须 >= 2（默认 200）：Redis 5.0 不支持 XRANGE 的独占区间，分页用闭区间并在客户端
+跳过上一页最后一条，batch 为 1 时每页只剩被跳过的同一条，游标永远无法前进。
+如需小批量验证可显式指定：--batch 2。
+
 依赖：pip install -r scripts/requirements.txt（redis>=5）
 """
 import argparse
@@ -72,7 +76,8 @@ def clean_stream(client, stream, group, batch, apply):
     scanned = candidates = removed = pending_kept = 0
     start = None
     while last_id and last_id != "0-0":
-        # Redis 5.0 不支持 XRANGE 的独占区间 "(id"，这里用闭区间并在客户端跳过上一页最后一条。
+        # 服务端 Redis 6.2 之前不支持 XRANGE 的独占区间 "(id"；为兼容旧服务端，
+        # 这里使用闭区间并在客户端跳过上一页最后一条（--batch 必须 >= 2，否则无法前进）。
         raw = client.xrange(stream, min=start or "-", max=last_id, count=batch)
         full = len(raw) == batch
         if start:
@@ -110,8 +115,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.apply and args.dry_run:
         parser.error("--apply 与 --dry-run 不能同时使用")
-    if args.batch < 1:
-        parser.error("--batch 必须为正数")
+    if args.batch < 2:
+        parser.error("--batch 至少为 2：闭区间续页依赖客户端跳过上一页最后一条，batch 为 1 时每页只剩被跳过的那一条，无法前进")
     client = redis.Redis(host=args.host, port=args.port, db=args.db, password=args.password, decode_responses=False)
     client.ping()
     results = [clean_stream(client, _stream_targets(key), args.group, args.batch, args.apply) for key in client.scan_iter(match=args.pattern, count=200)]
