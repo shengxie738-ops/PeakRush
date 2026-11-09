@@ -42,13 +42,21 @@ def inventory_targets(inventory,version):
                                             and row["redisAvailableStock"]==row["availableStock"] for row in inventory)
     return targets
 def order_targets(orders):
-    """Every accepted request must reach exactly one terminal state, with no pending/unknown left."""
-    terminal=orders.get("terminalStates") or {}
-    counters_valid=all(type(v) is int and v>=0 for v in terminal.values())
+    """Every accepted request must reach exactly one whitelisted terminal state.
+
+    Terminal state whitelist: SUCCESS, FAILED, SOLD_OUT, CANCELLED, CLOSED. Any
+    other key (including a null key or an unknown status) is rejected instead of
+    being silently counted as settled. terminalStates must be a dict of non-negative
+    ints whose whitelisted counts sum to uniqueAcceptedRequests (a non-negative int).
+    """
+    terminal=orders.get("terminalStates")
     accepted=orders.get("uniqueAcceptedRequests")
-    unsettled=sum(v for k,v in terminal.items() if k in ("UNSETTLED","PENDING","PROCESSING"))
-    settled=sum(v for k,v in terminal.items() if k not in ("UNSETTLED","PENDING","PROCESSING"))
-    return {"ordersTerminal":bool(counters_valid and type(accepted) is int and accepted>=0 and unsettled==0 and settled==accepted)}
+    whitelist=("SUCCESS","FAILED","SOLD_OUT","CANCELLED","CLOSED")
+    if not isinstance(terminal,dict):return {"ordersTerminal":False}
+    if any(k not in whitelist for k in terminal):return {"ordersTerminal":False}
+    if not all(type(v) is int and v>=0 for v in terminal.values()):return {"ordersTerminal":False}
+    if type(accepted) is not int or accepted<0:return {"ordersTerminal":False}
+    return {"ordersTerminal":bool(sum(terminal.values())==accepted)}
 async def run(args):
   async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=60),connector=aiohttp.TCPConnector(limit=args.users)) as session:
     api=Api(session,args.base);admin=await api.login("admin","admin12345")

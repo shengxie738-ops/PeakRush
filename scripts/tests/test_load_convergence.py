@@ -137,6 +137,20 @@ class OrderTargetTest(unittest.TestCase):
     def test_unknown_accepted_count_is_flagged(self):
         self.assertFalse(load.order_targets(self.orders(uniqueAcceptedRequests=None))["ordersTerminal"])
 
+    def test_null_terminal_state_key_is_flagged(self):
+        self.assertFalse(load.order_targets(self.orders(terminalStates={"SUCCESS": 2, None: 1}))["ordersTerminal"])
+
+    def test_unknown_terminal_state_is_flagged(self):
+        self.assertFalse(load.order_targets(self.orders(terminalStates={"SUCCESS": 2, "WHATEVER": 1}))["ordersTerminal"])
+
+    def test_whitelisted_terminal_states_settle(self):
+        self.assertEqual({"ordersTerminal": True}, load.order_targets(self.orders(terminalStates={"SUCCESS": 2, "FAILED": 1})))
+
+    def test_non_dict_terminal_states_are_flagged(self):
+        for value in (None, [], "SUCCESS", 3):
+            with self.subTest(terminalStates=value):
+                self.assertFalse(load.order_targets(self.orders(terminalStates=value))["ordersTerminal"])
+
 
 class ParserTest(unittest.TestCase):
     def test_targets_are_required_by_default(self):

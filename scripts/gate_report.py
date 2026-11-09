@@ -1,5 +1,6 @@
 """Fail a pipeline when load-test reports miss their acceptance targets.
-Example: python scripts/gate_report.py artifacts/load-V4-*.json
+Example: python scripts/gate_report.py artifacts/load-V4-1793608514.json artifacts/load-V4-1793608594.json
+Note: PowerShell does not expand globs; list files explicitly or pipe Get-ChildItem output.
 Exit code 0 only when every report carries targets.passed=true.
 """
 import argparse,json,pathlib,sys
