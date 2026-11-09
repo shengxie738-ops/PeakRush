@@ -116,13 +116,43 @@ jobs:
           docker logs "${{ job.services.kafka.id }}" 2>&1 | tail -50
           exit 1
       - run: mvn --batch-mode --no-transfer-progress -f backend/pom.xml verify
+      - name: Preserve main test reports
+        # 慢测会覆写同名 surefire XML：先把主测试报告另存，避免证据丢失。
+        # 复制前必须确认主报告确实存在，缺失时直接失败，不能用 `|| true` 静默吞掉。
+        if: always()
+        run: |
+          shopt -s nullglob
+          files=(backend/target/surefire-reports/*.xml)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No main surefire XML reports found under backend/target/surefire-reports; refusing to proceed without evidence"
+            exit 1
+          fi
+          mkdir -p backend/target/surefire-reports-main
+          cp "${files[@]}" backend/target/surefire-reports-main/
+          echo "Preserved ${#files[@]} main report file(s)"
       - name: Slow bridge capacity regression
         # 真实等待 12s 的保容量用例单独执行，不拖慢主测试集。
+        id: slow
         env:
           PEAKRUSH_SLOW_TESTS: 'true'
         run: >-
           mvn --batch-mode --no-transfer-progress -f backend/pom.xml test
           -Dtest=StreamBridgeFaultIsolationTest -Dgroups=slow -Dpeakrush.excluded.groups=none
+      - name: Preserve slow test reports
+        # 慢测被跳过（例如主套件已失败）时不能把主测试报告误标成 slow；
+        # 复制时只取目标类 XML，避免常规用例混进 slow 证据目录。
+        # 慢测步骤跑过却没有任何目标 XML，说明证据丢失，必须显式失败。
+        if: always() && steps.slow.outcome != '' && steps.slow.outcome != 'skipped'
+        run: |
+          shopt -s nullglob
+          files=(backend/target/surefire-reports/*StreamBridgeFaultIsolationTest*.xml)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::Slow test step ran but produced no StreamBridgeFaultIsolationTest XML under backend/target/surefire-reports"
+            exit 1
+          fi
+          mkdir -p backend/target/surefire-reports-slow
+          cp "${files[@]}" backend/target/surefire-reports-slow/
+          echo "Preserved ${#files[@]} slow report file(s)"
       - name: Collect service logs
         if: always()
         run: |
@@ -139,6 +169,8 @@ jobs:
           if-no-files-found: warn
           path: |
             backend/target/surefire-reports/**
+            backend/target/surefire-reports-main/**
+            backend/target/surefire-reports-slow/**
             backend/target/**/*.json
             service-logs/**
             artifacts/**/*.json
@@ -187,6 +219,20 @@ jobs:
   catalog-scripts:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    services:
+      redis:
+        image: redis:7.4.2
+        ports:
+          - 16379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+    env:
+      PEAKRUSH_REDIS_TESTS: 'true'
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: '16379'
     steps:
       - uses: actions/checkout@v7
         with:
