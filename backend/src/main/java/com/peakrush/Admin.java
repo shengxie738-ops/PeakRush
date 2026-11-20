@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 @Service
+@org.springframework.context.annotation.DependsOn("experimentSchema")
 public class Admin {
  final Store db;final Reservations redis;final Orders orders;final Purchases purchases;final Json json;final MeterRegistry meters;final KafkaLag lag;
  public Admin(Store db,Reservations redis,Orders orders,Purchases purchases,Json json,MeterRegistry meters,KafkaLag lag){this.db=db;this.redis=redis;this.orders=orders;this.purchases=purchases;this.json=json;this.meters=meters;this.lag=lag;}
@@ -52,14 +53,34 @@ public class Admin {
   String message=Objects.toString(e.getMessage(),""),cause=Objects.toString(e.getCause(),"");
   return message.contains("NOGROUP")||cause.contains("NOGROUP");
  }
- public Map<String,Object> experiments(){return db.list(db.jdbc.queryForList("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt FROM experiment ORDER BY id DESC"));}
+ public Map<String,Object> experiments(){return db.list(db.jdbc.queryForList("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,release_version AS releaseVersion,load_mode AS loadMode,target_rps AS targetRps,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt FROM experiment ORDER BY id DESC"));}
  public Map<String,Object> experiment(long id){
-  var r=db.one("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt,results_json FROM experiment WHERE id=?",id);
+  var r=db.one("SELECT id,name,CONCAT('V',architecture_version) AS architectureVersion,release_version AS releaseVersion,load_mode AS loadMode,target_rps AS targetRps,concurrency_count AS concurrency,duration_seconds AS durationSeconds,stock,notes,created_at AS createdAt,results_json FROM experiment WHERE id=?",id);
   Object results=r.remove("results_json");r.put("results",results==null?null:json.read(results.toString()));return r;
+ }
+ static String releaseVersion(Object value){
+  String v=value==null||String.valueOf(value).isBlank()?"V5.2":String.valueOf(value).trim();
+  if(v.startsWith("v"))v="V"+v.substring(1);
+  if(v.length()>20||!v.matches("V[0-9]+(\\.[0-9]+)?"))throw ApiException.bad("发布版本须形如 V5.2");
+  return v;
+ }
+ static String loadMode(Object value){
+  if(value==null||String.valueOf(value).isBlank())return "STEADY";
+  String mode=String.valueOf(value).trim().toUpperCase(Locale.ROOT);
+  if(!"STEADY".equals(mode)&&!"BURST".equals(mode))throw ApiException.bad("压测模式须为 STEADY 或 BURST");
+  return mode;
+ }
+ static Integer targetRps(Object value){
+  if(value==null||String.valueOf(value).isBlank())return null;
+  return Store.positive(value,100000);
  }
  public Map<String,Object> createExperiment(Map<String,Object> b){
   String name=Json.string(b,"name");if(name.isBlank()||name.length()>160)throw ApiException.bad("实验名称不合法");
-  long id=db.insert("INSERT INTO experiment(name,architecture_version,concurrency_count,duration_seconds,stock,notes) VALUES(?,?,?,?,?,?)",name,Store.version(b.get("architectureVersion")),Store.positive(b.get("concurrency"),100000),Store.positive(b.get("durationSeconds"),86400),Store.positive(b.get("stock"),10000000),Json.string(b,"notes"));
+  String mode=loadMode(b.get("loadMode"));
+  int concurrency=Store.positive(b.get("concurrency"),100000);
+  Integer rps=targetRps(b.get("targetRps"));
+  if(rps==null&&"STEADY".equals(mode))rps=concurrency;
+  long id=db.insert("INSERT INTO experiment(name,architecture_version,release_version,load_mode,target_rps,concurrency_count,duration_seconds,stock,notes) VALUES(?,?,?,?,?,?,?,?,?)",name,Store.version(b.get("architectureVersion")),releaseVersion(b.get("releaseVersion")),mode,rps,concurrency,Store.positive(b.get("durationSeconds"),86400),Store.positive(b.get("stock"),1000000),Json.string(b,"notes"));
   return experiment(id);
  }
  public Map<String,Object> results(long id,Map<String,Object> data){

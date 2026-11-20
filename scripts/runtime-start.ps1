@@ -165,6 +165,7 @@ log.segment.bytes=134217728
         Write-Host 'Formatting isolated Kafka KRaft storage...'
         Invoke-KafkaTool 'kafka.tools.StorageTool' @('format','--standalone','--cluster-id',$clusterId,'--config',$kafkaConfig)
     }
+    if (Test-Path -LiteralPath $kafkaData) { Get-ChildItem -LiteralPath $kafkaData -Recurse -File -Filter '*.deleted' -ErrorAction SilentlyContinue | Where-Object { $_.IsReadOnly } | ForEach-Object { $_.IsReadOnly = $false } }
     $kafkaArguments = @('-Xms512m','-Xmx512m','-Dfile.encoding=UTF-8',"-Dlog4j2.configurationFile=$kafkaDir/log4j2.xml",'-cp',"$script:KafkaHome/libs/*",'kafka.Kafka',$kafkaConfig)
     Start-OwnedProcess 'kafka' $java $kafkaArguments $kafkaConfig 19092 | Out-Null
 }

@@ -78,6 +78,9 @@ export interface Experiment {
   id: number;
   name: string;
   architectureVersion: string;
+  releaseVersion?: string;
+  loadMode?: "STEADY" | "BURST";
+  targetRps?: number | null;
   concurrency: number;
   durationSeconds: number;
   stock: number;

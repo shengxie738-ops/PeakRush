@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.*;
 @RestController @RequestMapping("/api")
 public class Api {
- final Auth auth;final Store db;final Purchases purchases;final Orders orders;final Admin admin;final Faults faults;
- public Api(Auth auth,Store db,Purchases purchases,Orders orders,Admin admin,Faults faults){this.auth=auth;this.db=db;this.purchases=purchases;this.orders=orders;this.admin=admin;this.faults=faults;}
+ final Auth auth;final Store db;final Purchases purchases;final Orders orders;final Admin admin;final Faults faults;final LoadReruns reruns;
+ public Api(Auth auth,Store db,Purchases purchases,Orders orders,Admin admin,Faults faults,LoadReruns reruns){this.auth=auth;this.db=db;this.purchases=purchases;this.orders=orders;this.admin=admin;this.faults=faults;this.reruns=reruns;}
  @PostMapping("/auth/login") Object login(@RequestBody Map<String,Object>b){return auth.login(b,false);}
  @PostMapping("/auth/register") Object register(@RequestBody Map<String,Object>b){return auth.login(b,true);}
  @GetMapping("/auth/me") Object me(HttpServletRequest r){return Auth.current(r);}
@@ -33,6 +33,9 @@ public class Api {
  @PostMapping("/admin/experiments") Object experiment(@RequestBody Map<String,Object>b){return admin.createExperiment(b);}
  @GetMapping("/admin/experiments/{id}/export") Object export(@PathVariable long id){return admin.experiment(id);}
  @PostMapping("/admin/experiments/{id}/results") Object results(@PathVariable long id,@RequestBody Map<String,Object>b){return admin.results(id,b);}
+ @PostMapping("/admin/experiments/{id}/rerun") Object rerun(@PathVariable long id,@RequestBody(required=false) Map<String,Object>b){return reruns.start(id,b);}
+ @PostMapping("/admin/experiments/rerun/cancel") Object rerunCancel(){return reruns.cancel();}
+ @GetMapping("/admin/experiments/rerun") Object rerunStatus(){return reruns.status();}
  @GetMapping("/admin/faults") Object faults(){return faults.get();}
  @PostMapping("/admin/faults") Object faults(@RequestBody Map<String,Object>b){return faults.set(b);}
 }

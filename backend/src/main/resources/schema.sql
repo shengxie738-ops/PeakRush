@@ -58,6 +58,9 @@ CREATE TABLE IF NOT EXISTS dead_letter_record (
 );
 CREATE TABLE IF NOT EXISTS experiment (
  id BIGINT PRIMARY KEY AUTO_INCREMENT,name VARCHAR(160) NOT NULL,architecture_version INT NOT NULL,
+ release_version VARCHAR(20) NOT NULL DEFAULT 'V5.2',
+ load_mode VARCHAR(16) NOT NULL DEFAULT 'STEADY',
+ target_rps INT NULL,
  concurrency_count INT NOT NULL,duration_seconds INT NOT NULL,stock INT NOT NULL,notes TEXT NOT NULL,
  results_json LONGTEXT,created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
 );

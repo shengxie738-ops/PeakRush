@@ -49,6 +49,23 @@ interface Faults {
   afterKafkaAckPauseMs: number;
   maxAckPauseMs: number;
 }
+interface RerunState {
+  experimentId?: number;
+  releaseVersion?: string;
+  architectureVersion?: string;
+  running: boolean;
+  cancelled?: boolean;
+  startedAt?: string;
+  finishedAt?: string;
+  exitCode?: number;
+  message?: string;
+  users?: number;
+  rps?: number;
+  seconds?: number;
+  stock?: number;
+  burst?: boolean;
+  output?: string[];
+}
 const tab = ref<Tab>("activities"),
   loading = ref(false),
   busy = ref(false),
@@ -85,13 +102,29 @@ const activityDialog = ref(false),
     architectureVersion: "V3",
     items: [],
   });
+const RELEASE_VERSION_OPTIONS = [
+  { value: "V5.2", label: "V5.2（当前最新）" },
+  { value: "V5.1", label: "V5.1" },
+  { value: "V5", label: "V5" },
+  { value: "V4", label: "V4" },
+];
+const EXPERIMENT_ARCH_OPTIONS = [
+  { value: "V4", label: "V4 · Stream 桥接（V5.2 主链路）" },
+  { value: "V3", label: "V3 · Kafka 异步" },
+  { value: "V2", label: "V2 · Redis Lua 预占" },
+  { value: "V1", label: "V1 · 条件更新" },
+  { value: "V0", label: "V0 · MySQL 行锁" },
+];
 const experimentDialog = ref(false),
   experimentForm = reactive({
     name: "",
-    architectureVersion: "V3",
-    concurrency: 200,
-    durationSeconds: 60,
-    stock: 100,
+    releaseVersion: "V5.2",
+    architectureVersion: "V4",
+    loadMode: "STEADY" as "STEADY" | "BURST",
+    concurrency: 50,
+    targetRps: 50,
+    durationSeconds: 5,
+    stock: 20,
     notes: "",
   });
 const resultsDialog = ref(false),
@@ -110,7 +143,11 @@ const faults = reactive<Faults>({
     maxAckPauseMs: 8000,
   }),
   faultsAvailable = ref(false);
+const rerun = ref<RerunState | null>(null);
 let timer: number;
+let rerunTimer: number | undefined;
+let lastRerunNotice = "";
+let rerunObservedRunning = false;
 const admin = computed(() => session.user?.role === "ADMIN");
 const metricCards = computed(() =>
   metrics.value
@@ -379,22 +416,93 @@ async function activityAction(
     busy.value = false;
   }
 }
-async function saveExperiment() {
+function isPositiveInt(value: unknown, max: number) {
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= 1 &&
+    value <= max
+  );
+}
+async function saveExperiment(startImmediately = false) {
   formError.value = "";
+  const rawRelease = (experimentForm.releaseVersion || "").trim();
+  const normalizedRelease = rawRelease.startsWith("v")
+    ? "V" + rawRelease.slice(1)
+    : rawRelease;
+  const releaseVersion = normalizedRelease || "V5.2";
   if (!experimentForm.name.trim()) {
     formError.value = "请输入实验名称。";
     return;
   }
+  if (!/^V[0-9]+(\.[0-9]+)?$/.test(releaseVersion) || releaseVersion.length > 20) {
+    formError.value = "发布版本须形如 V5.2（仅支持 V 加数字版本号）。";
+    return;
+  }
+  if (!isPositiveInt(experimentForm.concurrency, 100000)) {
+    formError.value = "并发用户数须为 1–100000 的整数。";
+    return;
+  }
+  if (
+    experimentForm.loadMode === "STEADY" &&
+    !isPositiveInt(experimentForm.targetRps, 100000)
+  ) {
+    formError.value = "目标速率（RPS）须为 1–100000 的整数。";
+    return;
+  }
+  if (!isPositiveInt(experimentForm.durationSeconds, 86400)) {
+    formError.value = "持续时间须为 1–86400 的整数。";
+    return;
+  }
+  if (!isPositiveInt(experimentForm.stock, 1000000)) {
+    formError.value = "配置库存须为 1–1000000 的整数。";
+    return;
+  }
   busy.value = true;
+  let created: Experiment;
   try {
-    await post("/api/admin/experiments", experimentForm);
-    experimentDialog.value = false;
-    ElMessage.success("实验配置已记录");
-    await load();
+    created = await post<Experiment>("/api/admin/experiments", {
+      name: experimentForm.name.trim(),
+      releaseVersion,
+      architectureVersion: experimentForm.architectureVersion,
+      loadMode: experimentForm.loadMode,
+      targetRps:
+        experimentForm.loadMode === "BURST" ? null : experimentForm.targetRps,
+      concurrency: experimentForm.concurrency,
+      durationSeconds: experimentForm.durationSeconds,
+      stock: experimentForm.stock,
+      notes: experimentForm.notes,
+    });
   } catch (e) {
     formError.value = errorMessage(e);
+    busy.value = false;
+    return;
+  }
+  experimentDialog.value = false;
+  try {
+    if (startImmediately) {
+      rerunObservedRunning = true;
+      rerun.value = await post<RerunState>(
+        "/api/admin/experiments/" + created.id + "/rerun",
+        {
+          loadMode: experimentForm.loadMode,
+          rps:
+            experimentForm.loadMode === "BURST"
+              ? experimentForm.concurrency
+              : experimentForm.targetRps,
+        },
+      );
+      startRerunPolling();
+      ElMessage.success("实验已创建并启动真实压测");
+    } else {
+      ElMessage.success("实验配置已记录");
+    }
+  } catch (e) {
+    rerunObservedRunning = false;
+    ElMessage.error("实验已保存，但启动压测失败：" + errorMessage(e));
   } finally {
     busy.value = false;
+    await load();
   }
 }
 async function exportExperiment(e: Experiment) {
@@ -431,12 +539,27 @@ async function openResults(e: Experiment) {
     formError.value = errorMessage(err);
   }
 }
-function workloadDuration(e: Experiment) {
+function isBurstExperiment(e: Experiment) {
+  if (e.loadMode === "BURST") return true;
   const model = (e.results as { workload?: { model?: unknown } } | undefined)
     ?.workload?.model;
-  return typeof model === "string" && model.toLowerCase().includes("burst")
+  return typeof model === "string" && model.toLowerCase().includes("burst");
+}
+function experimentRps(e: Experiment) {
+  if (typeof e.targetRps === "number" && e.targetRps > 0) return e.targetRps;
+  const requested = (
+    e.results as { workload?: { requestedRps?: unknown } } | undefined
+  )?.workload?.requestedRps;
+  if (typeof requested === "number" && requested > 0) return requested;
+  return e.concurrency;
+}
+function workloadDuration(e: Experiment) {
+  return isBurstExperiment(e) ? "瞬时突发" : e.durationSeconds + " 秒";
+}
+function experimentModeLabel(e: Experiment) {
+  return isBurstExperiment(e)
     ? "瞬时突发"
-    : e.durationSeconds + " 秒";
+    : `持续 ${experimentRps(e)} RPS`;
 }
 function measured(
   e: Experiment,
@@ -464,6 +587,18 @@ async function importFile(event: Event) {
     formError.value = "";
   }
 }
+async function copyResultsJson() {
+  if (!resultsJson.value.trim()) {
+    ElMessage.info("当前暂无可复制的 JSON 内容");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(resultsJson.value);
+    ElMessage.success("已复制 JSON 结果到剪贴板");
+  } catch {
+    ElMessage.warning("未能自动写入剪贴板，请直接在文本框内全选复制");
+  }
+}
 async function saveResults() {
   formError.value = "";
   let data: unknown;
@@ -485,6 +620,91 @@ async function saveResults() {
     formError.value = errorMessage(e);
   } finally {
     busy.value = false;
+  }
+}
+function stopRerunPolling() {
+  if (rerunTimer !== undefined) {
+    window.clearInterval(rerunTimer);
+    rerunTimer = undefined;
+  }
+}
+function startRerunPolling() {
+  if (rerunTimer === undefined)
+    rerunTimer = window.setInterval(refreshRerun, 2000);
+}
+async function refreshRerun() {
+  try {
+    const state = await api<RerunState>("/api/admin/experiments/rerun");
+    rerun.value = state;
+    if (state.running) {
+      rerunObservedRunning = true;
+      startRerunPolling();
+      return;
+    }
+    stopRerunPolling();
+    if (!rerunObservedRunning || state.experimentId === undefined || !state.finishedAt) return;
+    if (state.finishedAt === lastRerunNotice) return;
+    lastRerunNotice = state.finishedAt;
+    rerunObservedRunning = false;
+    if (tab.value === "experiments") await load(true);
+    if (state.exitCode === 0)
+      ElMessage.success(state.message || "压测完成，结果已回填");
+    else ElMessage.warning(state.message || "压测结束，请查看输出");
+  } catch {
+    stopRerunPolling();
+  }
+}
+async function rerunExperiment(e: Experiment) {
+  const burst = isBurstExperiment(e);
+  const rps = experimentRps(e);
+  const modeSummary = burst
+    ? `瞬时突发 / ${e.concurrency} 用户`
+    : `持续稳态 / ${e.concurrency} 用户 / ${rps} RPS / ${e.durationSeconds} 秒`;
+  try {
+    await ElMessageBox.confirm(
+      `将按该实验参数启动真实压测：${e.releaseVersion || "V5.2"} · ${e.architectureVersion}（${modeSummary} / ${e.stock} 件库存）。压测会创建独立活动和测试用户，完成后自动回填结果。`,
+      e.results ? "复测实验" : "开始压测",
+      {
+        confirmButtonText: "开始压测",
+        cancelButtonText: "取消",
+        type: "warning",
+      },
+    );
+  } catch {
+    return;
+  }
+  try {
+    rerunObservedRunning = true;
+    rerun.value = await post<RerunState>(
+      "/api/admin/experiments/" + e.id + "/rerun",
+      { loadMode: burst ? "BURST" : "STEADY", rps },
+    );
+    startRerunPolling();
+  } catch (err) {
+    rerunObservedRunning = false;
+    ElMessage.error(errorMessage(err));
+  }
+}
+async function cancelRerun() {
+  try {
+    await ElMessageBox.confirm(
+      "确认中止当前正在执行的压测？已创建的临时测试活动将被自动下线。",
+      "停止压测",
+      {
+        confirmButtonText: "确认停止",
+        cancelButtonText: "继续运行",
+        type: "warning",
+      },
+    );
+  } catch {
+    return;
+  }
+  try {
+    rerun.value = await post<RerunState>("/api/admin/experiments/rerun/cancel", {});
+    startRerunPolling();
+    ElMessage.info("已发送停止压测指令，正在清理退出");
+  } catch (err) {
+    ElMessage.error(errorMessage(err));
   }
 }
 async function letterAction(d: DeadLetter, action: "retry" | "abort") {
@@ -540,18 +760,28 @@ async function saveFaults(reset = false) {
     busy.value = false;
   }
 }
-watch(tab, () => load());
+watch(tab, () => {
+  load();
+  if (tab.value === "experiments") refreshRerun();
+});
 watch(
   () => session.user?.id,
-  () => load(),
+  () => {
+    load();
+    if (tab.value === "experiments" && admin.value) refreshRerun();
+  },
 );
 onMounted(() => {
   load();
+  if (tab.value === "experiments") refreshRerun();
   timer = window.setInterval(() => {
     if (tab.value === "metrics" && admin.value) load(true);
   }, 5000);
 });
-onUnmounted(() => window.clearInterval(timer));
+onUnmounted(() => {
+  window.clearInterval(timer);
+  stopRerunPolling();
+});
 </script>
 <template>
   <div class="content-page admin-page">
@@ -829,7 +1059,7 @@ onUnmounted(() => window.clearInterval(timer));
           ><div class="section-heading">
             <div>
               <h2>架构对比实验</h2>
-              <p>记录配置，导入真实测试数据，比较 V0 — V4。</p>
+              <p>选择发布版本（如 V5.2）与下单架构（V0 — V4），直接在网页启动压测或导入真实数据。</p>
             </div>
             <el-button
               type="primary"
@@ -838,11 +1068,11 @@ onUnmounted(() => window.clearInterval(timer));
                 experimentDialog = true;
                 formError = '';
               "
-              >记录实验</el-button
+              >新建 / 发起压测</el-button
             >
           </div>
           <el-alert
-            title="这里记录实验，不会自动发起压测。指标来自 verification_load.py 的真实结果；配置用户为实验参数，峰值在途为实测值。QPS 包括业务拒绝，订单 TPS 单独统计。“—”表示尚无测量数据。"
+            title="点击“开始压测”或“复测”会按配置参数在后台运行真实压测并自动回填结果；也可通过“查看 JSON / 导入结果”查看或手动导入 verification_load.py 的结果。配置用户为实验参数，峰值在途为实测值。QPS 包括业务拒绝，订单 TPS 单独统计。“—”表示尚无测量数据。"
             type="info"
             :closable="false"
             class="section-alert"
@@ -850,52 +1080,113 @@ onUnmounted(() => window.clearInterval(timer));
             ><el-table-column
               label="实验名称"
               prop="name"
-              min-width="170"
-            /><el-table-column
-              label="版本"
+              min-width="135"
+              show-overflow-tooltip
+            /><el-table-column label="发布版本" width="76"
+              ><template #default="{ row }">{{
+                row.releaseVersion || "V5.2"
+              }}</template></el-table-column
+            ><el-table-column
+              label="架构版本"
               prop="architectureVersion"
-              width="90"
-            /><el-table-column
+              width="72"
+            /><el-table-column label="压测模式" min-width="108"
+              ><template #default="{ row }">{{
+                experimentModeLabel(row)
+              }}</template></el-table-column
+            ><el-table-column
               label="配置用户"
               prop="concurrency"
-              width="110"
-            /><el-table-column label="持续 / 库存" min-width="135"
+              width="76"
+            /><el-table-column label="持续 / 库存" min-width="106"
               ><template #default="{ row }"
                 >{{ workloadDuration(row) }} / {{ row.stock }} 件</template
               ></el-table-column
-            ><el-table-column label="峰值在途" min-width="110"
+            ><el-table-column label="峰值在途" width="76"
               ><template #default="{ row }">{{
                 measured(row, "workload", "peakObservedInflight")
               }}</template></el-table-column
-            ><el-table-column label="实测 QPS" min-width="110"
+            ><el-table-column label="实测 QPS" width="84"
               ><template #default="{ row }">{{
                 measured(row, "http", "qps")
               }}</template></el-table-column
-            ><el-table-column label="P95 (ms)" min-width="110"
+            ><el-table-column label="P95 (ms)" width="80"
               ><template #default="{ row }">{{
                 measured(row, "http", "p95Ms")
               }}</template></el-table-column
-            ><el-table-column label="订单 TPS" min-width="110"
+            ><el-table-column label="订单 TPS" width="80"
               ><template #default="{ row }">{{
                 measured(row, "orders", "orderTps")
               }}</template></el-table-column
-            ><el-table-column label="服务 / 网络错误率" min-width="150"
+            ><el-table-column label="错误率" width="68"
               ><template #default="{ row }">{{
                 measured(row, "http", "serverOrNetworkErrorRatio", true)
               }}</template></el-table-column
             ><el-table-column
               label="备注"
               prop="notes"
-              min-width="160"
-            /><el-table-column label="操作" min-width="210"
+              min-width="100"
+              show-overflow-tooltip
+            /><el-table-column label="操作" fixed="right" width="215"
               ><template #default="{ row }"
-                ><el-button text type="primary" @click="openResults(row)"
-                  >导入 / 查看结果</el-button
-                ><el-button text @click="exportExperiment(row)"
-                  >导出 JSON</el-button
-                ></template
+                ><div class="table-actions">
+                  <el-button
+                    size="small"
+                    text
+                    type="warning"
+                    :loading="rerun?.running && rerun.experimentId === row.id"
+                    :disabled="rerun?.running && rerun.experimentId !== row.id"
+                    @click="rerunExperiment(row)"
+                    >{{ row.results ? "复测" : "开始压测" }}</el-button
+                  ><el-button
+                    size="small"
+                    text
+                    type="primary"
+                    @click="openResults(row)"
+                    >{{ row.results ? "查看 JSON" : "导入结果" }}</el-button
+                  ><el-button
+                    size="small"
+                    text
+                    @click="exportExperiment(row)"
+                    >导出</el-button
+                  >
+                </div></template
               ></el-table-column
             ></el-table
+          ><div
+            v-if="rerun && rerun.experimentId !== undefined"
+            class="rerun-status-bar"
+          >
+            <el-alert
+              :title="
+                rerun.running
+                  ? `实验 #${rerun.experimentId}（${rerun.releaseVersion || 'V5.2'} / ${rerun.architectureVersion || ''}）压测进行中：${rerun.burst ? '瞬时突发' : `${rerun.rps} RPS · ${rerun.seconds} 秒`} / ${rerun.users} 用户 / ${rerun.stock} 件库存，完成后自动刷新。`
+                  : rerun.message || '压测结束'
+              "
+              :type="
+                rerun.running
+                  ? 'warning'
+                  : rerun.cancelled
+                    ? 'info'
+                    : rerun.exitCode === 0
+                      ? 'success'
+                      : 'error'
+              "
+              :closable="false"
+              class="section-alert"
+            /><el-button
+              v-if="rerun.running"
+              type="danger"
+              plain
+              size="small"
+              class="rerun-stop-btn"
+              @click="cancelRerun"
+              >停止压测</el-button
+            >
+          </div><pre
+            v-if="rerun && rerun.experimentId !== undefined && rerun.output?.length"
+            class="rerun-log"
+            >{{ rerun.output.join("\n") }}</pre
           ></template
         >
         <template v-if="tab === 'recovery'"
@@ -1223,27 +1514,52 @@ onUnmounted(() => window.clearInterval(timer));
   >
   <el-dialog
     v-model="experimentDialog"
-    title="记录实验配置"
-    width="600px"
+    title="新建 / 发起压测实验"
+    width="640px"
     align-center
-    ><form @submit.prevent="saveExperiment">
+    ><form @submit.prevent="saveExperiment(false)">
       <label class="field-label" for="experimentName">实验名称</label
       ><el-input
         id="experimentName"
         v-model="experimentForm.name"
-        placeholder="例如：V3 · 200 用户正常负载"
+        placeholder="例如：V5.2 · V4 Stream 50 RPS 稳态"
       />
       <div class="form-grid">
         <div>
-          <label class="field-label">版本</label
+          <label class="field-label">发布版本</label
+          ><el-select
+            v-model="experimentForm.releaseVersion"
+            filterable
+            allow-create
+            default-first-option
+            aria-label="实验发布版本"
+            ><el-option
+              v-for="opt in RELEASE_VERSION_OPTIONS"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+          /></el-select>
+        </div>
+        <div>
+          <label class="field-label">架构版本（下单链路）</label
           ><el-select
             v-model="experimentForm.architectureVersion"
             aria-label="实验架构版本"
             ><el-option
-              v-for="v in ['V0', 'V1', 'V2', 'V3', 'V4']"
-              :key="v"
-              :label="v === 'V4' ? 'V4 · Stream 桥接' : v"
-              :value="v"
+              v-for="opt in EXPERIMENT_ARCH_OPTIONS"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+          /></el-select>
+        </div>
+        <div>
+          <label class="field-label">压测模式</label
+          ><el-select
+            v-model="experimentForm.loadMode"
+            aria-label="压测模式"
+            ><el-option label="持续稳态（Open-loop RPS）" value="STEADY" /><el-option
+              label="瞬时突发（Barrier Burst）"
+              value="BURST"
           /></el-select>
         </div>
         <div>
@@ -1255,7 +1571,16 @@ onUnmounted(() => window.clearInterval(timer));
             aria-label="并发用户数"
           />
         </div>
-        <div>
+        <div v-if="experimentForm.loadMode === 'STEADY'">
+          <label class="field-label">目标速率（RPS）</label
+          ><el-input-number
+            v-model="experimentForm.targetRps"
+            :min="1"
+            :max="100000"
+            aria-label="目标RPS"
+          />
+        </div>
+        <div v-if="experimentForm.loadMode === 'STEADY'">
           <label class="field-label">持续时间（秒）</label
           ><el-input-number
             v-model="experimentForm.durationSeconds"
@@ -1269,11 +1594,14 @@ onUnmounted(() => window.clearInterval(timer));
           ><el-input-number
             v-model="experimentForm.stock"
             :min="1"
-            :max="10000000"
+            :max="1000000"
             aria-label="实验库存"
           />
         </div>
       </div>
+      <p class="fine-print field-hint">
+        V5.2 为系统当前交付版本，其核心抢购链路对应架构 V4（Stream 桥接）；V0–V3 用于历代架构性能对照。
+      </p>
       <label class="field-label" for="experimentNotes">环境 / 场景备注</label
       ><el-input
         id="experimentNotes"
@@ -1290,8 +1618,14 @@ onUnmounted(() => window.clearInterval(timer));
       />
       <div class="dialog-actions form-footer">
         <el-button @click="experimentDialog = false">取消</el-button
-        ><el-button type="primary" :loading="busy" native-type="submit"
-          >保存配置</el-button
+        ><el-button :loading="busy" native-type="submit"
+          >仅保存配置</el-button
+        ><el-button
+          type="primary"
+          :loading="busy"
+          :disabled="Boolean(rerun?.running)"
+          @click="saveExperiment(true)"
+          >保存并开始压测</el-button
         >
       </div>
     </form></el-dialog
@@ -1324,6 +1658,8 @@ onUnmounted(() => window.clearInterval(timer));
       class="form-error"
     /><template #footer
       ><el-button @click="resultsDialog = false">关闭</el-button
+      ><el-button :disabled="!resultsJson.trim()" @click="copyResultsJson"
+        >复制 JSON</el-button
       ><el-button type="primary" :loading="busy" @click="saveResults"
         >保存真实结果</el-button
       ></template
